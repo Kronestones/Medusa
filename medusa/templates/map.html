@@ -178,7 +178,6 @@
       width: 310px;
       min-width: 310px;
       background: var(--surface);
-      display: none;
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -922,7 +921,7 @@ function fmtDate(iso) {
 
 
 // ── Live counter ──────────────────────────────────────────────────────────────
-const SERVER_TOTAL = {{ total }};
+const SERVER_TOTAL = {{ total|default(0) }};
 
 function animateCounter(el, target, duration) {
   if (!el) return;
@@ -939,18 +938,29 @@ function animateCounter(el, target, duration) {
 }
 
 // Run on load with server total, then update when API responds
-window.addEventListener('DOMContentLoaded', () => {
+// Counter runs after loadAll updates stats
+// SERVER_TOTAL used as initial value before API responds
+if (SERVER_TOTAL > 0) {
   const el = document.getElementById('s-total');
-  if (el && SERVER_TOTAL > 0) animateCounter(el, SERVER_TOTAL, 1200);
-});
+  if (el) animateCounter(el, SERVER_TOTAL, 1200);
+}
 
 // ── Sidebar toggle ───────────────────────────────────────────────────────────
 function toggleSidebar() {
   const s = document.getElementById('sidebar');
-  s.style.display = s.style.display === 'block' ? 'none' : 'block';
+  if (s.style.display === 'none' || s.style.display === '') {
+    s.style.display = 'flex';
+    s.style.flexDirection = 'column';
+  } else {
+    s.style.display = 'none';
+  }
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('sidebar');
+  if (s) s.style.display = 'none';
+});
 loadAll();
 </script>
 
