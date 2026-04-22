@@ -948,19 +948,15 @@ if (SERVER_TOTAL > 0) {
 // ── Sidebar toggle ───────────────────────────────────────────────────────────
 function toggleSidebar() {
   const s = document.getElementById('sidebar');
-  if (s.style.display === 'none' || s.style.display === '') {
-    s.style.display = 'flex';
-    s.style.flexDirection = 'column';
+  if (s.classList.contains('hidden')) {
+    s.classList.remove('hidden');
   } else {
-    s.style.display = 'none';
+    s.classList.add('hidden');
   }
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  const s = document.getElementById('sidebar');
-  if (s) s.style.display = 'none';
-});
+
 loadAll();
 </script>
 
