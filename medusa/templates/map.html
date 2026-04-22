@@ -74,10 +74,31 @@
       line-height: 1;
     }
 
-    #logo em {
-      font-style: normal;
-      color: #c0392b;
+    .grand-total {
+      font-family: 'Space Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      min-width: 60px;
+      text-align: right;
     }
+
+    #header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #menu-btn {
+      font-size: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    #menu-btn:hover { color: #fff; }
 
     #tagline {
       font-family: 'Space Mono', monospace;
@@ -85,6 +106,15 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--muted);
+    }
+
+    #tagline2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 11px;
+      font-style: italic;
+      color: #c0392b;
+      margin-top: 2px;
+      letter-spacing: 0.3px;
     }
 
     #stats-bar {
@@ -148,6 +178,7 @@
       width: 310px;
       min-width: 310px;
       background: var(--surface);
+      display: none;
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -492,35 +523,15 @@
   <!-- Header -->
   <div id="header">
     <div id="branding">
-      <div id="logo">ME<em>DU</em>SA</div>
+      <div id="logo">MEDUSA</div>
       <div id="tagline">Every Act Documented · United States</div>
+      <div id="tagline2">Live tracking male violence against women and children across America — an epidemic.</div>
     </div>
-
-    <div id="stats-bar">
-      <div class="stat">
-        <div class="stat-num" id="s-total">—</div>
-        <div class="stat-label">Total</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-homicide">—</div>
-        <div class="stat-label">Homicide</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-sa">—</div>
-        <div class="stat-label">Sex. Assault</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-dv">—</div>
-        <div class="stat-label">Dom. Violence</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-pf">—</div>
-        <div class="stat-label">Public Figures</div>
-      </div>
+    <div id="header-right">
+      <div id="s-total" class="grand-total">—</div>
+      <button id="scan-btn" onclick="triggerScan()">⟳ Scan Records</button>
+      <button id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
     </div>
-
-    <button id="scan-btn" onclick="triggerScan()">⟳ Scan Records</button>
-  </div>
 
   <!-- Body -->
   <div id="body">
@@ -887,11 +898,9 @@ function focusCase(lat, lng) {
 
 function updateStats(total, s) {
   const bt = s.by_type || {};
-  document.getElementById('s-total').textContent    = total || allCases.length;
-  document.getElementById('s-homicide').textContent = (bt.homicide||0) + (bt.attempted_murder||0);
-  document.getElementById('s-sa').textContent       = (bt.rape||0) + (bt.sexual_assault||0);
-  document.getElementById('s-dv').textContent       = (bt.domestic_violence||0) + (bt.coercive_control||0);
-  document.getElementById('s-pf').textContent       = s.public_figures || 0;
+  const t = total || allCases.length;
+  const el = document.getElementById('s-total');
+  if (el) animateCounter(el, t, 1200);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -931,6 +940,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const el = document.getElementById('s-total');
   if (el && SERVER_TOTAL > 0) animateCounter(el, SERVER_TOTAL, 1200);
 });
+
+// ── Sidebar toggle ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  s.style.display = s.style.display === 'block' ? 'none' : 'block';
+}
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadAll();
