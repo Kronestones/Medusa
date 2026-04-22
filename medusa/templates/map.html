@@ -908,6 +908,30 @@ function fmtDate(iso) {
   } catch { return iso; }
 }
 
+
+// ── Live counter ──────────────────────────────────────────────────────────────
+const SERVER_TOTAL = {{ total }};
+
+function animateCounter(el, target, duration) {
+  if (!el) return;
+  const start    = parseInt(el.textContent.replace(/,/g, '')) || 0;
+  const range    = target - start;
+  const step     = Math.ceil(duration / Math.abs(range || 1));
+  let   current  = start;
+  if (range === 0) { el.textContent = target.toLocaleString(); return; }
+  const timer = setInterval(() => {
+    current += range > 0 ? 1 : -1;
+    el.textContent = current.toLocaleString();
+    if (current === target) clearInterval(timer);
+  }, step);
+}
+
+// Run on load with server total, then update when API responds
+window.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('s-total');
+  if (el && SERVER_TOTAL > 0) animateCounter(el, SERVER_TOTAL, 1200);
+});
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadAll();
 </script>

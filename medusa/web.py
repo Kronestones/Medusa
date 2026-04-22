@@ -43,7 +43,11 @@ def create_app():
 
 @app.route("/")
 def index():
-    return render_template("map.html")
+    try:
+        total = get_case_count()
+    except Exception:
+        total = 0
+    return render_template("map.html", total=total)
 
 
 @app.route("/api/cases")
