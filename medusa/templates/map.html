@@ -713,6 +713,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
+map.on('zoomend', () => { if (allCases.length) renderMarkers(); });
+
 let allCases     = [];
 let activeTab    = 'all';
 let searchText   = '';
@@ -752,7 +754,12 @@ function renderMarkers() {
     const pfTag = c.is_public_figure
       ? '<span class="pf-badge">Public Figure</span>' : '';
 
-    const m = L.marker([c.lat, c.lng], { icon: makeIcon(color) });
+    // Zoom-adaptive jitter — spreads stacked dots at national view, tightens on zoom
+    const zoomLevel = map.getZoom();
+    const jitterAmt = Math.max(0.005, 0.35 / Math.pow(2, zoomLevel - 4));
+    const jLat = c.lat + (Math.random() - 0.5) * jitterAmt;
+    const jLng = c.lng + (Math.random() - 0.5) * jitterAmt;
+    const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
       <div class="popup-id">${c.case_id}</div>
