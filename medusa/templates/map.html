@@ -970,12 +970,12 @@ function animateCounter(el, target, duration) {
 }
 
 // Run on load with server total, then update when API responds
-// Counter runs after loadAll updates stats
-// SERVER_TOTAL used as initial value before API responds
-if (SERVER_TOTAL > 0) {
+// Counter — runs immediately with server total
+// then updates again when API responds via updateStats
+setTimeout(() => {
   const el = document.getElementById('s-total');
-  if (el) animateCounter(el, SERVER_TOTAL, 1200);
-}
+  if (el && SERVER_TOTAL > 0) animateCounter(el, SERVER_TOTAL, 1200);
+}, 200);
 
 // ── Sidebar toggle ───────────────────────────────────────────────────────────
 function toggleSidebar() {
