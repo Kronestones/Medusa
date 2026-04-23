@@ -494,6 +494,137 @@ def _extract_state_from_court(court_id):
     return None
 
 
+
+
+# ── Source 5: State Attorney General Press Releases ──────────────────────────
+def scan_state_ags():
+    """
+    All 50 state AG offices publish press releases.
+    Most use RSS feeds — free, no key required.
+    """
+    print("[Medusa] Scanning state AG offices...")
+    cases = []
+
+    # State AG RSS feeds
+    ag_feeds = {
+        "AL": "https://www.alabamaag.gov/news/feed",
+        "AK": "https://www.law.alaska.gov/press/pressReleases.html",
+        "AZ": "https://www.azag.gov/press-release/feed",
+        "AR": "https://arkansasag.gov/news/feed",
+        "CA": "https://oag.ca.gov/news/feed",
+        "CO": "https://coag.gov/feed",
+        "CT": "https://portal.ct.gov/AG/News/feed",
+        "DE": "https://news.delaware.gov/feed/?cat=13",
+        "FL": "https://www.myfloridalegal.com/feed",
+        "GA": "https://law.georgia.gov/news/feed",
+        "HI": "https://ag.hawaii.gov/feed",
+        "ID": "https://www.ag.idaho.gov/feed",
+        "IL": "https://illinoisattorneygeneral.gov/pressroom/feed",
+        "IN": "https://www.in.gov/attorneygeneral/feed",
+        "IA": "https://www.iowaattorneygeneral.gov/feed",
+        "KS": "https://ag.ks.gov/feed",
+        "KY": "https://ag.ky.gov/feed",
+        "LA": "https://www.ag.state.la.us/feed",
+        "ME": "https://www.maine.gov/ag/news/feed",
+        "MD": "https://www.marylandattorneygeneral.gov/feed",
+        "MA": "https://www.mass.gov/orgs/office-of-attorney-general/feed",
+        "MI": "https://www.michigan.gov/ag/feed",
+        "MN": "https://www.ag.state.mn.us/feed",
+        "MS": "https://www.ago.state.ms.us/feed",
+        "MO": "https://ago.mo.gov/feed",
+        "MT": "https://dojmt.gov/feed",
+        "NE": "https://ago.nebraska.gov/feed",
+        "NV": "https://ag.nv.gov/feed",
+        "NH": "https://www.doj.nh.gov/feed",
+        "NJ": "https://www.njoag.gov/feed",
+        "NM": "https://www.nmag.gov/feed",
+        "NY": "https://ag.ny.gov/press-releases/feed",
+        "NC": "https://ncdoj.gov/feed",
+        "ND": "https://attorneygeneral.nd.gov/feed",
+        "OH": "https://www.ohioattorneygeneral.gov/feed",
+        "OK": "https://www.oag.ok.gov/feed",
+        "OR": "https://www.doj.state.or.us/feed",
+        "PA": "https://www.attorneygeneral.gov/feed",
+        "RI": "https://riag.ri.gov/feed",
+        "SC": "https://www.scag.gov/feed",
+        "SD": "https://atg.sd.gov/feed",
+        "TN": "https://www.tn.gov/attorneygeneral/feed",
+        "TX": "https://www.texasattorneygeneral.gov/feed",
+        "UT": "https://attorneygeneral.utah.gov/feed",
+        "VT": "https://ago.vermont.gov/feed",
+        "VA": "https://www.oag.state.va.us/feed",
+        "WA": "https://www.atg.wa.gov/feed",
+        "WV": "https://ago.wv.gov/feed",
+        "WI": "https://www.doj.state.wi.us/feed",
+        "WY": "https://ag.wyo.gov/feed",
+        "DC": "https://oag.dc.gov/feed",
+    }
+
+    import xml.etree.ElementTree as ET
+
+    for state, url in ag_feeds.items():
+        try:
+            resp = requests.get(
+                url,
+                headers={"User-Agent": "Medusa/1.0"},
+                timeout=8,
+            )
+            if not resp.ok:
+                continue
+
+            # Parse RSS
+            try:
+                root = ET.fromstring(resp.content)
+            except ET.ParseError:
+                continue
+
+            # Handle both RSS and Atom
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+            items = root.findall(".//item") or root.findall(".//atom:entry", ns)
+
+            for item in items[:20]:
+                title = (item.findtext("title") or
+                        item.findtext("atom:title", namespaces=ns) or "")
+                desc  = (item.findtext("description") or
+                        item.findtext("atom:summary", namespaces=ns) or "")
+                link  = (item.findtext("link") or
+                        item.findtext("atom:link", namespaces=ns) or "")
+                date  = (item.findtext("pubDate") or
+                        item.findtext("atom:published", namespaces=ns) or "")
+
+                # Clean date
+                if date:
+                    try:
+                        from email.utils import parsedate_to_datetime
+                        date = parsedate_to_datetime(date).strftime("%Y-%m-%d")
+                    except Exception:
+                        date = date[:10] if len(date) >= 10 else None
+
+                vtype = _classify_violence(title + " " + desc)
+                if not vtype:
+                    continue
+
+                cases.append({
+                    "summary":     (title + ". " + desc[:200]).strip(),
+                    "city":        "Statewide",
+                    "state":       state,
+                    "date_incident": date,
+                    "violence_type": vtype,
+                    "status":      _classify_status(title + desc),
+                    "source_url":  link if isinstance(link, str) else "",
+                    "source_name": f"{state} Attorney General",
+                    "is_public_figure": detect_public_figure(title + desc),
+                })
+
+            time.sleep(0.2)
+
+        except Exception as e:
+            continue
+
+    print(f"[State AGs] {len(cases)} cases found")
+    return cases
+
+
 # ── Main Scanner ──────────────────────────────────────────────────────────────
 class MedusaScanner:
 
@@ -511,6 +642,7 @@ class MedusaScanner:
             scan_courtlistener,
             scan_nsopw,
             scan_propublica_ethics,
+            scan_state_ags,
         ]
 
         for source_fn in sources:
