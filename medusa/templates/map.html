@@ -554,19 +554,17 @@
   <div id="header">
     <div id="branding">
       <div id="logo">MEDUSA</div>
-      <div id="tagline">Every Act Documented · United States</div>
       <div id="tagline2">Live tracking male violence against women and children across America — an epidemic.</div>
     </div>
     <div id="header-right">
       <div id="s-total" class="grand-total">—</div>
-      <button id="scan-btn" onclick="triggerScan()">⟳ Scan Records</button>
       <button id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
     </div>
 
   <!-- Body -->
-  <div id="body">
+  <div id="body" style="flex:1;display:flex;overflow:hidden;min-height:0;">
 
-    <div id="map"></div>
+    <div id="map" style="flex:1;min-height:0;z-index:1;"></div>
 
     <div id="sidebar">
 
