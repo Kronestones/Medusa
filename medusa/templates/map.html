@@ -55,6 +55,7 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
     /* ── Header ── */
@@ -564,7 +565,7 @@
     </div>
 
   <!-- Body -->
-  <div id="body" style="flex:1;display:flex;overflow:hidden;min-height:0;">
+  <div id="body" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;overflow:hidden;">
 
     <div id="map" style="flex:1;min-height:0;z-index:1;"></div>
 
@@ -984,13 +985,33 @@ function toggleSidebar() {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 
+// Force map to correct height
+function fixMapHeight(){
+  const header = document.getElementById('header');
+  const body = document.getElementById('body');
+  const h = header ? header.offsetHeight : 80;
+  body.style.top = h + 'px';
+  map.invalidateSize();
+}
+window.addEventListener('resize', fixMapHeight);
+setTimeout(fixMapHeight, 100);
 loadAll();
 
 // Auto-scan every 24 hours
 setInterval(async()=>{
   try{
     await fetch('/api/scan',{method:'POST'});
-    await loadAll();
+    await // Force map to correct height
+function fixMapHeight(){
+  const header = document.getElementById('header');
+  const body = document.getElementById('body');
+  const h = header ? header.offsetHeight : 80;
+  body.style.top = h + 'px';
+  map.invalidateSize();
+}
+window.addEventListener('resize', fixMapHeight);
+setTimeout(fixMapHeight, 100);
+loadAll();
   }catch(e){}
 }, 24*60*60*1000);
 </script>
