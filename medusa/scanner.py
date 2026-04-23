@@ -72,11 +72,14 @@ STATE_NAMES = {
 
 PUBLIC_FIGURE_KEYWORDS = {
     "senator","congressman","congresswoman","representative","governor",
-    "mayor","judge","prosecutor","sheriff","police chief","officer",
-    "politician","official","minister","lobbyist","council member",
-    "assemblyman","assemblywoman","state rep","attorney general",
-    "secretary","ambassador","aide","deputy","commissioner",
-    "president","vice president","cabinet","superintendent",
+    "mayor","judge","prosecutor","sheriff","police chief",
+    "police officer","law enforcement officer",
+    "politician","elected official","public official",
+    "assemblyman","assemblywoman","state representative",
+    "attorney general","secretary of state","ambassador",
+    "deputy chief","commissioner","superintendent",
+    "vice president","cabinet member","city council",
+    "state senator","state legislator","federal agent",
 }
 
 _geocode_cache = {}
