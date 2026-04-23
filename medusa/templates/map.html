@@ -173,6 +173,7 @@
     #body {
       display: flex;
       flex: 1;
+      min-height: 0;
       overflow: hidden;
       position: relative;
     }
@@ -984,6 +985,14 @@ function toggleSidebar() {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 
 loadAll();
+
+// Auto-scan every 24 hours
+setInterval(async()=>{
+  try{
+    await fetch('/api/scan',{method:'POST'});
+    await loadAll();
+  }catch(e){}
+}, 24*60*60*1000);
 </script>
 
 </body>
