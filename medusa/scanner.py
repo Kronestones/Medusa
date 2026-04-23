@@ -137,15 +137,19 @@ def scan_doj():
     print("[Medusa] Scanning DOJ press releases...")
     cases = []
     keywords = [
-        "sexual assault", "rape", "domestic violence", "trafficking",
+        "sexual assault", "rape", "domestic violence", "sex trafficking",
         "femicide", "stalking", "sex offense", "sexual abuse",
+        "convicted rape", "convicted assault", "sex crimes",
+        "child sexual abuse", "child exploitation", "kidnapping assault",
+        "murder women", "homicide victim", "strangulation",
+        "intimate partner", "harassment conviction", "coercive",
     ]
     try:
-        for keyword in keywords[:4]:  # rate limit
+        for keyword in keywords:
             resp = requests.get(
-                "https://www.justice.gov/api/pressroom/press-releases.json",
-                params={"pagesize": 20, "field_pr_category": "opa",
-                        "search": keyword},
+                "https://www.justice.gov/api/v1/press_releases.json",
+                params={"pagesize": 50, "sort": "created", "direction": "DESC",
+                        "parameters[title]": keyword},
                 timeout=10,
             )
             if not resp.ok:
@@ -185,108 +189,164 @@ def scan_doj():
                     "source_name": "DOJ Office of Public Affairs",
                     "is_public_figure": detect_public_figure(title + body),
                 })
-            time.sleep(0.5)
+            # Fetch page 2 for each keyword
+            try:
+                resp2 = requests.get(
+                    "https://www.justice.gov/api/v1/press_releases.json",
+                    params={"pagesize": 50, "sort": "created", "direction": "DESC",
+                            "parameters[title]": keyword, "page": 1},
+                    timeout=10,
+                )
+                if resp2.ok:
+                    for r in resp2.json().get("results", []):
+                        title2 = r.get("title", "")
+                        body2  = r.get("body", "") or r.get("teaser", "")
+                        date2  = r.get("date", "")[:10] if r.get("date") else None
+                        url2   = r.get("url", "")
+                        if not url2.startswith("http"):
+                            url2 = "https://www.justice.gov" + url2
+                        state2 = None
+                        for sname, sabb in STATE_NAMES.items():
+                            if sname in body2 or sabb in title2:
+                                state2 = sabb
+                                break
+                        if not state2:
+                            state2 = "DC"
+                        vtype2 = _classify_violence(title2 + " " + body2)
+                        if not vtype2:
+                            continue
+                        cases.append({
+                            "summary":     (title2 + ". " + body2[:200]).strip(),
+                            "city":        "Federal",
+                            "state":       state2,
+                            "date_incident": date2,
+                            "violence_type": vtype2,
+                            "status":      _classify_status(title2 + body2),
+                            "source_url":  url2,
+                            "source_name": "DOJ Office of Public Affairs",
+                            "is_public_figure": detect_public_figure(title2 + body2),
+                        })
+            except Exception:
+                pass
+            time.sleep(0.3)
     except Exception as e:
         print(f"[DOJ] Error: {e}")
     print(f"[DOJ] {len(cases)} cases found")
     return cases
 
 
-# ── Source 2: CourtListener — Free Law Project ────────────────────────────────
+# ── Source 2: FBI Crime Data API ─────────────────────────────────────────────
 def scan_courtlistener():
     """
-    CourtListener API — free, no key required for basic access.
-    Searches federal court opinions and filings.
+    FBI Crime Data API — free, no key required.
+    Returns offense data by state for violent crimes against women.
     """
-    print("[Medusa] Scanning CourtListener federal records...")
+    print("[Medusa] Scanning FBI Crime Data API...")
     cases = []
-    searches = [
-        "sexual assault conviction women",
-        "domestic violence federal conviction",
-        "sex trafficking women conviction",
-        "rape conviction federal court",
+    # Offense codes for crimes predominantly against women
+    offense_codes = [
+        ("rape", "rape"),
+        ("sex-offenses", "sexual_assault"),
     ]
     try:
-        for query in searches[:2]:
+        for code, vtype in offense_codes:
             resp = requests.get(
-                "https://www.courtlistener.com/api/rest/v3/opinions/",
-                params={"q": query, "order_by": "score desc",
-                        "filed_after": "2020-01-01", "page_size": 10},
+                f"https://cde.ucr.cjis.gov/ORDS/downing/api/estimates/offense/{code}",
+                params={"year": 2022},
+                headers={"User-Agent": "Medusa/1.0"},
+                timeout=10,
+            )
+            if not resp.ok:
+                # Try alternate FBI endpoint
+                resp = requests.get(
+                    f"https://api.usa.gov/crime/fbi/summary/state/offense/{code}/count",
+                    params={"year": 2022, "count": 10},
+                    headers={"User-Agent": "Medusa/1.0"},
+                    timeout=10,
+                )
+            if resp.ok:
+                data = resp.json()
+                results = data if isinstance(data, list) else data.get("results", [])
+                for r in results[:10]:
+                    state = r.get("state_abbr") or r.get("state", "")
+                    count = r.get("count") or r.get("actual", 0)
+                    if not state or not count:
+                        continue
+                    cases.append({
+                        "summary": f"FBI UCR 2022: {count} reported {code.replace('-',' ')} offenses in {state}. Majority of victims are female per FBI statistics.",
+                        "city": "Statewide",
+                        "state": state[:2].upper() if state else "DC",
+                        "date_incident": "2022-01-01",
+                        "violence_type": vtype,
+                        "status": "reported",
+                        "source_url": "https://ucr.fbi.gov/crime-in-the-u.s/2022",
+                        "source_name": "FBI Uniform Crime Report 2022",
+                        "is_public_figure": False,
+                    })
+            time.sleep(0.5)
+    except Exception as e:
+        print(f"[FBI] Error: {e}")
+    print(f"[FBI] {len(cases)} cases found")
+    return cases
+
+
+# ── Source 3: USAO District Press Releases ───────────────────────────────────
+def scan_nsopw():
+    """
+    DOJ US Attorney Office district-level press releases.
+    Searches for convictions and charges by district.
+    Free, no key required.
+    """
+    print("[Medusa] Scanning USAO district convictions...")
+    cases = []
+    # High-volume districts for violence against women cases
+    districts = [
+        ("sdny", "NY"), ("ndil", "IL"), ("cdca", "CA"),
+        ("sdtx", "TX"), ("edva", "VA"), ("ndga", "GA"),
+    ]
+    try:
+        for district, state in districts[:4]:
+            resp = requests.get(
+                "https://www.justice.gov/api/v1/press_releases.json",
+                params={
+                    "pagesize": 10,
+                    "sort": "created",
+                    "direction": "DESC",
+                    "parameters[title]": f"{district} convicted",
+                },
                 headers={"User-Agent": "Medusa/1.0"},
                 timeout=10,
             )
             if not resp.ok:
                 continue
             data = resp.json()
-            for result in data.get("results", []):
-                court      = result.get("court_id", "")
-                date_filed = result.get("date_filed", "")[:10] if result.get("date_filed") else None
-                url        = "https://www.courtlistener.com" + result.get("absolute_url", "")
-                case_name  = result.get("case_name", "")
-                snippet    = result.get("snippet", "") or case_name
+            for r in data.get("results", []):
+                title = r.get("title", "")
+                body  = r.get("body", "") or r.get("teaser", "")
+                date  = r.get("date", "")[:10] if r.get("date") else None
+                url   = r.get("url", "")
+                if not url.startswith("http"):
+                    url = "https://www.justice.gov" + url
 
-                state = _extract_state_from_court(court)
-                vtype = _classify_violence(case_name + " " + snippet)
+                vtype = _classify_violence(title + " " + body)
                 if not vtype:
                     continue
 
                 cases.append({
-                    "summary":       f"{case_name}. {snippet[:200]}".strip(),
-                    "city":          "Federal Court",
-                    "state":         state or "DC",
-                    "date_incident": date_filed,
+                    "summary":     (title + ". " + body[:200]).strip(),
+                    "city":        "Federal",
+                    "state":       state,
+                    "date_incident": date,
                     "violence_type": vtype,
-                    "status":        "convicted",
-                    "source_url":    url,
-                    "source_name":   f"CourtListener — {court}",
-                    "is_public_figure": detect_public_figure(case_name),
+                    "status":      _classify_status(title + body),
+                    "source_url":  url,
+                    "source_name": f"DOJ USAO {district.upper()}",
+                    "is_public_figure": detect_public_figure(title + body),
                 })
-            time.sleep(1)
+            time.sleep(0.5)
     except Exception as e:
-        print(f"[CourtListener] Error: {e}")
-    print(f"[CourtListener] {len(cases)} cases found")
-    return cases
-
-
-# ── Source 3: NSOPW — National Sex Offender Registry ─────────────────────────
-def scan_nsopw():
-    """
-    NSOPW.gov public API — federal government, completely free.
-    Returns aggregate registry data by state.
-    """
-    print("[Medusa] Scanning NSOPW national registry...")
-    cases = []
-    try:
-        # NSOPW search API
-        resp = requests.post(
-            "https://www.nsopw.gov/api/Search/Territories",
-            json={},
-            headers={"Content-Type": "application/json",
-                     "User-Agent": "Medusa/1.0"},
-            timeout=10,
-        )
-        if resp.ok:
-            territories = resp.json()
-            for t in territories.get("Territories", [])[:10]:
-                state_id = t.get("Identifier", "")
-                name     = t.get("Name", "")
-                state    = normalize_state(state_id) or normalize_state(name)
-                if not state:
-                    continue
-                cases.append({
-                    "summary":       f"State sex offender registry: {name}. Public registry maintained under SORNA. Contains convicted sex offenders with female victims.",
-                    "city":          name,
-                    "state":         state,
-                    "date_incident": "2024-01-01",
-                    "violence_type": "sexual_assault",
-                    "status":        "convicted",
-                    "source_url":    f"https://www.nsopw.gov/Search/Results?territory={state_id}",
-                    "source_name":   "NSOPW — National Sex Offender Public Website",
-                    "is_public_figure": False,
-                })
-    except Exception as e:
-        print(f"[NSOPW] Error: {e}")
-    print(f"[NSOPW] {len(cases)} registry entries found")
+        print(f"[USAO] Error: {e}")
+    print(f"[USAO] {len(cases)} district cases found")
     return cases
 
 

@@ -47,6 +47,14 @@ def index():
         total = get_case_count()
     except Exception:
         total = 0
+    return render_template("entry.html", total=total)
+
+@app.route("/map")
+def map_view():
+    try:
+        total = get_case_count()
+    except Exception:
+        total = 0
     return render_template("map.html", total=total)
 
 

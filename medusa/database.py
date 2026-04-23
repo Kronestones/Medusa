@@ -233,3 +233,68 @@ def _to_dict(row: Case) -> dict:
         "additional_sources":  row.additional_sources,
         "verified":            row.verified,
     }
+
+
+def save_cases_batch(case_list: list) -> int:
+    """Save multiple cases in a single DB session. Returns count saved."""
+    if not case_list:
+        return 0
+    session = get_session()
+    saved = 0
+    try:
+        for case_dict in case_list:
+            existing = session.query(Case).filter_by(
+                case_id=case_dict.get("case_id")
+            ).first()
+            if existing:
+                continue
+
+            date_incident = case_dict.get("date_incident")
+            if isinstance(date_incident, str):
+                try:
+                    date_incident = datetime.fromisoformat(date_incident)
+                except Exception:
+                    date_incident = None
+
+            core_keys = {
+                "case_id", "date_incident", "date_reported", "violence_type",
+                "city", "state", "lat", "lng", "summary", "source_url",
+                "source_name", "status", "verified", "is_public_figure",
+                "additional_sources",
+            }
+            extra = {k: v for k, v in case_dict.items() if k not in core_keys}
+
+            row = Case(
+                case_id            = case_dict["case_id"],
+                violence_type      = case_dict.get("violence_type", "unknown"),
+                summary            = case_dict.get("summary", ""),
+                status             = case_dict.get("status", "reported"),
+                is_public_figure   = case_dict.get("is_public_figure", False),
+                date_incident      = date_incident,
+                date_reported      = datetime.now(timezone.utc),
+                city               = case_dict.get("city", "Unknown"),
+                state              = case_dict.get("state", "Unknown"),
+                lat                = case_dict.get("lat"),
+                lng                = case_dict.get("lng"),
+                source_url         = case_dict.get("source_url", ""),
+                source_name        = case_dict.get("source_name", ""),
+                additional_sources = case_dict.get("additional_sources"),
+                verified           = case_dict.get("verified", False),
+                extra              = extra if extra else None,
+            )
+            session.add(row)
+            saved += 1
+
+            # Commit every 50 records to avoid memory buildup
+            if saved % 50 == 0:
+                session.commit()
+                print(f"  [DB] {saved} saved so far...")
+
+        session.commit()
+        return saved
+    except Exception as e:
+        session.rollback()
+        print(f"[DB] batch save error: {e}")
+        return saved
+    finally:
+        session.close()
