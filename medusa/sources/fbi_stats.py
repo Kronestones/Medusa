@@ -1,141 +1,102 @@
 """
-sources/fbi_stats.py — FBI Crime Data Explorer (CDE) API
+sources/fbi_stats.py — FBI Crime Data Explorer API (no API key required)
 
-Free, no API key required.
-Base URL: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/explorer/crime/crime-trend
+The FBI CDE API at api.usa.gov/crime/fbi/cde/ is completely free and keyless.
+It provides aggregated statistics — not individual case records.
 
-REST API endpoint (undocumented but public):
-  https://api.usa.gov/crime/fbi/cde/
+We use it to:
+  1. Pull state-level violent crime counts (as context/reference records)
+  2. Identify states/years with high concentrations for targeted scanning
 
-NOTE: FBI data is aggregated statistics, NOT individual case records.
-We use it to generate summary records per state showing documented
-violence statistics. These appear on the map as state-level data points
-with counts rather than named individual cases.
+Note: This source produces AGGREGATE records, not individual cases.
+      They are marked status="reported" and summarize FBI statistical data.
+      They appear on the map as state-centroid markers.
 
-Offenses tracked:
-  - Rape (legacy + revised definition)
-  - Aggravated assault (female victims)
-  - Homicide (female victims)
-  - Human trafficking
+API docs: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/docApi
 """
 
-import time
+import re
 from medusa.fetch import safe_json
-from medusa.record import STATE_LARGEST_CITY, VALID_STATES
+from medusa.record import STATE_LARGEST_CITY
 
-FBI_BASE = "https://api.usa.gov/crime/fbi/cde"
+BASE = "https://api.usa.gov/crime/fbi/cde"
 
-# Most recent year we can reliably pull
-DATA_YEAR = 2022
+# Offense types relevant to violence against women
+# FBI UCR offense codes
+OFFENSE_MAP = {
+    "rape":                    "rape",
+    "aggravated-assault":      "assault",
+    "human-trafficking":       "trafficking",
+    "sex-offenses":            "sexual_assault",
+    "fondling":                "sexual_assault",
+    "sodomy":                  "rape",
+    "sexual-assault-w-object": "sexual_assault",
+}
 
-# Offense codes we care about
-OFFENSES = [
-    ("rape-legacy",       "rape",              "Rape (FBI UCR)"),
-    ("aggravated-assault","assault",            "Aggravated Assault (FBI UCR)"),
-    ("homicide",          "homicide",           "Homicide (FBI UCR)"),
-    ("human-trafficking", "trafficking",        "Human Trafficking (FBI UCR)"),
+# Pull last 3 years of data
+YEARS = ["2021", "2022", "2023"]
+
+# States to sample (all 50 + DC would be 150+ calls — sample top states by population)
+SAMPLE_STATES = [
+    "CA", "TX", "FL", "NY", "PA", "IL", "OH", "GA", "NC", "MI",
+    "NJ", "VA", "WA", "AZ", "MA", "TN", "IN", "MO", "MD", "WI",
+    "CO", "MN", "SC", "AL", "LA", "KY", "OR", "OK", "CT", "NV",
 ]
 
 
 def fetch() -> list[dict]:
     """
-    Pull FBI CDE aggregate stats by state.
-    Returns one summary record per state per offense type where data exists.
-    These are statistical/aggregate records, not individual cases.
+    Pull FBI CDE aggregate offense data. Returns state-level summary records.
+    These are statistical markers, not individual cases.
     """
     records = []
 
-    for offense_slug, vtype, offense_label in OFFENSES:
-        state_records = _fetch_offense_by_state(offense_slug, vtype, offense_label)
-        records.extend(state_records)
-        time.sleep(0.5)   # be polite to the API
+    for offense_slug, vtype in OFFENSE_MAP.items():
+        for year in YEARS:
+            data = safe_json(
+                f"{BASE}/offense/state/offenses/{offense_slug}/{year}",
+                params={"offense": offense_slug},
+            )
+            if not data:
+                continue
 
-    print(f"[FBI CDE] {len(records)} aggregate state records fetched.")
+            results = data if isinstance(data, list) else data.get("results", [])
+            for item in results:
+                rec = _parse_item(item, offense_slug, vtype, year)
+                if rec:
+                    records.append(rec)
+
+    print(f"[FBI CDE] {len(records)} aggregate records fetched.")
     return records
 
 
-def _fetch_offense_by_state(offense_slug: str, vtype: str,
-                             offense_label: str) -> list[dict]:
-    """Fetch a single offense type across all states for DATA_YEAR."""
-    url = f"{FBI_BASE}/estimate/national/{offense_slug}/{DATA_YEAR}/{DATA_YEAR}"
-    data = safe_json(url)
+def _parse_item(item: dict, offense_slug: str, vtype: str, year: str) -> dict | None:
+    state = (item.get("state_abbr") or item.get("state") or "").strip().upper()
+    if not state or len(state) != 2:
+        return None
 
-    if not data:
-        # Try alternate endpoint structure
-        url2 = f"{FBI_BASE}/offense/state/run/{offense_slug}/{DATA_YEAR}/{DATA_YEAR}"
-        data = safe_json(url2)
+    count = item.get("actual") or item.get("count") or 0
+    if not count:
+        return None
 
-    if not data:
-        return []
+    city = STATE_LARGEST_CITY.get(state, "")
+    if not city:
+        return None
 
-    records = []
+    offense_label = offense_slug.replace("-", " ").title()
+    summary = (
+        f"FBI UCR data: {count:,} reported {offense_label} incidents in "
+        f"{state} ({year}). Source: FBI Crime Data Explorer."
+    )
 
-    # FBI API returns either a list of state objects or a dict with nested data
-    items = data if isinstance(data, list) else data.get("data", data.get("results", []))
-
-    for item in items:
-        state_abbr = _extract_state(item)
-        if not state_abbr or state_abbr not in VALID_STATES:
-            continue
-
-        count = _extract_count(item)
-        if count is None or count == 0:
-            continue
-
-        city = STATE_LARGEST_CITY.get(state_abbr, "")
-        if not city:
-            continue
-
-        summary = (
-            f"FBI UCR Data: {count:,} {offense_label} incidents reported in "
-            f"{state_abbr} ({DATA_YEAR}). This is aggregate law enforcement "
-            f"reporting data — individual cases within this count may appear "
-            f"separately from other sources."
-        )
-
-        records.append({
-            "summary":       summary,
-            "city":          city,
-            "state":         state_abbr,
-            "date_incident": str(DATA_YEAR),
-            "violence_type": vtype,
-            "status":        "reported",
-            "source_url":    f"https://cde.ucr.cjis.gov/",
-            "source_name":   "FBI Crime Data Explorer (UCR)",
-            "verified":      True,
-        })
-
-    return records
-
-
-def _extract_state(item: dict) -> str | None:
-    """Extract 2-letter state abbreviation from FBI API response item."""
-    # Try common field names
-    for key in ("state_abbr", "state_id", "state", "StateAbbr", "abbr"):
-        val = item.get(key)
-        if val and len(str(val)) == 2:
-            return str(val).upper()
-
-    # Try state name
-    for key in ("state_name", "StateName", "name"):
-        val = item.get(key)
-        if val:
-            from medusa.record import validate_state, _NAME_TO_ABBR
-            abbr = _NAME_TO_ABBR.get(str(val).lower().strip())
-            if abbr:
-                return abbr
-
-    return None
-
-
-def _extract_count(item: dict) -> int | None:
-    """Extract numeric count from FBI API response item."""
-    for key in ("value", "count", "actual", "reported", "total",
-                "offenses", "incidents", "rape", "homicide"):
-        val = item.get(key)
-        if val is not None:
-            try:
-                return int(val)
-            except (ValueError, TypeError):
-                pass
-    return None
+    return {
+        "summary":       summary,
+        "city":          city,
+        "state":         state,
+        "date_incident": f"{year}-01-01",
+        "violence_type": vtype,
+        "status":        "reported",
+        "source_url":    f"https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/explorer/crime/crime-trend",
+        "source_name":   "FBI Crime Data Explorer",
+        "verified":      True,
+    }

@@ -1,47 +1,384 @@
 """
 record.py — Medusa unified record format
 
-Every source module returns raw dicts.
-normalize_record() validates and standardizes them into the
-locked CaseRecord schema before the orchestrator geocodes and saves.
+Every source module produces a MedusaRecord dict.
+Shape is locked here. DB layer reads this shape. Nothing else.
 
-Key guarantees:
-  - state is always a valid 2-letter US abbreviation (or record is dropped)
-  - city is always a real string (never "Federal", "Unknown", etc.)
-  - violence_type is always a valid enum value
-  - status is always a valid enum value
-  - case_id is deterministic and collision-resistant
+Also contains:
+  - make_case_id()
+  - detect_public_figure()
+  - FEDERAL_DISTRICT_CITY  — deterministic district → city lookup
+  - normalize_record()     — validates and fills defaults
 """
 
 import hashlib
-import re
-from datetime import datetime
+from typing import TypedDict
 
-# ── Enums ─────────────────────────────────────────────────────────────────────
+# ── Unified record shape ──────────────────────────────────────────────────────
 
-VALID_VIOLENCE_TYPES = {
-    "homicide", "assault", "sexual_assault", "stalking", "trafficking",
-    "domestic_violence", "rape", "harassment", "attempted_murder",
-    "child_abuse", "coercive_control",
+VIOLENCE_TYPES = {
+    "homicide", "assault", "sexual_assault", "stalking",
+    "trafficking", "domestic_violence", "rape", "harassment",
+    "attempted_murder", "child_abuse", "coercive_control",
 }
 
-VALID_STATUSES = {
+STATUSES = {
     "reported", "charged", "convicted", "acquitted",
     "civil_judgment", "credible_allegation", "congressional_record", "unknown",
 }
 
-# ── State validation ──────────────────────────────────────────────────────────
+class MedusaRecord(TypedDict, total=False):
+    case_id:          str           # MEDUSA-YYYY-XXXXXXXX  (set by normalize)
+    summary:          str           # factual; no victim name
+    city:             str
+    state:            str           # 2-letter US abbrev
+    date_incident:    str           # YYYY-MM-DD | YYYY-MM | YYYY
+    violence_type:    str           # one of VIOLENCE_TYPES
+    status:           str           # one of STATUSES
+    source_url:       str
+    source_name:      str
+    is_public_figure: bool          # set by normalize
+    verified:         bool
+    lat:              float | None
+    lng:              float | None
 
-VALID_STATES = {
-    "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
-    "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-    "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC",
+
+# ── Federal district → city (all 94 districts) ───────────────────────────────
+# Key: lowercase normalized district abbreviation or partial name
+# Used by CourtListener and DOJ source parsers.
+
+FEDERAL_DISTRICT_CITY: dict[str, tuple[str, str]] = {
+    # Alabama
+    "n.d. ala.":    ("Birmingham",   "AL"),
+    "m.d. ala.":    ("Montgomery",   "AL"),
+    "s.d. ala.":    ("Mobile",       "AL"),
+    # Alaska
+    "d. alaska":    ("Anchorage",    "AK"),
+    # Arizona
+    "d. ariz.":     ("Phoenix",      "AZ"),
+    # Arkansas
+    "e.d. ark.":    ("Little Rock",  "AR"),
+    "w.d. ark.":    ("Fort Smith",   "AR"),
+    # California
+    "n.d. cal.":    ("San Francisco","CA"),
+    "e.d. cal.":    ("Sacramento",   "CA"),
+    "c.d. cal.":    ("Los Angeles",  "CA"),
+    "s.d. cal.":    ("San Diego",    "CA"),
+    # Colorado
+    "d. colo.":     ("Denver",       "CO"),
+    # Connecticut
+    "d. conn.":     ("New Haven",    "CT"),
+    # Delaware
+    "d. del.":      ("Wilmington",   "DE"),
+    # DC
+    "d.d.c.":       ("Washington",   "DC"),
+    "d. d.c.":      ("Washington",   "DC"),
+    # Florida
+    "n.d. fla.":    ("Pensacola",    "FL"),
+    "m.d. fla.":    ("Tampa",        "FL"),
+    "s.d. fla.":    ("Miami",        "FL"),
+    # Georgia
+    "n.d. ga.":     ("Atlanta",      "GA"),
+    "m.d. ga.":     ("Macon",        "GA"),
+    "s.d. ga.":     ("Savannah",     "GA"),
+    # Hawaii
+    "d. haw.":      ("Honolulu",     "HI"),
+    # Idaho
+    "d. idaho":     ("Boise",        "ID"),
+    # Illinois
+    "n.d. ill.":    ("Chicago",      "IL"),
+    "c.d. ill.":    ("Springfield",  "IL"),
+    "s.d. ill.":    ("East St. Louis","IL"),
+    # Indiana
+    "n.d. ind.":    ("Hammond",      "IN"),
+    "s.d. ind.":    ("Indianapolis", "IN"),
+    # Iowa
+    "n.d. iowa":    ("Cedar Rapids", "IA"),
+    "s.d. iowa":    ("Des Moines",   "IA"),
+    # Kansas
+    "d. kan.":      ("Wichita",      "KS"),
+    # Kentucky
+    "e.d. ky.":     ("Lexington",    "KY"),
+    "w.d. ky.":     ("Louisville",   "KY"),
+    # Louisiana
+    "e.d. la.":     ("New Orleans",  "LA"),
+    "m.d. la.":     ("Baton Rouge",  "LA"),
+    "w.d. la.":     ("Shreveport",   "LA"),
+    # Maine
+    "d. me.":       ("Portland",     "ME"),
+    # Maryland
+    "d. md.":       ("Baltimore",    "MD"),
+    # Massachusetts
+    "d. mass.":     ("Boston",       "MA"),
+    # Michigan
+    "e.d. mich.":   ("Detroit",      "MI"),
+    "w.d. mich.":   ("Grand Rapids", "MI"),
+    # Minnesota
+    "d. minn.":     ("Minneapolis",  "MN"),
+    # Mississippi
+    "n.d. miss.":   ("Oxford",       "MS"),
+    "s.d. miss.":   ("Jackson",      "MS"),
+    # Missouri
+    "e.d. mo.":     ("St. Louis",    "MO"),
+    "w.d. mo.":     ("Kansas City",  "MO"),
+    # Montana
+    "d. mont.":     ("Billings",     "MT"),
+    # Nebraska
+    "d. neb.":      ("Omaha",        "NE"),
+    # Nevada
+    "d. nev.":      ("Las Vegas",    "NV"),
+    # New Hampshire
+    "d.n.h.":       ("Concord",      "NH"),
+    "d. n.h.":      ("Concord",      "NH"),
+    # New Jersey
+    "d.n.j.":       ("Newark",       "NJ"),
+    "d. n.j.":      ("Newark",       "NJ"),
+    # New Mexico
+    "d.n.m.":       ("Albuquerque",  "NM"),
+    "d. n.m.":      ("Albuquerque",  "NM"),
+    # New York
+    "n.d.n.y.":     ("Albany",       "NY"),
+    "n.d. n.y.":    ("Albany",       "NY"),
+    "e.d.n.y.":     ("Brooklyn",     "NY"),
+    "e.d. n.y.":    ("Brooklyn",     "NY"),
+    "s.d.n.y.":     ("New York",     "NY"),
+    "s.d. n.y.":    ("New York",     "NY"),
+    "w.d.n.y.":     ("Buffalo",      "NY"),
+    "w.d. n.y.":    ("Buffalo",      "NY"),
+    # North Carolina
+    "e.d.n.c.":     ("Raleigh",      "NC"),
+    "e.d. n.c.":    ("Raleigh",      "NC"),
+    "m.d.n.c.":     ("Greensboro",   "NC"),
+    "m.d. n.c.":    ("Greensboro",   "NC"),
+    "w.d.n.c.":     ("Charlotte",    "NC"),
+    "w.d. n.c.":    ("Charlotte",    "NC"),
+    # North Dakota
+    "d.n.d.":       ("Bismarck",     "ND"),
+    "d. n.d.":      ("Bismarck",     "ND"),
+    # Ohio
+    "n.d. ohio":    ("Cleveland",    "OH"),
+    "s.d. ohio":    ("Columbus",     "OH"),
+    # Oklahoma
+    "n.d. okla.":   ("Tulsa",        "OK"),
+    "e.d. okla.":   ("Muskogee",     "OK"),
+    "w.d. okla.":   ("Oklahoma City","OK"),
+    # Oregon
+    "d. or.":       ("Portland",     "OR"),
+    # Pennsylvania
+    "e.d. pa.":     ("Philadelphia", "PA"),
+    "m.d. pa.":     ("Scranton",     "PA"),
+    "w.d. pa.":     ("Pittsburgh",   "PA"),
+    # Rhode Island
+    "d.r.i.":       ("Providence",   "RI"),
+    "d. r.i.":      ("Providence",   "RI"),
+    # South Carolina
+    "d.s.c.":       ("Columbia",     "SC"),
+    "d. s.c.":      ("Columbia",     "SC"),
+    # South Dakota
+    "d.s.d.":       ("Sioux Falls",  "SD"),
+    "d. s.d.":      ("Sioux Falls",  "SD"),
+    # Tennessee
+    "e.d. tenn.":   ("Knoxville",    "TN"),
+    "m.d. tenn.":   ("Nashville",    "TN"),
+    "w.d. tenn.":   ("Memphis",      "TN"),
+    # Texas
+    "n.d. tex.":    ("Dallas",       "TX"),
+    "e.d. tex.":    ("Beaumont",     "TX"),
+    "s.d. tex.":    ("Houston",      "TX"),
+    "w.d. tex.":    ("San Antonio",  "TX"),
+    # Utah
+    "d. utah":      ("Salt Lake City","UT"),
+    # Vermont
+    "d. vt.":       ("Burlington",   "VT"),
+    # Virginia
+    "e.d. va.":     ("Alexandria",   "VA"),
+    "w.d. va.":     ("Roanoke",      "VA"),
+    # Washington
+    "e.d. wash.":   ("Spokane",      "WA"),
+    "w.d. wash.":   ("Seattle",      "WA"),
+    # West Virginia
+    "n.d.w. va.":   ("Clarksburg",   "WV"),
+    "n.d. w. va.":  ("Clarksburg",   "WV"),
+    "s.d.w. va.":   ("Charleston",   "WV"),
+    "s.d. w. va.":  ("Charleston",   "WV"),
+    # Wisconsin
+    "e.d. wis.":    ("Milwaukee",    "WI"),
+    "w.d. wis.":    ("Madison",      "WI"),
+    # Wyoming
+    "d. wyo.":      ("Cheyenne",     "WY"),
 }
 
-# Full state name → abbreviation
-_NAME_TO_ABBR = {
+# Verbose name fragments → lookup (for CourtListener "court_full_name" field)
+DISTRICT_NAME_FRAGMENTS: dict[str, tuple[str, str]] = {
+    "northern district of alabama":     ("Birmingham",    "AL"),
+    "middle district of alabama":       ("Montgomery",    "AL"),
+    "southern district of alabama":     ("Mobile",        "AL"),
+    "district of alaska":               ("Anchorage",     "AK"),
+    "district of arizona":              ("Phoenix",       "AZ"),
+    "eastern district of arkansas":     ("Little Rock",   "AR"),
+    "western district of arkansas":     ("Fort Smith",    "AR"),
+    "northern district of california":  ("San Francisco", "CA"),
+    "eastern district of california":   ("Sacramento",    "CA"),
+    "central district of california":   ("Los Angeles",   "CA"),
+    "southern district of california":  ("San Diego",     "CA"),
+    "district of colorado":             ("Denver",        "CO"),
+    "district of connecticut":          ("New Haven",     "CT"),
+    "district of delaware":             ("Wilmington",    "DE"),
+    "district of columbia":             ("Washington",    "DC"),
+    "northern district of florida":     ("Pensacola",     "FL"),
+    "middle district of florida":       ("Tampa",         "FL"),
+    "southern district of florida":     ("Miami",         "FL"),
+    "northern district of georgia":     ("Atlanta",       "GA"),
+    "middle district of georgia":       ("Macon",         "GA"),
+    "southern district of georgia":     ("Savannah",      "GA"),
+    "district of hawaii":               ("Honolulu",      "HI"),
+    "district of idaho":                ("Boise",         "ID"),
+    "northern district of illinois":    ("Chicago",       "IL"),
+    "central district of illinois":     ("Springfield",   "IL"),
+    "southern district of illinois":    ("East St. Louis","IL"),
+    "northern district of indiana":     ("Hammond",       "IN"),
+    "southern district of indiana":     ("Indianapolis",  "IN"),
+    "northern district of iowa":        ("Cedar Rapids",  "IA"),
+    "southern district of iowa":        ("Des Moines",    "IA"),
+    "district of kansas":               ("Wichita",       "KS"),
+    "eastern district of kentucky":     ("Lexington",     "KY"),
+    "western district of kentucky":     ("Louisville",    "KY"),
+    "eastern district of louisiana":    ("New Orleans",   "LA"),
+    "middle district of louisiana":     ("Baton Rouge",   "LA"),
+    "western district of louisiana":    ("Shreveport",    "LA"),
+    "district of maine":                ("Portland",      "ME"),
+    "district of maryland":             ("Baltimore",     "MD"),
+    "district of massachusetts":        ("Boston",        "MA"),
+    "eastern district of michigan":     ("Detroit",       "MI"),
+    "western district of michigan":     ("Grand Rapids",  "MI"),
+    "district of minnesota":            ("Minneapolis",   "MN"),
+    "northern district of mississippi": ("Oxford",        "MS"),
+    "southern district of mississippi": ("Jackson",       "MS"),
+    "eastern district of missouri":     ("St. Louis",     "MO"),
+    "western district of missouri":     ("Kansas City",   "MO"),
+    "district of montana":              ("Billings",      "MT"),
+    "district of nebraska":             ("Omaha",         "NE"),
+    "district of nevada":               ("Las Vegas",     "NV"),
+    "district of new hampshire":        ("Concord",       "NH"),
+    "district of new jersey":           ("Newark",        "NJ"),
+    "district of new mexico":           ("Albuquerque",   "NM"),
+    "northern district of new york":    ("Albany",        "NY"),
+    "eastern district of new york":     ("Brooklyn",      "NY"),
+    "southern district of new york":    ("New York",      "NY"),
+    "western district of new york":     ("Buffalo",       "NY"),
+    "eastern district of north carolina":("Raleigh",      "NC"),
+    "middle district of north carolina": ("Greensboro",   "NC"),
+    "western district of north carolina":("Charlotte",    "NC"),
+    "district of north dakota":         ("Bismarck",      "ND"),
+    "northern district of ohio":        ("Cleveland",     "OH"),
+    "southern district of ohio":        ("Columbus",      "OH"),
+    "northern district of oklahoma":    ("Tulsa",         "OK"),
+    "eastern district of oklahoma":     ("Muskogee",      "OK"),
+    "western district of oklahoma":     ("Oklahoma City", "OK"),
+    "district of oregon":               ("Portland",      "OR"),
+    "eastern district of pennsylvania": ("Philadelphia",  "PA"),
+    "middle district of pennsylvania":  ("Scranton",      "PA"),
+    "western district of pennsylvania": ("Pittsburgh",    "PA"),
+    "district of rhode island":         ("Providence",    "RI"),
+    "district of south carolina":       ("Columbia",      "SC"),
+    "district of south dakota":         ("Sioux Falls",   "SD"),
+    "eastern district of tennessee":    ("Knoxville",     "TN"),
+    "middle district of tennessee":     ("Nashville",     "TN"),
+    "western district of tennessee":    ("Memphis",       "TN"),
+    "northern district of texas":       ("Dallas",        "TX"),
+    "eastern district of texas":        ("Beaumont",      "TX"),
+    "southern district of texas":       ("Houston",       "TX"),
+    "western district of texas":        ("San Antonio",   "TX"),
+    "district of utah":                 ("Salt Lake City","UT"),
+    "district of vermont":              ("Burlington",    "VT"),
+    "eastern district of virginia":     ("Alexandria",    "VA"),
+    "western district of virginia":     ("Roanoke",       "VA"),
+    "eastern district of washington":   ("Spokane",       "WA"),
+    "western district of washington":   ("Seattle",       "WA"),
+    "northern district of west virginia":("Clarksburg",   "WV"),
+    "southern district of west virginia":("Charleston",   "WV"),
+    "eastern district of wisconsin":    ("Milwaukee",     "WI"),
+    "western district of wisconsin":    ("Madison",       "WI"),
+    "district of wyoming":              ("Cheyenne",      "WY"),
+}
+
+
+def district_to_city(court_name: str) -> tuple[str, str] | None:
+    """
+    Given a court name string (any format), return (city, state) or None.
+    Tries abbreviated form first, then verbose fragment matching.
+    """
+    if not court_name:
+        return None
+    s = court_name.lower().strip()
+
+    # Try abbreviated
+    if s in FEDERAL_DISTRICT_CITY:
+        return FEDERAL_DISTRICT_CITY[s]
+
+    # Try verbose fragment
+    for fragment, loc in DISTRICT_NAME_FRAGMENTS.items():
+        if fragment in s:
+            return loc
+
+    return None
+
+
+# ── Public figure detection ───────────────────────────────────────────────────
+
+PUBLIC_FIGURE_KEYWORDS = {
+    "senator", "congressman", "congresswoman", "representative", "governor",
+    "mayor", "judge", "prosecutor", "sheriff", "police chief", "officer",
+    "politician", "official", "minister", "lobbyist", "staffer",
+    "council member", "assemblyman", "assemblywoman", "state rep",
+    "attorney general", "secretary", "ambassador", "aide",
+    "deputy", "commissioner", "superintendent",
+    "president", "vice president", "cabinet", "professor", "coach",
+    "administrator", "dean", "principal", "clergy", "pastor", "priest",
+    "reverend", "bishop", "deacon",
+}
+
+
+def detect_public_figure(summary: str) -> bool:
+    s = (summary or "").lower()
+    return any(kw in s for kw in PUBLIC_FIGURE_KEYWORDS)
+
+
+# ── Case ID ───────────────────────────────────────────────────────────────────
+
+def make_case_id(city: str, state: str, vtype: str, date_str: str, source_url: str = "") -> str:
+    raw = f"{city}{state}{vtype}{date_str}{source_url}".lower().replace(" ", "")
+    h   = hashlib.md5(raw.encode()).hexdigest()[:8].upper()
+    yr  = (date_str or "")[:4] or "0000"
+    return f"MEDUSA-{yr}-{h}"
+
+
+# ── Record normalizer ─────────────────────────────────────────────────────────
+
+_BOGUS_CITIES = {
+    "federal", "national", "unknown", "n/a", "na", "none",
+    "us", "usa", "united states", "washington dc",   # DC ok only if actually DC
+}
+
+# State field values that are not real US states — drop the record entirely
+_BOGUS_STATES = {
+    "us", "usa", "united states", "america", "federal", "national",
+    "unknown", "n/a", "na", "none", "",
+    # Full country names that might bleed in from sources
+    "canada", "mexico", "uk", "england", "australia", "germany",
+    "france", "spain", "italy", "brazil", "china", "japan", "india",
+    "nigeria", "kenya", "south africa", "pakistan", "afghanistan",
+}
+
+_STATE_ABBREVS = {
+    "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN",
+    "IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV",
+    "NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN",
+    "TX","UT","VT","VA","WA","WV","WI","WY","DC",
+}
+
+# State name → abbreviation fallback
+_STATE_NAMES = {
     "alabama":"AL","alaska":"AK","arizona":"AZ","arkansas":"AR",
     "california":"CA","colorado":"CO","connecticut":"CT","delaware":"DE",
     "florida":"FL","georgia":"GA","hawaii":"HI","idaho":"ID","illinois":"IL",
@@ -54,95 +391,10 @@ _NAME_TO_ABBR = {
     "rhode island":"RI","south carolina":"SC","south dakota":"SD",
     "tennessee":"TN","texas":"TX","utah":"UT","vermont":"VT","virginia":"VA",
     "washington":"WA","west virginia":"WV","wisconsin":"WI","wyoming":"WY",
-    "district of columbia":"DC","d.c.":"DC","washington dc":"DC","washington d.c.":"DC",
+    "district of columbia":"DC",
 }
 
-# Strings that are NOT valid city names
-_INVALID_CITIES = {
-    "", "federal", "national", "unknown", "n/a", "na", "none",
-    "united states", "us", "usa", "various", "multiple",
-}
-
-
-def validate_state(raw: str) -> str | None:
-    """
-    Return a valid 2-letter US state abbreviation, or None if invalid.
-    Accepts full names ('California') or abbreviations ('CA').
-    Rejects non-US territories (PR, GU, VI, etc.) — US 50 + DC only.
-    """
-    if not raw:
-        return None
-    s = raw.strip()
-
-    # Already a 2-letter abbr?
-    if len(s) == 2:
-        up = s.upper()
-        return up if up in VALID_STATES else None
-
-    # Full name lookup
-    return _NAME_TO_ABBR.get(s.lower())
-
-
-def validate_city(raw: str) -> str | None:
-    """
-    Return a cleaned city string or None if invalid.
-    """
-    if not raw:
-        return None
-    clean = raw.strip().title()
-    if clean.lower() in _INVALID_CITIES:
-        return None
-    # Must be at least 2 chars, mostly letters/spaces/hyphens
-    if len(clean) < 2:
-        return None
-    return clean
-
-
-def normalize_violence_type(raw: str) -> str:
-    """Map raw string to a valid violence_type enum. Defaults to 'assault'."""
-    if not raw:
-        return "assault"
-    r = raw.strip().lower().replace(" ", "_").replace("-", "_")
-    if r in VALID_VIOLENCE_TYPES:
-        return r
-    # Common aliases
-    aliases = {
-        "murder": "homicide", "femicide": "homicide", "manslaughter": "homicide",
-        "rape": "rape", "sexual_abuse": "sexual_assault", "sex_assault": "sexual_assault",
-        "dv": "domestic_violence", "intimate_partner": "domestic_violence",
-        "human_trafficking": "trafficking", "sex_trafficking": "trafficking",
-        "attempted_homicide": "attempted_murder", "attempted_killing": "attempted_murder",
-        "molestation": "child_abuse", "child_sexual_abuse": "child_abuse",
-        "coercion": "coercive_control", "abuse": "assault",
-    }
-    return aliases.get(r, "assault")
-
-
-def normalize_status(raw: str) -> str:
-    """Map raw string to a valid status enum. Defaults to 'reported'."""
-    if not raw:
-        return "reported"
-    r = raw.strip().lower()
-    if r in VALID_STATUSES:
-        return r
-    aliases = {
-        "guilty plea": "convicted", "pleaded guilty": "convicted",
-        "sentenced": "convicted", "found guilty": "convicted",
-        "arrested": "charged", "indicted": "charged", "faces charges": "charged",
-        "not guilty": "acquitted", "charges dropped": "acquitted",
-        "dismissed": "acquitted",
-        "civil judgment": "civil_judgment", "judgment": "civil_judgment",
-        "allegation": "credible_allegation", "alleged": "credible_allegation",
-        "congressional": "congressional_record",
-    }
-    for k, v in aliases.items():
-        if k in r:
-            return v
-    return "reported"
-
-
-# ── Largest city fallback per state ──────────────────────────────────────────
-
+# State abbreviation → largest city (last-resort geocoding fallback)
 STATE_LARGEST_CITY = {
     "AL":"Birmingham","AK":"Anchorage","AZ":"Phoenix","AR":"Little Rock",
     "CA":"Los Angeles","CO":"Denver","CT":"Bridgeport","DE":"Wilmington",
@@ -160,184 +412,115 @@ STATE_LARGEST_CITY = {
 }
 
 
-# ── Federal district → (city, state) ─────────────────────────────────────────
-# Called by courtlistener.py and any source dealing with federal courts.
-
-_DISTRICT_PATTERNS = [
-    # Patterns: match court strings like "W.D. Tex.", "S.D.N.Y.", "N.D. Cal."
-    (re.compile(r"S\.?D\.?\s*N\.?Y\.?",    re.I), ("New York",      "NY")),
-    (re.compile(r"E\.?D\.?\s*N\.?Y\.?",    re.I), ("Brooklyn",      "NY")),
-    (re.compile(r"N\.?D\.?\s*N\.?Y\.?",    re.I), ("Albany",        "NY")),
-    (re.compile(r"W\.?D\.?\s*N\.?Y\.?",    re.I), ("Buffalo",       "NY")),
-    (re.compile(r"N\.?D\.?\s*Cal\.?",      re.I), ("San Francisco", "CA")),
-    (re.compile(r"E\.?D\.?\s*Cal\.?",      re.I), ("Sacramento",    "CA")),
-    (re.compile(r"C\.?D\.?\s*Cal\.?",      re.I), ("Los Angeles",   "CA")),
-    (re.compile(r"S\.?D\.?\s*Cal\.?",      re.I), ("San Diego",     "CA")),
-    (re.compile(r"N\.?D\.?\s*Tex\.?",      re.I), ("Dallas",        "TX")),
-    (re.compile(r"S\.?D\.?\s*Tex\.?",      re.I), ("Houston",       "TX")),
-    (re.compile(r"W\.?D\.?\s*Tex\.?",      re.I), ("San Antonio",   "TX")),
-    (re.compile(r"E\.?D\.?\s*Tex\.?",      re.I), ("Beaumont",      "TX")),
-    (re.compile(r"N\.?D\.?\s*Ill\.?",      re.I), ("Chicago",       "IL")),
-    (re.compile(r"N\.?D\.?\s*Ohio",        re.I), ("Cleveland",     "OH")),
-    (re.compile(r"S\.?D\.?\s*Ohio",        re.I), ("Columbus",      "OH")),
-    (re.compile(r"E\.?D\.?\s*Mich\.?",     re.I), ("Detroit",       "MI")),
-    (re.compile(r"W\.?D\.?\s*Mich\.?",     re.I), ("Grand Rapids",  "MI")),
-    (re.compile(r"N\.?D\.?\s*Ga\.?",       re.I), ("Atlanta",       "GA")),
-    (re.compile(r"S\.?D\.?\s*Fla\.?",      re.I), ("Miami",         "FL")),
-    (re.compile(r"M\.?D\.?\s*Fla\.?",      re.I), ("Tampa",         "FL")),
-    (re.compile(r"N\.?D\.?\s*Fla\.?",      re.I), ("Pensacola",     "FL")),
-    (re.compile(r"E\.?D\.?\s*Pa\.?",       re.I), ("Philadelphia",  "PA")),
-    (re.compile(r"W\.?D\.?\s*Pa\.?",       re.I), ("Pittsburgh",    "PA")),
-    (re.compile(r"D\.?\s*Colo\.?",         re.I), ("Denver",        "CO")),
-    (re.compile(r"D\.?\s*Ariz\.?",         re.I), ("Phoenix",       "AZ")),
-    (re.compile(r"D\.?\s*N\.?J\.?",        re.I), ("Newark",        "NJ")),
-    (re.compile(r"D\.?\s*Md\.?",           re.I), ("Baltimore",     "MD")),
-    (re.compile(r"D\.?\s*Mass\.?",         re.I), ("Boston",        "MA")),
-    (re.compile(r"D\.?\s*Conn\.?",         re.I), ("New Haven",     "CT")),
-    (re.compile(r"W\.?D\.?\s*Wash\.?",     re.I), ("Seattle",       "WA")),
-    (re.compile(r"E\.?D\.?\s*Wash\.?",     re.I), ("Spokane",       "WA")),
-    (re.compile(r"D\.?\s*Or\.?",           re.I), ("Portland",      "OR")),
-    (re.compile(r"D\.?\s*Nev\.?",          re.I), ("Las Vegas",     "NV")),
-    (re.compile(r"D\.?\s*D\.?C\.?",        re.I), ("Washington",    "DC")),
-    (re.compile(r"District of Columbia",   re.I), ("Washington",    "DC")),
-    # State name fallbacks
-    (re.compile(r"\bTexas\b",              re.I), ("Houston",       "TX")),
-    (re.compile(r"\bCalifornia\b",         re.I), ("Los Angeles",   "CA")),
-    (re.compile(r"\bNew York\b",           re.I), ("New York",      "NY")),
-    (re.compile(r"\bFlorida\b",            re.I), ("Jacksonville",  "FL")),
-    (re.compile(r"\bIllinois\b",           re.I), ("Chicago",       "IL")),
-]
-
-
-def district_to_city(court_str: str) -> tuple[str, str] | None:
-    """
-    Given a court citation string (e.g. 'W.D. Tex.' or 'S.D.N.Y.'),
-    return (city, state) or None.
-    """
-    for pattern, location in _DISTRICT_PATTERNS:
-        if pattern.search(court_str):
-            return location
-    return None
-
-
-# ── make_case_id ──────────────────────────────────────────────────────────────
-
-def make_case_id(city: str, state: str, vtype: str, date_str: str) -> str:
-    raw = f"{city}{state}{vtype}{date_str}".lower().replace(" ", "")
-    h   = hashlib.md5(raw.encode()).hexdigest()[:8].upper()
-    yr  = (date_str or "")[:4] or "0000"
-    return f"MEDUSA-{yr}-{h}"
-
-
-# ── PUBLIC_FIGURE detection ───────────────────────────────────────────────────
-
-_PUBLIC_FIGURE_KEYWORDS = {
-    "senator", "congressman", "congresswoman", "representative", "governor",
-    "mayor", "judge", "prosecutor", "sheriff", "police chief", "officer",
-    "politician", "official", "minister", "lobbyist", "staffer",
-    "council member", "assemblyman", "assemblywoman", "state rep",
-    "attorney general", "secretary", "ambassador", "aide",
-    "deputy", "commissioner", "superintendent", "president",
-    "vice president", "cabinet", "professor", "coach",
-    "administrator", "dean", "principal", "clergy", "pastor", "priest",
-}
-
-
-def detect_public_figure(summary: str) -> bool:
-    s = (summary or "").lower()
-    return any(kw in s for kw in _PUBLIC_FIGURE_KEYWORDS)
-
-
-# ── normalize_record ──────────────────────────────────────────────────────────
-
-def normalize_record(raw: dict) -> dict | None:
-    """
-    Validate and normalize a raw source dict into a complete MedusaRecord.
-    Returns None if the record cannot be salvaged (invalid state, empty city, etc.).
-
-    Input keys (all optional except noted):
-        summary, city, state*, violence_type, status,
-        date_incident, source_url, source_name, verified
-    """
-    # ── State (required) ─────────────────────────────────────────────────────
-    state = validate_state(raw.get("state", ""))
-    if not state:
-        return None     # Can't place it in the US — drop
-
-    # ── City ─────────────────────────────────────────────────────────────────
-    city = validate_city(raw.get("city", ""))
-    if not city:
-        # Fall back to largest city in state rather than dropping
-        city = STATE_LARGEST_CITY.get(state, "")
-        if not city:
-            return None
-
-    # ── Violence type ─────────────────────────────────────────────────────────
-    vtype = normalize_violence_type(raw.get("violence_type", ""))
-
-    # ── Status ────────────────────────────────────────────────────────────────
-    status = normalize_status(raw.get("status", ""))
-
-    # ── Date ──────────────────────────────────────────────────────────────────
-    date_incident = _clean_date(raw.get("date_incident", ""))
-
-    # ── Summary ───────────────────────────────────────────────────────────────
-    summary = (raw.get("summary") or "").strip()[:600]
-
-    # ── Source ───────────────────────────────────────────────────────────────
-    source_url  = (raw.get("source_url")  or "").strip()
-    source_name = (raw.get("source_name") or "").strip()
-
-    # ── Case ID ───────────────────────────────────────────────────────────────
-    case_id = make_case_id(city, state, vtype, date_incident)
-
-    # ── Public figure ─────────────────────────────────────────────────────────
-    is_public_figure = detect_public_figure(summary)
-
-    return {
-        "case_id":          case_id,
-        "summary":          summary,
-        "city":             city,
-        "state":            state,
-        "date_incident":    date_incident,
-        "violence_type":    vtype,
-        "status":           status,
-        "source_url":       source_url,
-        "source_name":      source_name,
-        "verified":         bool(raw.get("verified", True)),
-        "is_public_figure": is_public_figure,
-        # lat/lng filled by scanner.py after geocoding
-        "lat":              None,
-        "lng":              None,
-    }
-
-
-def _clean_date(raw) -> str:
+def normalize_state(raw: str) -> str | None:
     if not raw:
-        return ""
-    s = str(raw).strip()
-    # Already YYYY-MM-DD
-    if re.match(r"\d{4}-\d{2}-\d{2}$", s):
+        return None
+    # Reject anything that's clearly not a US state
+    if raw.strip().lower() in _BOGUS_STATES:
+        return None
+    s = raw.strip().upper()
+    if s in _STATE_ABBREVS:
         return s
-    # YYYY-MM
-    if re.match(r"\d{4}-\d{2}$", s):
+    # Try full name
+    abbr = _STATE_NAMES.get(raw.strip().lower())
+    return abbr
+
+
+def normalize_violence_type(raw: str) -> str:
+    if not raw:
+        return "assault"
+    v = raw.lower().strip().replace(" ", "_").replace("-", "_")
+    if v in VIOLENCE_TYPES:
+        return v
+    # Fuzzy map
+    if "homicid" in v or "murder" in v or "femicid" in v or "kill" in v:
+        return "homicide"
+    if "rape" in v:
+        return "rape"
+    if "sexual" in v or "sex_assault" in v:
+        return "sexual_assault"
+    if "domestic" in v or "intimate" in v or "partner" in v:
+        return "domestic_violence"
+    if "stalking" in v or "stalk" in v:
+        return "stalking"
+    if "trafficking" in v or "traffick" in v:
+        return "trafficking"
+    if "harass" in v:
+        return "harassment"
+    if "attempted" in v or "attempt" in v:
+        return "attempted_murder"
+    if "child" in v or "minor" in v:
+        return "child_abuse"
+    if "coercive" in v or "control" in v:
+        return "coercive_control"
+    return "assault"
+
+
+def normalize_status(raw: str) -> str:
+    if not raw:
+        return "unknown"
+    s = raw.lower().strip()
+    if s in STATUSES:
         return s
-    # YYYY
-    if re.match(r"\d{4}$", s):
-        return s
-    # Try common formats
-    for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ",
-                "%m/%d/%Y", "%d %b %Y", "%B %d, %Y"):
-        try:
-            return datetime.strptime(s[:len(fmt)+5], fmt).strftime("%Y-%m-%d")
-        except Exception:
-            pass
-    # Extract any YYYY-MM-DD substring
-    m = re.search(r"\d{4}-\d{2}-\d{2}", s)
-    if m:
-        return m.group(0)
-    # Extract just year
-    m = re.search(r"\b(20\d{2})\b", s)
-    if m:
-        return m.group(1)
-    return ""
+    if "convict" in s or "guilty" in s or "sentenced" in s:
+        return "convicted"
+    if "charg" in s or "arrest" in s or "indicted" in s:
+        return "charged"
+    if "acquit" in s or "not guilty" in s:
+        return "acquitted"
+    if "civil" in s or "judgment" in s or "settlement" in s:
+        return "civil_judgment"
+    if "congressional" in s or "testimony" in s or "hearing" in s:
+        return "congressional_record"
+    if "report" in s or "alleged" in s or "allegation" in s:
+        return "reported"
+    if "credible" in s:
+        return "credible_allegation"
+    return "unknown"
+
+
+def normalize_record(r: dict) -> dict | None:
+    """
+    Validate and fill defaults. Returns None if record is unusable.
+    Fixes bogus city values in place.
+    """
+    # State
+    state = normalize_state(r.get("state", ""))
+    if not state:
+        return None
+    r["state"] = state
+
+    # City — fix "Federal", "National", etc.
+    city = (r.get("city") or "").strip()
+    if not city or city.lower() in _BOGUS_CITIES:
+        city = STATE_LARGEST_CITY.get(state, "")
+    r["city"] = city
+
+    if not city:
+        return None
+
+    # Violence type
+    r["violence_type"] = normalize_violence_type(r.get("violence_type", ""))
+
+    # Status
+    r["status"] = normalize_status(r.get("status", ""))
+
+    # Booleans
+    r.setdefault("verified", True)
+    r["is_public_figure"] = detect_public_figure(r.get("summary", ""))
+
+    # Case ID
+    r["case_id"] = make_case_id(
+        r["city"], r["state"],
+        r["violence_type"], r.get("date_incident", ""),
+        r.get("source_url", "")
+    )
+
+    # Defaults
+    r.setdefault("summary", "")
+    r.setdefault("source_url", "")
+    r.setdefault("source_name", "")
+    r.setdefault("lat", None)
+    r.setdefault("lng", None)
+
+    return r

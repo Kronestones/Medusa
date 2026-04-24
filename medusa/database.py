@@ -71,17 +71,22 @@ class Case(Base):
 
 # ── Engine ────────────────────────────────────────────────────────────────────
 
+_engine = None
+
 def get_engine():
-    url = os.environ.get("DATABASE_URL", "")
-    if not url:
-        raise RuntimeError("DATABASE_URL not set")
-    return create_engine(
-        url,
-        pool_pre_ping=True,
-        pool_recycle=300,
-        pool_size=5,
-        max_overflow=10,
-    )
+    global _engine
+    if _engine is None:
+        url = os.environ.get("DATABASE_URL", "")
+        if not url:
+            raise RuntimeError("DATABASE_URL not set")
+        _engine = create_engine(
+            url,
+            pool_pre_ping=True,
+            pool_recycle=300,
+            pool_size=5,
+            max_overflow=10,
+        )
+    return _engine
 
 
 def get_session():

@@ -123,7 +123,7 @@ class MedusaScanner:
             ("DOJ",           doj.fetch),
             ("AP News RSS",   ap_rss.fetch),
             ("Congress RSS",  congress_rss.fetch),
-            ("FBI CDE",       fbi_stats.fetch),
+            #("FBI CDE",       fbi_stats.fetch),
             ("ED.gov",        ed_gov.fetch),
         ]
 

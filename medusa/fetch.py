@@ -6,6 +6,7 @@ Never raises. Returns None on any failure.
 Handles: timeouts, retries, rate-limit backoff, user-agent.
 """
 
+import os
 import time
 import requests
 from requests.adapters import HTTPAdapter
@@ -44,6 +45,14 @@ def safe_get(url: str, params: dict = None, timeout: int = 15,
         headers["Accept"] = "application/xml, text/xml, */*"
     if extra_headers:
         headers.update(extra_headers)
+    token = os.environ.get("COURTLISTENER_TOKEN")
+    if token and "courtlistener.com" in url:
+        headers["Authorization"] = f"Token {token}"
+    fbi_key = os.environ.get("FBI_API_KEY")
+    if fbi_key and "api.usa.gov" in url:
+        if params is None:
+            params = {}
+        params["api_key"] = fbi_key
     try:
         resp = _SESSION.get(url, params=params, headers=headers, timeout=timeout)
         if resp.status_code == 429:
