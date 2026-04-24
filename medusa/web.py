@@ -38,6 +38,7 @@ def create_app():
         print("[Medusa Web] DB initialized.")
     except Exception as e:
         print(f"[Medusa Web] DB init warning: {e}")
+    start_scheduler()
     return app
 
 
@@ -116,3 +117,35 @@ if __name__ == "__main__":
     app = create_app()
     port = int(os.environ.get("PORT", 5050))
     app.run(host="0.0.0.0", port=port, debug=False)
+
+
+# ── 24-hour auto-scan scheduler ───────────────────────────────────────────────
+def _run_scheduled_scan():
+    """Run silently in background every 24 hours."""
+    try:
+        print(f"[Medusa] Scheduled scan starting...")
+        scanner = _get_scanner()
+        cases   = scanner.scan()
+        saved   = 0
+        for c in cases:
+            from .database import save_case
+            if save_case(c):
+                saved += 1
+        print(f"[Medusa] Scheduled scan complete. {saved} new cases saved.")
+    except Exception as e:
+        print(f"[Medusa] Scheduled scan error: {e}")
+
+
+def start_scheduler():
+    from apscheduler.schedulers.background import BackgroundScheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(
+        _run_scheduled_scan,
+        trigger="interval",
+        hours=24,
+        id="medusa_daily_scan",
+        replace_existing=True,
+    )
+    scheduler.start()
+    print("[Medusa] 24-hour scan scheduler started.")
+    return scheduler
