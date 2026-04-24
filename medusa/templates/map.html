@@ -757,8 +757,16 @@ function renderMarkers() {
     // Zoom-adaptive jitter — spreads stacked dots at national view, tightens on zoom
     const zoomLevel = map.getZoom();
     const jitterAmt = Math.max(0.005, 0.35 / Math.pow(2, zoomLevel - 4));
-    const jLat = c.lat + (Math.random() - 0.5) * jitterAmt;
-    const jLng = c.lng + (Math.random() - 0.5) * jitterAmt;
+    const _jid = c.case_id || c.source_url || (c.lat + ',' + c.lng);
+    function hashJitter(str, seed) {
+      let h = seed;
+      for (let i = 0; i < (str||'').length; i++) {
+        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+      }
+      return (h >>> 0) / 0xFFFFFFFF;
+    }
+    const jLat = c.lat + (hashJitter(_jid, 1) - 0.5) * jitterAmt;
+    const jLng = c.lng + (hashJitter(_jid, 2) - 0.5) * jitterAmt;
     const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
