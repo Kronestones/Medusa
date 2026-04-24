@@ -56,27 +56,29 @@ def fetch() -> list[dict]:
 
 
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
-    """Search dockets endpoint, return normalized partial records."""
-    data = safe_json(
-        f"{BASE}/search/",
-        params={
-            "q":         search_term,
-            "type":      "d",
-            "order_by":  "score desc",
-            "page_size": PAGE_SIZE,
-        },
-        extra_headers={"Accept": "application/json"},
-    )
-    if not data:
-        return []
-
-    results = data.get("results", [])
+    """Search dockets endpoint with pagination, return normalized partial records."""
+    url = f"{BASE}/search/"
+    params = {
+        "q":         search_term,
+        "type":      "d",
+        "order_by":  "score desc",
+        "page_size": PAGE_SIZE,
+    }
     records = []
+    pages_fetched = 0
+    max_pages = 10
 
-    for item in results:
-        rec = _parse_docket(item, vtype_hint)
-        if rec:
-            records.append(rec)
+    while url and pages_fetched < max_pages:
+        data = safe_json(url, params=params, extra_headers={"Accept": "application/json"})
+        if not data:
+            break
+        for item in data.get("results", []):
+            rec = _parse_docket(item, vtype_hint)
+            if rec:
+                records.append(rec)
+        url = data.get("next")
+        params = None
+        pages_fetched += 1
 
     return records
 
