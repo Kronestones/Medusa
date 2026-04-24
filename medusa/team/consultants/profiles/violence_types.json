@@ -1,0 +1,101 @@
+[
+  {
+    "id": "vt_001",
+    "name": "Homicide Specialist",
+    "domain": "violence_type",
+    "focus": "homicide",
+    "keywords": ["homicide", "murder", "killed", "femicide", "manslaughter", "slain", "strangled", "shot"],
+    "weight": 10,
+    "notes": "Highest priority classification. Femicide specifically is killing of woman by intimate partner."
+  },
+  {
+    "id": "vt_002",
+    "name": "Rape Specialist",
+    "domain": "violence_type",
+    "focus": "rape",
+    "keywords": ["rape", "raped", "rapist", "sodomy", "fondling", "sexual penetration"],
+    "weight": 9,
+    "notes": "Distinguish from sexual_assault — rape involves penetration. UCR/FBI code separately."
+  },
+  {
+    "id": "vt_003",
+    "name": "Sexual Assault Specialist",
+    "domain": "violence_type",
+    "focus": "sexual_assault",
+    "keywords": ["sexual assault", "sexually assaulted", "sex assault", "sexual abuse", "title ix", "sexual violence", "sex offense"],
+    "weight": 9,
+    "notes": "Broader than rape. Includes non-penetrative offenses. Title IX cases often in ED.gov source."
+  },
+  {
+    "id": "vt_004",
+    "name": "Domestic Violence Specialist",
+    "domain": "violence_type",
+    "focus": "domestic_violence",
+    "keywords": ["domestic violence", "intimate partner violence", "ipv", "domestic assault", "domestic abuse", "battered"],
+    "weight": 9,
+    "notes": "Must involve intimate partner or family member. Not all assault in the home qualifies."
+  },
+  {
+    "id": "vt_005",
+    "name": "Trafficking Specialist",
+    "domain": "violence_type",
+    "focus": "trafficking",
+    "keywords": ["sex trafficking", "human trafficking", "forced prostitution", "trafficking victim", "commercial sexual exploitation", "csec"],
+    "weight": 9,
+    "notes": "Often federal charges. CourtListener richest source. Look for TVPA statute citations."
+  },
+  {
+    "id": "vt_006",
+    "name": "Stalking Specialist",
+    "domain": "violence_type",
+    "focus": "stalking",
+    "keywords": ["stalking", "stalked", "cyberstalking", "restraining order", "order of protection", "protection order"],
+    "weight": 9,
+    "notes": "Cyberstalking increasingly common. Restraining order violations often precede homicide."
+  },
+  {
+    "id": "vt_007",
+    "name": "Attempted Murder Specialist",
+    "domain": "violence_type",
+    "focus": "attempted_murder",
+    "keywords": ["attempted murder", "attempted homicide", "attempted femicide", "tried to kill", "attempted to kill"],
+    "weight": 9,
+    "notes": "Distinguish from assault — must show intent to kill. Often charged alongside other offenses."
+  },
+  {
+    "id": "vt_008",
+    "name": "Child Abuse Specialist",
+    "domain": "violence_type",
+    "focus": "child_abuse",
+    "keywords": ["child sexual abuse", "child molestation", "molestation of minor", "sexual abuse of minor", "child exploitation", "cse", "csam"],
+    "weight": 9,
+    "notes": "Often sealed in state courts. CourtListener covers federal charges only. ED.gov covers campus."
+  },
+  {
+    "id": "vt_009",
+    "name": "Harassment Specialist",
+    "domain": "violence_type",
+    "focus": "harassment",
+    "keywords": ["sexual harassment", "harassed", "harassment", "hostile work environment"],
+    "weight": 7,
+    "notes": "Often civil cases. CourtListener has many Title VII and Title IX harassment dockets."
+  },
+  {
+    "id": "vt_010",
+    "name": "Coercive Control Specialist",
+    "domain": "violence_type",
+    "focus": "coercive_control",
+    "keywords": ["coercive control", "psychological abuse", "financial abuse", "economic abuse", "isolation"],
+    "weight": 8,
+    "notes": "Newer legal category. Some states now have specific coercive control statutes."
+  },
+  {
+    "id": "vt_011",
+    "name": "Assault Specialist",
+    "domain": "violence_type",
+    "focus": "assault",
+    "keywords": ["assault", "attacked", "beaten", "beat", "struck", "punched", "physical abuse", "aggravated assault"],
+    "weight": 5,
+    "notes": "Default/fallback type. If any more specific type matches, use that instead."
+  }
+]

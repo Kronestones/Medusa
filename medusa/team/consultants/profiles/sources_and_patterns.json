@@ -1,0 +1,273 @@
+[
+  {
+    "id": "src_001",
+    "name": "CourtListener Monitor",
+    "domain": "source_health",
+    "source": "CourtListener",
+    "check_url": "https://www.courtlistener.com/api/rest/v4/search/?type=d&page_size=1",
+    "auth_header": "Authorization: Token {COURTLISTENER_TOKEN}",
+    "expected_min": 20,
+    "failure_modes": [
+      "401 — token missing or expired. Regenerate at courtlistener.com/profile/",
+      "400 unknown_params — endpoint changed. Was /dockets/, now /search/?type=d",
+      "0 results — queries may need updating. Check SEARCH_TERMS list in courtlistener.py",
+      "Slow — page_size is 20, safely increase to 50 in PAGE_SIZE constant"
+    ],
+    "notes": "Primary source. Token: 75b1d8e8d99f11c3ec013a7eb5b038bcb9a27f81"
+  },
+  {
+    "id": "src_002",
+    "name": "FBI CDE Monitor",
+    "domain": "source_health",
+    "source": "FBI CDE",
+    "check_url": "https://api.usa.gov/crime/fbi/cde/offense/state/offenses/rape/2023?api_key={FBI_API_KEY}",
+    "auth_header": null,
+    "auth_param": "api_key={FBI_API_KEY}",
+    "expected_min": 50,
+    "failure_modes": [
+      "403 MissingAuthenticationTokenException — key sent as header, must be URL param",
+      "404 Not Found — endpoint path wrong, check cde.ucr.cjis.gov for current API",
+      "Empty response — year parameter may be out of range, try current year - 1",
+      "0 records — OFFENSE_TYPES list in fbi_stats.py may use invalid slugs"
+    ],
+    "notes": "Aggregate data only. Key: vIGVtIYpjRh4oG6d8fI3SrAvdYUfCWXcsyCAyhXU. Must be ?api_key= param."
+  },
+  {
+    "id": "src_003",
+    "name": "AP RSS Monitor",
+    "domain": "source_health",
+    "source": "AP RSS",
+    "check_url": "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "auth_header": null,
+    "expected_min": 5,
+    "failure_modes": [
+      "feeds.apnews.com — PERMANENTLY DEAD. Do not attempt to restore.",
+      "rsshub.app — RESTRICTED. Do not use.",
+      "NYT feed 403 — NYT may have paywalled their RSS",
+      "Guardian feed down — check theguardian.com/us-news/rss directly",
+      "0 results — check keyword filters in ap_rss.py are not too restrictive"
+    ],
+    "notes": "Now uses NYT/NPR/Guardian feeds. File still called ap_rss.py for historical reasons."
+  },
+  {
+    "id": "src_004",
+    "name": "Congress RSS Monitor",
+    "domain": "source_health",
+    "source": "Congress RSS",
+    "check_url": "https://www.congress.gov/rss/",
+    "auth_header": null,
+    "expected_min": 2,
+    "failure_modes": [
+      "Feed URLs changed — check https://www.congress.gov/rss/ for current paths",
+      "0 results — keyword filters may be too restrictive for legislative language",
+      "Feed parses but no violence content — Congress RSS covers legislation not prosecutions"
+    ],
+    "notes": "Returns legislative mentions of DV/trafficking. Low volume is normal."
+  },
+  {
+    "id": "src_005",
+    "name": "ED.gov Monitor",
+    "domain": "source_health",
+    "source": "ED.gov",
+    "check_url": "https://ocrcas.ed.gov/ocr-search/searchocr?issue=14&page=1",
+    "auth_header": null,
+    "expected_min": 5,
+    "failure_modes": [
+      "403 — endpoint moved or auth required. Check ocrcas.ed.gov for current API.",
+      "404 — URL structure changed. Check ed.gov developer docs.",
+      "Empty — issue parameter 14 may no longer map to sexual violence"
+    ],
+    "notes": "Currently returning 403. Needs investigation. Campus sexual violence cases."
+  },
+  {
+    "id": "src_006",
+    "name": "DOJ Press Release Monitor",
+    "domain": "source_health",
+    "source": "DOJ Press Releases",
+    "check_url": "https://www.justice.gov/rss/news.xml",
+    "auth_header": null,
+    "expected_min": 10,
+    "failure_modes": [
+      "NOT YET IMPLEMENTED — highest priority source to add",
+      "If implemented and 0: check feed URL, justice.gov occasionally restructures"
+    ],
+    "notes": "PRIORITY 1 unimplemented source. No auth required. Add sources/doj_press.py"
+  },
+  {
+    "id": "pat_001",
+    "name": "Save Rate Pattern Monitor",
+    "domain": "pattern",
+    "focus": "save_rate",
+    "threshold": 0.50,
+    "description": "Monitors ratio of saved/found cases each scan",
+    "alert_condition": "saved/found < 0.50",
+    "diagnosis": [
+      "Check source_url uniqueness — same URL across many records causes hash collisions",
+      "Check make_case_id() in record.py still includes source_url in hash",
+      "Check FBI source URLs — all records may share same CDE dashboard URL",
+      "If rate is 0: all records already in DB from previous scan — this is NORMAL"
+    ]
+  },
+  {
+    "id": "pat_002",
+    "name": "Type Distribution Monitor",
+    "domain": "pattern",
+    "focus": "type_distribution",
+    "description": "Monitors violence type distribution for anomalies",
+    "alert_condition": "any single type > 60% of total",
+    "diagnosis": [
+      "One type dominating may indicate source bias (e.g. CourtListener heavy on DV dockets)",
+      "Check SEARCH_TERMS in courtlistener.py — may over-weight certain terms",
+      "Check Voss classification rules — a high-weight rule may be matching too broadly"
+    ]
+  },
+  {
+    "id": "pat_003",
+    "name": "Public Figure Rate Monitor",
+    "domain": "pattern",
+    "focus": "public_figure_rate",
+    "description": "Monitors public figure detection rate",
+    "alert_condition": "public_figures / total < 0.05 OR > 0.50",
+    "diagnosis": [
+      "Rate too low: detect_public_figure() in record.py may be missing role keywords",
+      "Rate too high: public figure keywords may be too broad — 'officer' matches too many",
+      "Check Cairo's EXTENDED_PUBLIC_FIGURE_ROLES for false positives"
+    ]
+  },
+  {
+    "id": "pat_004",
+    "name": "Geographic Distribution Monitor",
+    "domain": "pattern",
+    "focus": "geographic_coverage",
+    "description": "Monitors state coverage for gaps",
+    "alert_condition": "any US state with zero cases for 5+ consecutive scans",
+    "diagnosis": [
+      "Underserved states list in Lira.py for context",
+      "State-specific sources (AG feeds) would help — see Reed's STATE_AG_FEEDS",
+      "Rural states genuinely have less documented cases — not always a data problem"
+    ]
+  },
+  {
+    "id": "pat_005",
+    "name": "Geocoding Health Monitor",
+    "domain": "pattern",
+    "focus": "geocoding",
+    "description": "Monitors lat/lng completeness",
+    "alert_condition": "cases with null lat/lng > 20% of total",
+    "diagnosis": [
+      "Nominatim may be rate-limiting — check 0.2s sleep is present in scanner.py",
+      "DNS issue — test: nslookup nominatim.openstreetmap.org 8.8.8.8",
+      "Invalid city names slipping through — check _INVALID_CITIES in record.py",
+      "State fallback coordinates should catch most failures via STATE_COORDS in scanner.py"
+    ]
+  },
+  {
+    "id": "pat_006",
+    "name": "Status Distribution Monitor",
+    "domain": "pattern",
+    "focus": "status_distribution",
+    "description": "Monitors case status distribution",
+    "alert_condition": "status 'unknown' > 50% of total",
+    "diagnosis": [
+      "Check _infer_status() in each source module",
+      "CourtListener: dateTerminated set → should be convicted or acquitted",
+      "News RSS: 'sentenced', 'convicted', 'acquitted' keywords → update status",
+      "FBI: all records should be 'reported' not 'unknown'"
+    ]
+  },
+  {
+    "id": "pat_007",
+    "name": "Verification Rate Monitor",
+    "domain": "pattern",
+    "focus": "verification",
+    "description": "Monitors source verification rate",
+    "alert_condition": "verified / total < 0.30",
+    "diagnosis": [
+      "Check Maren's TRUSTED_DOMAINS — new source domains may need adding",
+      "Aggregate sources (FBI) are always unverified — this is correct",
+      "If CourtListener records show unverified: check domain in Maren"
+    ]
+  },
+  {
+    "id": "pat_008",
+    "name": "Duplicate Detection Monitor",
+    "domain": "pattern",
+    "focus": "deduplication",
+    "description": "Monitors deduplication effectiveness",
+    "alert_condition": "found - after_dedup > 20% of found",
+    "diagnosis": [
+      "High duplicate rate: multiple sources reporting same cases — normal for high-profile",
+      "Very high rate (>40%): check if case_id hash is too aggressive",
+      "Check make_case_id() — source_url must be included for uniqueness"
+    ]
+  },
+  {
+    "id": "sys_001",
+    "name": "Database Connection Monitor",
+    "domain": "system",
+    "focus": "db_connection",
+    "description": "Monitors database connection health",
+    "checks": [
+      "DATABASE_URL env var set",
+      "Neon PostgreSQL reachable",
+      "pool_pre_ping=True in create_engine()",
+      "Engine is singleton (_engine global in database.py)",
+      "pool_recycle=300, pool_size=5, max_overflow=10"
+    ],
+    "failure_modes": [
+      "KeyboardInterrupt on rollback — engine created per-call, not singleton. Fix: use _engine global.",
+      "SSL error — Neon requires SSL. Check connection string includes sslmode=require.",
+      "Connection timeout — check pool_recycle setting, check Neon dashboard for outages."
+    ]
+  },
+  {
+    "id": "sys_002",
+    "name": "Environment Variable Monitor",
+    "domain": "system",
+    "focus": "env_vars",
+    "description": "Monitors required environment variables",
+    "required_vars": [
+      "DATABASE_URL",
+      "COURTLISTENER_TOKEN",
+      "FBI_API_KEY"
+    ],
+    "optional_vars": [
+      "NEWS_API_KEY"
+    ],
+    "persist_command": "echo 'export VAR=\"value\"' >> ~/.bashrc",
+    "notes": "Env vars lost on Termux restart unless added to ~/.bashrc"
+  },
+  {
+    "id": "sys_003",
+    "name": "DNS Health Monitor",
+    "domain": "system",
+    "focus": "dns",
+    "description": "Monitors DNS resolution health",
+    "test_commands": [
+      "ping -c 2 8.8.8.8",
+      "nslookup courtlistener.com 8.8.8.8",
+      "nslookup api.usa.gov 8.8.8.8"
+    ],
+    "fix_command": "echo 'nameserver 8.8.8.8' > $PREFIX/etc/resolv.conf && echo 'nameserver 8.8.4.4' >> $PREFIX/etc/resolv.conf",
+    "notes": "Termux DNS can break while IP connectivity works. Fix resolv.conf. Check Android Private DNS settings if fix doesn't hold."
+  },
+  {
+    "id": "sys_004",
+    "name": "Termux Process Monitor",
+    "domain": "system",
+    "focus": "process_health",
+    "description": "Monitors Termux process stability",
+    "checks": [
+      "termux-wake-lock active during long scans",
+      "Battery optimization disabled for Termux",
+      "Storage permission granted to Termux"
+    ],
+    "commands": {
+      "scan": "python3 main.py --scan",
+      "status": "python3 main.py --status",
+      "server": "python3 main.py",
+      "wake_lock": "termux-wake-lock"
+    },
+    "notes": "Android kills background processes. termux-wake-lock prevents this during scans."
+  }
+]
