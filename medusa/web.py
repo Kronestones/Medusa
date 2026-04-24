@@ -87,19 +87,17 @@ def api_stats():
 
 @app.route("/api/scan", methods=["POST"])
 def api_scan():
-    try:
-        scanner   = _get_scanner()
-        new_cases = scanner.scan()
-        saved = sum(1 for c in new_cases if save_case(c))
-        return jsonify({
-            "ok":      True,
-            "found":   len(new_cases),
-            "saved":   saved,
-            "message": f"Scan complete. {saved} new cases documented.",
-        })
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)}), 500
-
+    import threading
+    def _do_scan():
+        try:
+            s = _get_scanner()
+            cases = s.scan()
+            saved = sum(1 for c in cases if save_case(c))
+            print(f"[Medusa] Scan complete. {saved} new cases saved.")
+        except Exception as e:
+            print(f"[Medusa] Scan error: {e}")
+    threading.Thread(target=_do_scan, daemon=True).start()
+    return jsonify({"ok": True, "message": "Scan started."})
 
 @app.route("/api/status")
 def api_status():
