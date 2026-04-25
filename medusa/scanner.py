@@ -137,6 +137,8 @@ _VICTIM_TERMS = [
     "domestic violence", "sexual assault", "rape", "stalking",
     "trafficking", "abuse", "exploitation", "harassment",
     "intimate partner", "dating violence",
+    "transgender woman", "transgender girl", "transgender female",
+    "trans woman", "trans girl", "transfeminine",
 ]
 
 
