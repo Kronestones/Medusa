@@ -926,6 +926,9 @@
           </div>
           <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
             <div class="legend-dot" style="background:var(--coercive_control)"></div>Coercive Ctrl
+            </div>
+            <div class="legend-item">
+            <div class="legend-dot" style="background:#ff69b4"></div>Trans Violence
           </div>
         </div>
       </div>
@@ -945,6 +948,49 @@
         <div style="padding:28px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-align:center;">
           LOADING…
         </div>
+      </div>
+
+      <!-- Global stats panel -->
+      <div id="global-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
+        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
+          Global estimates from WHO, UN Women, and UNODC. Medusa documents US cases only.
+        </div>
+
+        <div class="global-region">GLOBAL</div>
+        <div class="fact-row"><span class="fact-label">Women experience violence</span><span class="fact-val">1 IN 3</span></div>
+        <div class="fact-row"><span class="fact-label">Killed by intimate partner</span><span class="fact-val">~89,000 / YR</span></div>
+        <div class="fact-row"><span class="fact-label">Girls married before 18</span><span class="fact-val">~12M / YR</span></div>
+        <div class="fact-row"><span class="fact-label">Women in forced labour</span><span class="fact-val">~6.3M</span></div>
+
+        <div class="global-region">AFRICA</div>
+        <div class="fact-row"><span class="fact-label">Intimate partner violence</span><span class="fact-val">1 IN 3</span></div>
+        <div class="fact-row"><span class="fact-label">Female genital mutilation</span><span class="fact-val">200M+</span></div>
+        <div class="fact-row"><span class="fact-label">Child marriage W. Africa</span><span class="fact-val">~40%</span></div>
+
+        <div class="global-region">ASIA &amp; PACIFIC</div>
+        <div class="fact-row"><span class="fact-label">Partner violence S. Asia</span><span class="fact-val">~40%</span></div>
+        <div class="fact-row"><span class="fact-label">Dowry-related deaths India</span><span class="fact-val">~7,000 / YR</span></div>
+        <div class="fact-row"><span class="fact-label">Missing women sex-selective</span><span class="fact-val">~1.7M / YR</span></div>
+
+        <div class="global-region">LATIN AMERICA</div>
+        <div class="fact-row"><span class="fact-label">Femicide rate</span><span class="fact-val">HIGHEST</span></div>
+        <div class="fact-row"><span class="fact-label">Honduras femicide</span><span class="fact-val">~6 PER 100K</span></div>
+        <div class="fact-row"><span class="fact-label">Child marriage</span><span class="fact-val">~24% OF GIRLS</span></div>
+
+        <div class="global-region">MIDDLE EAST &amp; N. AFRICA</div>
+        <div class="fact-row"><span class="fact-label">Partner violence</span><span class="fact-val">~37%</span></div>
+        <div class="fact-row"><span class="fact-label">Honour killings global</span><span class="fact-val">~5,000 / YR</span></div>
+
+        <div class="global-region">EUROPE</div>
+        <div class="fact-row"><span class="fact-label">Partner violence</span><span class="fact-val">~22%</span></div>
+        <div class="fact-row"><span class="fact-label">Sexual violence</span><span class="fact-val">~11%</span></div>
+
+        <div class="global-region">TRANS VIOLENCE — US</div>
+        <div class="fact-row"><span class="fact-label">Trans people killed 2024</span><span class="fact-val">~50+</span></div>
+        <div class="fact-row"><span class="fact-label">Trans women of color killed</span><span class="fact-val">~80% OF TOTAL</span></div>
+        <div class="fact-row"><span class="fact-label">Trans people experiencing violence</span><span class="fact-val">1 IN 4</span></div>
+
+        <p class="facts-source" style="padding:10px 14px 0;">Sources: WHO · UN Women · UNODC · HRC Fatal Violence Report · 2023 data</p>
       </div>
 
       <!-- Disclosure -->
