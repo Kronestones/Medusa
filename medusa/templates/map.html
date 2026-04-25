@@ -1192,6 +1192,8 @@ setTimeout(() => {
 function toggleSidebar() {
   const s = document.getElementById('sidebar');
   s.classList.toggle('open');
+  const dot = document.getElementById('facts-dot');
+  if (dot) dot.style.display = s.classList.contains('open') ? 'none' : 'flex';
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
