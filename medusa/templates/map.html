@@ -627,6 +627,84 @@
     }
 
   
+    /* ── Name search ── */
+    #name-search-wrap {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #name-search {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 8px 10px;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    #name-search::placeholder { color: var(--muted); }
+    #name-search:focus { border-color: #2d6a4f; }
+
+    #name-disclaimer {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.6;
+      display: none;
+    }
+
+    #name-disclaimer.visible { display: block; }
+
+    #name-results {
+      margin-top: 8px;
+    }
+
+    .name-hit {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--surface2);
+    }
+
+    .name-hit-type {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin-bottom: 4px;
+    }
+
+    .name-hit-summary {
+      font-family: 'Crimson Pro', serif;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+
+    .name-hit-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      color: var(--muted);
+    }
+
+    .name-no-results {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 8px 0;
+      text-align: center;
+    }
+
     /* ── Facts dot & drawer ── */
     #facts-dot {
       position: fixed;
@@ -776,6 +854,14 @@
       <div id="search-wrap">
         <input id="search" type="text" placeholder="Search cases, cities, states…"
                oninput="filterFeed()" />
+      </div>
+
+      <!-- Name search -->
+      <div id="name-search-wrap">
+        <input id="name-search" type="text" placeholder="Search by name…"
+               oninput="searchByName()" />
+        <div id="name-disclaimer">Public court records only. Multiple people may share the same name.</div>
+        <div id="name-results"></div>
       </div>
 
       <!-- Legend -->
@@ -1208,6 +1294,39 @@ function fixMapHeight(){
 }
 window.addEventListener('resize', fixMapHeight);
 setTimeout(fixMapHeight, 100);
+// ── Name search ──────────────────────────────────────────────────────────────
+
+function searchByName() {
+  const q = document.getElementById('name-search').value.trim().toLowerCase();
+  const disclaimer = document.getElementById('name-disclaimer');
+  const results = document.getElementById('name-results');
+
+  if (q.length < 2) {
+    disclaimer.classList.remove('visible');
+    results.innerHTML = '';
+    return;
+  }
+
+  disclaimer.classList.add('visible');
+
+  const hits = allCases.filter(c =>
+    (c.summary || '').toLowerCase().includes(q)
+  );
+
+  if (hits.length === 0) {
+    results.innerHTML = '<div class="name-no-results">No documented cases found.</div>';
+    return;
+  }
+
+  results.innerHTML = hits.slice(0, 20).map(c => `
+    <div class="name-hit">
+      <div class="name-hit-type">${c.violence_type || 'unknown'}</div>
+      <div class="name-hit-summary">${(c.summary || '').slice(0, 180)}${c.summary && c.summary.length > 180 ? '…' : ''}</div>
+      <div class="name-hit-meta">${c.city || ''}, ${c.state || ''} &nbsp;·&nbsp; ${c.status || ''}</div>
+    </div>
+  `).join('');
+}
+
 // ── Facts drawer ─────────────────────────────────────────────────────────────
 function toggleFacts() {
   document.getElementById('facts-drawer').classList.toggle('open');
