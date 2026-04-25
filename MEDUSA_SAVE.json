@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-04-25T02:18:43.709831+00:00",
+  "total_cases": 2675,
+  "public_figures": 369,
+  "by_type": {
+    "domestic_violence": 488,
+    "stalking": 261,
+    "sexual_assault": 547,
+    "attempted_murder": 177,
+    "homicide": 208,
+    "child_abuse": 177,
+    "assault": 187,
+    "harassment": 11,
+    "trafficking": 277,
+    "rape": 342
+  }
+}

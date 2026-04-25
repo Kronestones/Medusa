@@ -29,17 +29,13 @@ from medusa.record import (
     normalize_record, make_case_id,
     STATE_LARGEST_CITY,
 )
-from medusa.team.engine import TeamEngine
 
 # Source modules
 from medusa.sources import courtlistener
-from medusa.sources import doj
 from medusa.sources import ap_rss
 from medusa.sources import congress_rss
 from medusa.sources import fbi_stats
 from medusa.sources import ed_gov
-from medusa.sources import doj_press
-from medusa.sources import state_ag
 
 
 # State centroids — fallback when Nominatim fails
@@ -105,6 +101,73 @@ def geocode(city: str, state: str) -> tuple:
     return coords
 
 
+
+# ── Scope filter ──────────────────────────────────────────────────────────────
+# Medusa documents male violence against women and children ONLY.
+# This gate runs after normalization and drops anything outside that mission.
+
+# Female perpetrator indicators — drop these cases entirely
+_FEMALE_PERP_TERMS = [
+    "woman pleads", "woman convicted", "woman sentenced", "woman arrested",
+    "woman charged", "woman indicted", "woman guilty",
+    "female suspect", "female defendant", "female perpetrator",
+    "mother convicted", "mother pleads", "mother sentenced", "mother charged",
+    "wife convicted", "wife pleads", "wife sentenced",
+    "girlfriend convicted", "girlfriend sentenced",
+]
+
+# Out-of-scope subject matter — not male violence against women/children
+_OUT_OF_SCOPE_TERMS = [
+    "animal crush", "animal cruelty", "monkey", "dog fighting",
+    "drug trafficking", "drug possession", "drug distribution",
+    "tax fraud", "tax evasion", "financial fraud", "bank fraud",
+    "immigration violation", "border crossing",
+    "terrorism", "bomb threat",
+    "death sentence reinstated",     # AG press releases re: old cases
+    "attorney general announces",    # press releases, not incidents
+    "for immediate release",         # press release boilerplate
+    "for press inquiries",
+]
+
+# Must contain at least one victim-context term to confirm relevance
+_VICTIM_TERMS = [
+    "woman", "women", "female", "girl", "girls", "daughter",
+    "wife", "girlfriend", "mother", "victim", "survivor",
+    "child", "children", "minor", "juvenile", "infant", "baby",
+    "domestic violence", "sexual assault", "rape", "stalking",
+    "trafficking", "abuse", "exploitation", "harassment",
+    "intimate partner", "dating violence",
+]
+
+
+def _is_in_scope(record: dict) -> bool:
+    """
+    Returns True only if record is male violence against women/children.
+    Checks title, summary, description. Drops female perps, off-topic cases,
+    and press releases with no victim context.
+    """
+    text = " ".join([
+        str(record.get("title", "")),
+        str(record.get("summary", "")),
+        str(record.get("description", "")),
+        str(record.get("detail", "")),
+    ]).lower()
+
+    # Drop female perpetrators
+    if any(term in text for term in _FEMALE_PERP_TERMS):
+        return False
+
+    # Drop out-of-scope subject matter
+    if any(term in text for term in _OUT_OF_SCOPE_TERMS):
+        return False
+
+    # Must have victim context
+    if not any(term in text for term in _VICTIM_TERMS):
+        return False
+
+    return True
+
+
 class MedusaScanner:
 
     def __init__(self):
@@ -123,13 +186,10 @@ class MedusaScanner:
         # ── Collect from each source ──────────────────────────────────────────
         sources = [
             ("CourtListener", courtlistener.fetch),
-            ("DOJ",           doj.fetch),
             ("AP News RSS",   ap_rss.fetch),
             ("Congress RSS",  congress_rss.fetch),
-            #("FBI CDE",       fbi_stats.fetch),
+            ("FBI CDE",       fbi_stats.fetch),
             ("ED.gov",        ed_gov.fetch),
-            ("DOJ Press",     doj_press.fetch),
-            ("State AG",      state_ag.fetch),
         ]
 
         for name, fetch_fn in sources:
@@ -154,6 +214,10 @@ class MedusaScanner:
 
         print(f"[Medusa] After normalization: {len(normalized)} valid records")
 
+        # ── Relevance filter — male violence against women/children ONLY ──────
+        normalized = [r for r in normalized if _is_in_scope(r)]
+        print(f"[Medusa] After scope filter: {len(normalized)} in-scope records")
+
         # ── Deduplicate by case_id ────────────────────────────────────────────
         seen_ids: set[str] = set()
         unique: list[dict] = []
@@ -172,15 +236,6 @@ class MedusaScanner:
             r["lat"] = lat
             r["lng"] = lng
             time.sleep(0.2)    # Nominatim rate limit: 1 req/s max
-
-        # ── Team Pipeline ─────────────────────────────────────────────────────
-        engine = TeamEngine()
-        scan_result = {
-            "found": len(unique),
-            "saved": 0,
-            "sources": {name: len([r for r in unique if name in (r.get("source_name") or "")]) for name, _ in sources},
-        }
-        unique, team_report = engine.run(unique, scan_result)
 
         # ── Finalize ──────────────────────────────────────────────────────────
         self.last_scan    = datetime.now(timezone.utc).isoformat()
