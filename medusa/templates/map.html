@@ -626,6 +626,127 @@
       display: none;
     }
 
+  
+    /* ── Facts dot & drawer ── */
+    #facts-dot {
+      position: fixed;
+      bottom: 22px;
+      left: 22px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #1a2a22;
+      border: 1.5px solid #2d6a4f;
+      color: #40916c;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2000;
+      transition: background 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+    #facts-dot:hover { background: #2d6a4f; color: #fff; border-color: #40916c; }
+
+    #facts-drawer {
+      position: fixed;
+      bottom: 72px;
+      left: 16px;
+      width: 310px;
+      max-height: 70vh;
+      background: #0d1117;
+      border: 1px solid #1f2d25;
+      border-radius: 6px;
+      z-index: 1999;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      overflow: hidden;
+    }
+    #facts-drawer.open { display: flex; }
+
+    #facts-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    #facts-close:hover { color: var(--text); }
+
+    #facts-inner {
+      overflow-y: auto;
+      padding: 16px 16px 18px;
+      scrollbar-width: thin;
+      scrollbar-color: #1f2d25 transparent;
+    }
+
+    .facts-section-head {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #40916c;
+      margin-bottom: 10px;
+    }
+
+    .fact-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 4px 0;
+      border-bottom: 1px solid #141a1f;
+    }
+    .fact-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--text);
+    }
+    .fact-val {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #c0392b;
+      font-weight: 700;
+    }
+
+    .fact-item {
+      font-family: 'Crimson Pro', serif;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 9px 0;
+      border-bottom: 1px solid #141a1f;
+    }
+    .fact-year {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin-bottom: 3px;
+    }
+
+    .facts-note {
+      font-family: 'Crimson Pro', serif;
+      font-size: 11px;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    .facts-source {
+      font-family: 'Space Mono', monospace;
+      font-size: 7.5px;
+      letter-spacing: 0.5px;
+      color: var(--dim);
+      margin-top: 6px;
+      line-height: 1.7;
+    }
+
   </style>
 </head>
 <body>
@@ -1085,6 +1206,11 @@ function fixMapHeight(){
 }
 window.addEventListener('resize', fixMapHeight);
 setTimeout(fixMapHeight, 100);
+// ── Facts drawer ─────────────────────────────────────────────────────────────
+function toggleFacts() {
+  document.getElementById('facts-drawer').classList.toggle('open');
+}
+
 loadAll();
 
 // Auto-scan every 24 hours
@@ -1107,53 +1233,89 @@ loadAll();
 </script>
 
 
-  <!-- National Statistics Panel -->
-  <div id="national-stats">
-    <h4>&#9888; National Estimates &#8212; Not in This Database</h4>
-    <div class="ns-row">
-      <span class="ns-label">Domestic violence</span>
-      <span class="ns-value">~10M / yr</span>
-    </div>
-    <div class="ns-row">
-      <span class="ns-label">Sexual assault</span>
-      <span class="ns-value">~460K / yr</span>
-    </div>
-    <div class="ns-row">
-      <span class="ns-label">Rape (reported)</span>
-      <span class="ns-value">~130K / yr</span>
-    </div>
-    <div class="ns-row">
-      <span class="ns-label">Stalking</span>
-      <span class="ns-value">~7.5M / yr</span>
-    </div>
-    <div class="ns-row">
-      <span class="ns-label">IPV homicide</span>
-      <span class="ns-value">~1,500 / yr</span>
-    </div>
-    <p class="ns-disclaimer">
-      These are national estimates. Medusa documents only publicly recorded,
-      court-filed, and prosecuted cases &mdash; a fraction of what actually occurs.
-    </p>
-    <p class="ns-source">
-      Sources: CDC NISVS &middot; FBI UCR &middot; BJS NCVS &middot; 2023 data<br>
-      Updated annually when federal reports are released.
-    </p>
-    <p class="ns-source" style="margin-top:4px;color:#2d6a4f;">&#9660; click to collapse</p>
-  </div>
-  <div id="ns-toggle">national estimates &#9650;</div>
+  <!-- Facts Dot -->
+  <div id="facts-dot" onclick="toggleFacts()" title="The Law &amp; The Numbers">&#9651;</div>
 
-  <script>
-    const nsPanel  = document.getElementById('national-stats');
-    const nsToggle = document.getElementById('ns-toggle');
-    nsPanel.addEventListener('click', function() {
-      nsPanel.style.display  = 'none';
-      nsToggle.style.display = 'block';
-    });
-    nsToggle.addEventListener('click', function() {
-      nsPanel.style.display  = 'block';
-      nsToggle.style.display = 'none';
-    });
-  </script>
+  <div id="facts-drawer">
+    <div id="facts-close" onclick="toggleFacts()">&#10005;</div>
+    <div id="facts-inner">
+
+      <div class="facts-section-head">THE NUMBERS</div>
+
+      <div class="fact-row">
+        <span class="fact-label">Domestic violence</span>
+        <span class="fact-val">~10M / yr</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Sexual assault</span>
+        <span class="fact-val">~460K / yr</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Rape (reported)</span>
+        <span class="fact-val">~130K / yr</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Stalking</span>
+        <span class="fact-val">~7.5M / yr</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">IPV homicide</span>
+        <span class="fact-val">~1,500 / yr</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Children abused</span>
+        <span class="fact-val">~700K / yr</span>
+      </div>
+
+      <p class="facts-note">These are national estimates. Medusa documents only publicly recorded, court-filed cases &mdash; a fraction of what actually occurs.</p>
+      <p class="facts-source">Sources: CDC NISVS &middot; FBI UCR &middot; BJS NCVS &middot; 2023 data</p>
+
+      <div class="facts-section-head" style="margin-top:18px;">THE LAW</div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1993</span>
+        Marital rape was legal in at least one state. North Carolina was the last to criminalize it &mdash; July 5, 1993. Until 1976, every single state had a spousal exemption allowing a husband to rape his wife with no legal consequences.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today</span>
+        Some states still treat marital rape differently than stranger rape &mdash; shorter reporting windows, reduced penalties, or additional force requirements. South Carolina requires proof of a weapon or extreme violence to prosecute spousal rape.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Child marriage</span>
+        Child marriage is still legal in 34 states. California, Mississippi, New Mexico, and Oklahoma set no minimum age &mdash; a child of any age can marry with parental consent. Nearly 315,000 children, mostly girls, were legally married in the U.S. between 2000 and 2021.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Marriage as escape</span>
+        In most states, marriage is a legal defense to statutory rape. Marrying a child you sexually abused makes the prior abuse legal. At least 66,000 child marriages since 2000 involved an age gap that would otherwise be a sex crime.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1974</span>
+        Women could not get a credit card in their own name. The Equal Credit Opportunity Act was not passed until 1974.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1973</span>
+        Women could be legally fired for being pregnant. The Pregnancy Discrimination Act did not pass until 1978.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1920</span>
+        Women could not vote. The 19th Amendment was ratified August 18, 1920 &mdash; 144 years after the nation was founded.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1839</span>
+        No state allowed women to own property in their own name. Mississippi was the first &mdash; and required a husband&rsquo;s permission.
+      </div>
+
+      <p class="facts-source" style="margin-top:14px;">Sources: Unchained At Last &middot; OJP &middot; CDC &middot; National Women&rsquo;s History Alliance &middot; Congress.gov</p>
+
+    </div>
+  </div>
 
 </body>
 </html>
