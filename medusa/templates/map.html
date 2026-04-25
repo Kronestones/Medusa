@@ -902,7 +902,7 @@ const DV_TYPES     = new Set(['domestic_violence','coercive_control','stalking']
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 
-const map = L.map('map', { center:[39.5,-98.35], zoom:4 });
+const map = L.map('map', { center:[39.5,-98.35], zoom:4, zoomControl:false });
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; OpenStreetMap &copy; CARTO',
