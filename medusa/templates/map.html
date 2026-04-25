@@ -627,6 +627,35 @@
     }
 
   
+    /* ── Global panel ── */
+    .global-intro {
+      font-family: 'Crimson Pro', serif;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--muted);
+      padding: 12px 14px 8px;
+      line-height: 1.6;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .global-region {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #40916c;
+      padding: 12px 14px 6px;
+    }
+
+    #global-panel .fact-row {
+      padding: 4px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #global-panel .facts-source {
+      padding: 0 14px 14px;
+    }
+
     /* ── Name search ── */
     #name-search-wrap {
       padding: 10px 14px;
@@ -908,6 +937,7 @@
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
+        <div class="tab"         onclick="switchTab('global',this)">Global</div>
       </div>
 
       <!-- Feed -->
@@ -1212,6 +1242,18 @@ function toggleLayer(key, el) {
 function switchTab(tab, el) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const gp = document.getElementById('global-panel');
+  const feed = document.getElementById('feed');
+  const nameWrap = document.getElementById('name-search-wrap');
+  if (tab === 'global') {
+    if (gp) gp.style.display = 'block';
+    if (feed) feed.style.display = 'none';
+    if (nameWrap) nameWrap.style.display = 'none';
+  } else {
+    if (gp) gp.style.display = 'none';
+    if (feed) feed.style.display = 'block';
+    if (nameWrap) nameWrap.style.display = 'block';
+  }
   el.classList.add('active');
   renderFeed();
 }
