@@ -56,36 +56,34 @@ def fetch() -> list[dict]:
 
 
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
-    """Search dockets endpoint with pagination, return normalized partial records."""
-    url = f"{BASE}/search/"
-    params = {
-        "q":         search_term,
-        "type":      "d",
-        "order_by":  "score desc",
-        "page_size": PAGE_SIZE,
-    }
-    records = []
-    pages_fetched = 0
-    max_pages = 10
+    """Search dockets endpoint, return normalized partial records."""
+    data = safe_json(
+        f"{BASE}/dockets/",
+        params={
+            "q":          search_term,
+            "court_type": COURT_TYPE_FILTER,
+            "order_by":   "date_filed",
+            "page_size":  PAGE_SIZE,
+        },
+        extra_headers={"Accept": "application/json"},
+    )
+    if not data:
+        return []
 
-    while url and pages_fetched < max_pages:
-        data = safe_json(url, params=params, extra_headers={"Accept": "application/json"})
-        if not data:
-            break
-        for item in data.get("results", []):
-            rec = _parse_docket(item, vtype_hint)
-            if rec:
-                records.append(rec)
-        url = data.get("next")
-        params = None
-        pages_fetched += 1
+    results = data.get("results", [])
+    records = []
+
+    for item in results:
+        rec = _parse_docket(item, vtype_hint)
+        if rec:
+            records.append(rec)
 
     return records
 
 
 def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
     """Convert a CourtListener docket object to a partial MedusaRecord."""
-    case_name = item.get("caseName") or item.get("case_name") or ""
+    case_name = item.get("case_name") or item.get("case_name_short") or ""
     if not case_name:
         return None
 
@@ -101,11 +99,11 @@ def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
         return None
 
     # Date
-    date_filed = item.get("dateFiled") or item.get("date_filed") or ""
+    date_filed = item.get("date_filed") or item.get("date_argued") or ""
     date_str = _clean_date(date_filed)
 
     # Build summary from available fields
-    docket_number = item.get("docketNumber") or item.get("docket_number") or ""
+    docket_number = item.get("docket_number") or ""
     summary = _build_summary(case_name, court_str, docket_number, nature_of_suit)
 
     # Determine violence type from case name + hint
@@ -114,7 +112,7 @@ def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
     # Status from available fields
     status = _infer_status(item)
 
-    absolute_url = item.get("docket_absolute_url") or item.get("absolute_url") or ""
+    absolute_url = item.get("absolute_url") or ""
     source_url = f"https://www.courtlistener.com{absolute_url}" if absolute_url else ""
 
     return {
@@ -261,8 +259,8 @@ def _infer_violence_type(case_name: str, nos: str, hint: str) -> str:
 
 def _infer_status(item: dict) -> str:
     # CourtListener doesn't always expose verdict — use date_terminated as proxy
-    if item.get("dateTerminated"):
+    if item.get("date_terminated"):
         return "convicted"     # case closed; approximate
-    if item.get("dateFiled") or item.get("date_filed"):
+    if item.get("date_filed"):
         return "charged"
     return "reported"
