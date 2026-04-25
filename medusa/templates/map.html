@@ -549,6 +549,83 @@
       #menu-btn{display:flex;align-items:center;justify-content:center;}
     }
 
+  
+    /* ── National Statistics Panel ── */
+    #national-stats {
+      position: absolute;
+      bottom: 24px;
+      left: 12px;
+      z-index: 10;
+      background: rgba(10, 10, 10, 0.92);
+      border: 1px solid #1e2a1e;
+      border-radius: 4px;
+      padding: 12px 14px;
+      width: 230px;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+    }
+    #national-stats h4 {
+      font-family: 'Space Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #b5935a;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .ns-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 3px 0;
+      border-bottom: 1px solid #1e2a1e;
+    }
+    .ns-row:last-of-type { border-bottom: none; }
+    .ns-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      color: #5a6b57;
+      letter-spacing: 0.5px;
+    }
+    .ns-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      color: #e8e4d9;
+    }
+    #national-stats .ns-disclaimer {
+      font-family: 'Crimson Pro', serif;
+      font-size: 10px;
+      font-style: italic;
+      color: #5a6b57;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    #national-stats .ns-source {
+      font-family: 'Space Mono', monospace;
+      font-size: 7px;
+      color: #2d3d2a;
+      margin-top: 5px;
+      letter-spacing: 0.3px;
+    }
+    #ns-toggle {
+      position: absolute;
+      bottom: 24px;
+      left: 12px;
+      z-index: 10;
+      background: rgba(10,10,10,0.85);
+      border: 1px solid #1e2a1e;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #b5935a;
+      cursor: pointer;
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -559,7 +636,7 @@
   <div id="header">
     <div id="branding">
       <div id="logo">MEDUSA</div>
-      <div id="tagline2">Live tracking male violence against women and children across America — an epidemic.</div>
+      <div id="tagline2">Live tracking male violence against women and children across America.</div>
     </div>
     <div id="header-right">
       <div id="s-total" class="grand-total">—</div>
@@ -1028,6 +1105,55 @@ loadAll();
   }catch(e){}
 }, 24*60*60*1000);
 </script>
+
+
+  <!-- National Statistics Panel -->
+  <div id="national-stats">
+    <h4>&#9888; National Estimates &#8212; Not in This Database</h4>
+    <div class="ns-row">
+      <span class="ns-label">Domestic violence</span>
+      <span class="ns-value">~10M / yr</span>
+    </div>
+    <div class="ns-row">
+      <span class="ns-label">Sexual assault</span>
+      <span class="ns-value">~460K / yr</span>
+    </div>
+    <div class="ns-row">
+      <span class="ns-label">Rape (reported)</span>
+      <span class="ns-value">~130K / yr</span>
+    </div>
+    <div class="ns-row">
+      <span class="ns-label">Stalking</span>
+      <span class="ns-value">~7.5M / yr</span>
+    </div>
+    <div class="ns-row">
+      <span class="ns-label">IPV homicide</span>
+      <span class="ns-value">~1,500 / yr</span>
+    </div>
+    <p class="ns-disclaimer">
+      These are national estimates. Medusa documents only publicly recorded,
+      court-filed, and prosecuted cases &mdash; a fraction of what actually occurs.
+    </p>
+    <p class="ns-source">
+      Sources: CDC NISVS &middot; FBI UCR &middot; BJS NCVS &middot; 2023 data<br>
+      Updated annually when federal reports are released.
+    </p>
+    <p class="ns-source" style="margin-top:4px;color:#2d6a4f;">&#9660; click to collapse</p>
+  </div>
+  <div id="ns-toggle">national estimates &#9650;</div>
+
+  <script>
+    const nsPanel  = document.getElementById('national-stats');
+    const nsToggle = document.getElementById('ns-toggle');
+    nsPanel.addEventListener('click', function() {
+      nsPanel.style.display  = 'none';
+      nsToggle.style.display = 'block';
+    });
+    nsToggle.addEventListener('click', function() {
+      nsPanel.style.display  = 'block';
+      nsToggle.style.display = 'none';
+    });
+  </script>
 
 </body>
 </html>

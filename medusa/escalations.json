@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2026-04-24T20:14:34.779582+00:00",
+    "escalations": [
+      {
+        "severity": "HIGH",
+        "issue": "Critical save rate: 0/1278 (0%)",
+        "action": "Check make_case_id() includes source_url in hash. Check source_url uniqueness in DB. Run: SELECT source_url, COUNT(*) FROM cases GROUP BY source_url HAVING COUNT(*) > 20"
+      }
+    ],
+    "resolved": true,
+    "resolution": "False positive \u2014 0 saves is normal when all records already in DB"
+  },
+  {
+    "timestamp": "2026-04-25T01:30:46.475879+00:00",
+    "escalations": [
+      {
+        "severity": "HIGH",
+        "issue": "Critical save rate: 0/1277 (0%)",
+        "action": "Check make_case_id() includes source_url in hash. Check source_url uniqueness in DB. Run: SELECT source_url, COUNT(*) FROM cases GROUP BY source_url HAVING COUNT(*) > 20"
+      }
+    ],
+    "resolved": true,
+    "resolution": "False positive \u2014 0 saves is normal when all records already in DB"
+  }
+]

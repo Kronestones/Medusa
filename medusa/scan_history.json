@@ -1,0 +1,42 @@
+[
+  {
+    "found": 1278,
+    "saved": 0,
+    "sources": {
+      "CourtListener": 1247,
+      "DOJ": 0,
+      "AP News RSS": 0,
+      "Congress RSS": 0,
+      "ED.gov": 0
+    },
+    "anomalies": [
+      "SAVE RATE CRITICAL: 0/1278 (0%). Check source_url uniqueness and make_case_id() in record.py.",
+      "SILENT SOURCE: DOJ returned 0. No specific diagnosis available.",
+      "SILENT SOURCE: AP News RSS returned 0. No specific diagnosis available.",
+      "SILENT SOURCE: Congress RSS returned 0. Feed URLs may have changed. Check https://www.congress.gov/rss/ for current paths.",
+      "SILENT SOURCE: ED.gov returned 0. ocrcas.ed.gov returning 403. Endpoint may have moved. Check https://ocrcas.ed.gov/ocr-search for current API."
+    ],
+    "watchdog": "Sable"
+  },
+  {
+    "found": 1277,
+    "saved": 0,
+    "sources": {
+      "CourtListener": 1246,
+      "DOJ": 1,
+      "AP News RSS": 0,
+      "Congress RSS": 0,
+      "ED.gov": 0,
+      "DOJ Press": 1,
+      "State AG": 0
+    },
+    "anomalies": [
+      "SAVE RATE CRITICAL: 0/1277 (0%). Check source_url uniqueness and make_case_id() in record.py.",
+      "SILENT SOURCE: AP News RSS returned 0. No specific diagnosis available.",
+      "SILENT SOURCE: Congress RSS returned 0. Feed URLs may have changed. Check https://www.congress.gov/rss/ for current paths.",
+      "SILENT SOURCE: ED.gov returned 0. ocrcas.ed.gov returning 403. Endpoint may have moved. Check https://ocrcas.ed.gov/ocr-search for current API.",
+      "SILENT SOURCE: State AG returned 0. No specific diagnosis available."
+    ],
+    "watchdog": "Sable"
+  }
+]

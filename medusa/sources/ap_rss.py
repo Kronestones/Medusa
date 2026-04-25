@@ -1,17 +1,28 @@
 """
 sources/ap_rss.py — Wire news RSS feeds (no API key required)
+
+feeds.apnews.com    — PERMANENTLY DEAD. Do not restore.
+feeds.reuters.com   — DEAD.
+rsshub.app          — RESTRICTED. Do not use.
+
+Active feeds as of 2026:
+  NYT US News, NYT Crime, NPR News, NPR US, Guardian US, Guardian DV,
+  ProPublica, Marshall Project (direct site feed)
 """
+
 import re
 from medusa.fetch import safe_rss
 from medusa.record import normalize_violence_type, normalize_status
 
 AP_FEEDS = [
-    "https://feeds.apnews.com/rss/apf-topnews",
-    "https://feeds.apnews.com/rss/apf-usnews",
-    "https://feeds.reuters.com/reuters/us-legal-news",
-    "https://feeds.themarshallproject.org/marshall-project-stories",
-    "https://www.propublica.org/feeds/propublica/main",
+    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
+    "https://rss.nytimes.com/services/xml/rss/nyt/Crime.xml",
     "https://feeds.npr.org/1001/rss.xml",
+    "https://feeds.npr.org/1057/rss.xml",
+    "https://www.theguardian.com/us-news/rss",
+    "https://www.theguardian.com/society/domestic-violence/rss",
+    "https://www.propublica.org/feeds/propublica/main",
+    "https://feeds.themarshallproject.org/marshall-project-stories",
 ]
 
 INCLUDE_KEYWORDS = [
@@ -20,7 +31,8 @@ INCLUDE_KEYWORDS = [
     "restraining order", "murdered wife", "killed girlfriend",
     "assault women", "violence against women", "sex abuse",
     "attempted murder", "strangled", "stabbed wife", "beaten",
-    "child abuse", "molestation",
+    "child abuse", "molestation", "sexual violence", "sexual abuse",
+    "battered", "coercive control", "sex trafficking",
 ]
 
 EXCLUDE_KEYWORDS = [
@@ -68,17 +80,11 @@ _CITY_STATE_PATTERN = re.compile(
     r"[\s,\.]"
 )
 
-def _infer_source_name(url: str) -> str:
-    if "reuters.com" in url:   return "Reuters"
-    if "marshall" in url:      return "The Marshall Project"
-    if "propublica" in url:    return "ProPublica"
-    if "npr.org" in url:       return "NPR"
-    if "apnews.com" in url:    return "AP News"
-    return "Wire"
 
 def fetch() -> list[dict]:
-    records = []
+    records   = []
     seen_urls = set()
+
     for feed_url in AP_FEEDS:
         entries = safe_rss(feed_url)
         for entry in entries:
@@ -89,59 +95,66 @@ def fetch() -> list[dict]:
             if rec:
                 seen_urls.add(url)
                 records.append(rec)
+
     print(f"[Wire RSS] {len(records)} records fetched.")
     return records
 
+
 def _parse_entry(entry) -> dict | None:
-    title   = entry.get("title") or ""
+    title   = entry.get("title")   or ""
     summary = entry.get("summary") or entry.get("description") or ""
     text    = f"{title} {summary}".lower()
+
     if not any(kw in text for kw in INCLUDE_KEYWORDS):
         return None
     if any(kw in text for kw in EXCLUDE_KEYWORDS):
         return None
-    vtype = _infer_type(text)
-    full_text = f"{title} {summary}"
+
+    vtype      = _infer_type(text)
+    full_text  = f"{title} {summary}"
     city, state = _extract_location(full_text)
     if not state:
         return None
-    published = entry.get("published") or entry.get("updated") or ""
-    date_str  = _parse_date(published)
-    status = _infer_status(text)
-    clean_summary = _clean_summary(title, summary)
-    url = entry.get("link") or ""
+
+    date_str = _parse_date(entry.get("published") or entry.get("updated") or "")
+    status   = _infer_status(text)
+
     return {
-        "summary":       clean_summary,
+        "summary":       _clean_summary(title, summary),
         "city":          city or state,
         "state":         state,
         "date_incident": date_str,
         "violence_type": vtype,
         "status":        status,
-        "source_url":    url,
-        "source_name":   _infer_source_name(url),
+        "source_url":    entry.get("link") or "",
+        "source_name":   "Wire RSS",
         "verified":      True,
     }
 
+
 def _infer_type(text: str) -> str:
-    if any(x in text for x in ["murder", "homicide", "killed", "femicide", "manslaughter"]):
+    if any(x in text for x in ["murder", "homicide", "killed", "femicide", "manslaughter", "strangled"]):
         return "homicide"
     if any(x in text for x in ["rape", "raped"]):
         return "rape"
-    if any(x in text for x in ["sexual assault", "sex assault", "sexually assault"]):
+    if any(x in text for x in ["sexual assault", "sex assault", "sexually assault", "sexual abuse", "sexual violence"]):
         return "sexual_assault"
-    if "trafficking" in text:
+    if "sex trafficking" in text or "human trafficking" in text or "trafficking" in text:
         return "trafficking"
     if "stalking" in text or "stalked" in text:
         return "stalking"
-    if any(x in text for x in ["domestic violence", "intimate partner"]):
+    if any(x in text for x in ["domestic violence", "intimate partner", "battered"]):
         return "domestic_violence"
     if any(x in text for x in ["attempted murder", "tried to kill", "attempted to kill"]):
         return "attempted_murder"
     if any(x in text for x in ["child abuse", "molestation", "molested"]):
         return "child_abuse"
+    if "coercive control" in text:
+        return "coercive_control"
     if "harassment" in text or "harassed" in text:
         return "harassment"
     return "assault"
+
 
 def _extract_location(text: str) -> tuple[str, str]:
     match = _CITY_STATE_PATTERN.search(text)
@@ -157,6 +170,7 @@ def _extract_location(text: str) -> tuple[str, str]:
         return "", state
     return "", ""
 
+
 def _parse_date(raw: str) -> str:
     if not raw:
         return ""
@@ -171,6 +185,7 @@ def _parse_date(raw: str) -> str:
     m = re.match(r"(\d{4}-\d{2}-\d{2})", raw)
     return m.group(1) if m else ""
 
+
 def _infer_status(text: str) -> str:
     if any(x in text for x in ["convicted", "guilty plea", "pleaded guilty", "sentenced", "found guilty"]):
         return "convicted"
@@ -180,10 +195,11 @@ def _infer_status(text: str) -> str:
         return "acquitted"
     return "reported"
 
+
 def _clean_summary(title: str, body: str) -> str:
-    clean_body = re.sub(r"<[^>]+>", "", body).strip()
-    sentences = re.split(r"(?<=[.!?])\s+", clean_body)
-    first_sentence = sentences[0] if sentences else ""
-    if first_sentence and first_sentence != title:
-        return f"{title} {first_sentence}"[:600]
+    clean = re.sub(r"<[^>]+>", "", body).strip()
+    sentences = re.split(r"(?<=[.!?])\s+", clean)
+    first = sentences[0] if sentences else ""
+    if first and first != title:
+        return f"{title} {first}"[:600]
     return title[:600]

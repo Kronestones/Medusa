@@ -29,6 +29,7 @@ from medusa.record import (
     normalize_record, make_case_id,
     STATE_LARGEST_CITY,
 )
+from medusa.team.engine import TeamEngine
 
 # Source modules
 from medusa.sources import courtlistener
@@ -37,6 +38,8 @@ from medusa.sources import ap_rss
 from medusa.sources import congress_rss
 from medusa.sources import fbi_stats
 from medusa.sources import ed_gov
+from medusa.sources import doj_press
+from medusa.sources import state_ag
 
 
 # State centroids — fallback when Nominatim fails
@@ -125,6 +128,8 @@ class MedusaScanner:
             ("Congress RSS",  congress_rss.fetch),
             #("FBI CDE",       fbi_stats.fetch),
             ("ED.gov",        ed_gov.fetch),
+            ("DOJ Press",     doj_press.fetch),
+            ("State AG",      state_ag.fetch),
         ]
 
         for name, fetch_fn in sources:
@@ -167,6 +172,15 @@ class MedusaScanner:
             r["lat"] = lat
             r["lng"] = lng
             time.sleep(0.2)    # Nominatim rate limit: 1 req/s max
+
+        # ── Team Pipeline ─────────────────────────────────────────────────────
+        engine = TeamEngine()
+        scan_result = {
+            "found": len(unique),
+            "saved": 0,
+            "sources": {name: len([r for r in unique if name in (r.get("source_name") or "")]) for name, _ in sources},
+        }
+        unique, team_report = engine.run(unique, scan_result)
 
         # ── Finalize ──────────────────────────────────────────────────────────
         self.last_scan    = datetime.now(timezone.utc).isoformat()
