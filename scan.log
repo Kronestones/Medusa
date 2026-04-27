@@ -1,0 +1,75 @@
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[CourtListener] 0 records fetched.
+[Medusa] CourtListener: 0 raw records
+[fetch] FAIL https://feeds.apnews.com/rss/apf-topnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-topnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.apnews.com/rss/apf-usnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-usnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[AP RSS] 0 records fetched.
+[Medusa] AP News RSS: 0 raw records
+[Congress RSS] 0 records fetched.
+[Medusa] Congress RSS: 0 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[Medusa] Total raw records: 0
+[Medusa] After normalization: 0 valid records
+[Medusa] After scope filter: 0 in-scope records
+[Medusa] After dedup: 0 unique records
+[Medusa] Scan complete. 0 cases ready.
+
+  [Medusa] 0 found, 0 new cases saved.
+
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[CourtListener] 0 records fetched.
+[Medusa] CourtListener: 0 raw records
+[fetch] FAIL https://feeds.apnews.com/rss/apf-topnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-topnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.apnews.com/rss/apf-usnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-usnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[AP RSS] 0 records fetched.
+[Medusa] AP News RSS: 0 raw records
+[Congress RSS] 0 records fetched.
+[Medusa] Congress RSS: 0 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[Medusa] Total raw records: 0
+[Medusa] After normalization: 0 valid records
+[Medusa] After scope filter: 0 in-scope records
+[Medusa] After dedup: 0 unique records
+[Medusa] Scan complete. 0 cases ready.
+
+  [Medusa] 0 found, 0 new cases saved.
+
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[CourtListener] 0 records fetched.
+[Medusa] CourtListener: 0 raw records
+[fetch] FAIL https://feeds.apnews.com/rss/apf-topnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-topnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.apnews.com/rss/apf-usnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-usnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[AP RSS] 0 records fetched.
+[Medusa] AP News RSS: 0 raw records
+[Congress RSS] 0 records fetched.
+[Medusa] Congress RSS: 0 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[Medusa] Total raw records: 0
+[Medusa] After normalization: 0 valid records
+[Medusa] After scope filter: 0 in-scope records
+[Medusa] After dedup: 0 unique records
+[Medusa] Scan complete. 0 cases ready.
+
+  [Medusa] 0 found, 0 new cases saved.
+

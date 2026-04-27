@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-04-27T20:28:03.392456+00:00",
+  "total": 1,
+  "cases": [
+    {
+      "id": 43239,
+      "case_id": "MEDUSA-2026-FEB49264",
+      "violence_type": "domestic_violence",
+      "summary": "US states propose domestic violence registries \u2013 but could they harm women? Tennessee leads way but experts say offender registry could provide a false sense of security \u2013 and identify victimsWhen Amanda Martin started dating Christopher Cendroski, whose family described him as \u201cbig-hearted\u201d, she had no idea he had been arrested for domestic assault.",
+      "status": "charged",
+      "is_public_figure": false,
+      "date_incident": "2026-04-06T00:00:00+00:00",
+      "date_reported": "2026-04-27T20:20:51.863147+00:00",
+      "city": "TN",
+      "state": "TN",
+      "lat": 35.9637763,
+      "lng": -83.9183587,
+      "source_url": "https://www.theguardian.com/us-news/2026/apr/06/domestic-violence-offender-registry",
+      "source_name": "AP News",
+      "additional_sources": null,
+      "verified": true
+    }
+  ]
+}
