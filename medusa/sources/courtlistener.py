@@ -56,17 +56,27 @@ def fetch() -> list[dict]:
 
 
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
-    """Search dockets endpoint, return normalized partial records."""
-    data = safe_json(
-        f"{BASE}/dockets/",
-        params={
-            "q":          search_term,
-            "court_type": COURT_TYPE_FILTER,
-            "order_by":   "date_filed",
-            "page_size":  PAGE_SIZE,
-        },
-        extra_headers={"Accept": "application/json"},
-    )
+    """Search opinions endpoint (v4/search), return normalized partial records."""
+    import requests as _req
+    try:
+        resp = _req.get(
+            f"{BASE}/search/",
+            params={
+                "q":        search_term,
+                "type":     "o",
+                "order_by": "score desc",
+                "page_size": PAGE_SIZE,
+            },
+            headers={
+                "User-Agent": "Medusa/1.2 (sentinel.commons@gmail.com)",
+                "Accept": "application/json",
+            },
+            timeout=15,
+        )
+        data = resp.json() if resp.ok else {}
+    except Exception as e:
+        print(f"[CourtListener] request error: {e}")
+        data = {}
     if not data:
         return []
 
@@ -74,11 +84,62 @@ def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
     records = []
 
     for item in results:
-        rec = _parse_docket(item, vtype_hint)
+        rec = _parse_opinion(item, vtype_hint)
         if rec:
             records.append(rec)
 
     return records
+
+
+def _parse_opinion(item: dict, vtype_hint: str) -> dict | None:
+    """Convert a CourtListener search result to a partial MedusaRecord."""
+    case_name = item.get("caseNameFull") or item.get("caseName") or item.get("case_name") or ""
+    if not case_name:
+        return None
+
+    court_str = item.get("court_citation_string") or item.get("court") or ""
+    court_id  = item.get("court_id") or ""
+    city, state = _resolve_location(item, court_str)
+    if not city or not state:
+        for slug, (c, s) in _SLUG_MAP.items():
+            if slug in court_id.lower():
+                city, state = c, s
+                break
+        if not state:
+            return None
+
+    date_str = _clean_date(
+        item.get("dateFiled") or item.get("date_filed") or ""
+    )
+
+    posture  = item.get("posture") or ""
+    syllabus = item.get("syllabus") or ""
+    nature   = item.get("suitNature") or ""
+    snippet  = item.get("snippet") or ""
+
+    summary = f"Court case: {case_name}."
+    if court_str: summary += f" Filed in {court_str}."
+    if nature: summary += f" Nature: {nature}."
+    if posture: summary += f" {posture[:150]}"
+    if syllabus: summary += f" {syllabus[:150]}"
+    if snippet: summary += f" {snippet[:150]}"
+
+    vtype = _infer_violence_type(case_name, f"{posture} {syllabus} {nature}", vtype_hint)
+    absolute_url = item.get("absolute_url") or ""
+    source_url = f"https://www.courtlistener.com{absolute_url}" if absolute_url else ""
+
+    return {
+        "summary":       summary[:500],
+        "city":          city,
+        "state":         state,
+        "date_incident": date_str,
+        "violence_type": vtype,
+        "status":        "charged",
+        "source_url":    source_url,
+        "source_name":   "CourtListener / PACER",
+        "verified":      True,
+        "_docket_id":    item.get("id"),
+    }
 
 
 def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
@@ -206,6 +267,90 @@ _SLUG_MAP = {
     "wvnd": ("Clarksburg",    "WV"), "wvsd": ("Charleston",   "WV"),
     "wied": ("Milwaukee",     "WI"), "wiwd": ("Madison",      "WI"),
     "wyd":  ("Cheyenne",      "WY"),
+    # State supreme and appellate courts
+    "alaska": ("Anchorage",      "AK"),
+    "ariz":   ("Phoenix",        "AZ"),
+    "ark":    ("Little Rock",    "AR"),
+    "cal":    ("Los Angeles",    "CA"),
+    "colo":   ("Denver",         "CO"),
+    "conn":   ("Hartford",       "CT"),
+    "connappct": ("Hartford",    "CT"),
+    "dc":     ("Washington",     "DC"),
+    "fla":    ("Tallahassee",    "FL"),
+    "ga":     ("Atlanta",        "GA"),
+    "haw":    ("Honolulu",       "HI"),
+    "idaho":  ("Boise",          "ID"),
+    "ill":    ("Springfield",    "IL"),
+    "ind":    ("Indianapolis",   "IN"),
+    "iowa":   ("Des Moines",     "IA"),
+    "iowactapp": ("Des Moines",  "IA"),
+    "kan":    ("Topeka",         "KS"),
+    "ky":     ("Louisville",     "KY"),
+    "la":     ("Baton Rouge",    "LA"),
+    "me":     ("Augusta",        "ME"),
+    "mass":   ("Boston",         "MA"),
+    "mich":   ("Lansing",        "MI"),
+    "minn":   ("Minneapolis",    "MN"),
+    "miss":   ("Jackson",        "MS"),
+    "mo":     ("Jefferson City", "MO"),
+    "mont":   ("Helena",         "MT"),
+    "neb":    ("Lincoln",        "NE"),
+    "nev":    ("Las Vegas",      "NV"),
+    "nh":     ("Concord",        "NH"),
+    "nj":     ("Trenton",        "NJ"),
+    "nm":     ("Albuquerque",    "NM"),
+    "ny":     ("Albany",         "NY"),
+    "nc":     ("Raleigh",        "NC"),
+    "nd":     ("Bismarck",       "ND"),
+    "ohio":   ("Columbus",       "OH"),
+    "ohioctapp": ("Columbus",    "OH"),
+    "okla":   ("Oklahoma City",  "OK"),
+    "or":     ("Portland",       "OR"),
+    "pa":     ("Harrisburg",     "PA"),
+    "ri":     ("Providence",     "RI"),
+    "sc":     ("Columbia",       "SC"),
+    "sd":     ("Pierre",         "SD"),
+    "tenn":   ("Nashville",      "TN"),
+    "tenncrimapp": ("Nashville", "TN"),
+    "tex":    ("Austin",         "TX"),
+    "txctapp1":  ("Houston",     "TX"),
+    "txctapp2":  ("Fort Worth",  "TX"),
+    "txctapp3":  ("Austin",      "TX"),
+    "txctapp4":  ("San Antonio", "TX"),
+    "txctapp5":  ("Dallas",      "TX"),
+    "txctapp6":  ("Texarkana",   "TX"),
+    "txctapp7":  ("Amarillo",    "TX"),
+    "txctapp8":  ("El Paso",     "TX"),
+    "txctapp9":  ("Beaumont",    "TX"),
+    "txctapp10": ("Waco",        "TX"),
+    "txctapp11": ("Eastland",    "TX"),
+    "txctapp12": ("Tyler",       "TX"),
+    "txctapp13": ("Corpus Christi","TX"),
+    "txctapp14": ("Houston",     "TX"),
+    "utah":   ("Salt Lake City", "UT"),
+    "vt":     ("Montpelier",     "VT"),
+    "va":     ("Richmond",       "VA"),
+    "wash":   ("Olympia",        "WA"),
+    "wva":    ("Charleston",     "WV"),
+    "wis":    ("Madison",        "WI"),
+    "wyo":    ("Cheyenne",       "WY"),
+    # Federal circuits
+    "ca1":  ("Boston",           "MA"),
+    "ca2":  ("New York",         "NY"),
+    "ca3":  ("Philadelphia",     "PA"),
+    "ca4":  ("Richmond",         "VA"),
+    "ca5":  ("New Orleans",      "LA"),
+    "ca6":  ("Cincinnati",       "OH"),
+    "ca7":  ("Chicago",          "IL"),
+    "ca8":  ("St. Louis",        "MO"),
+    "ca9":  ("San Francisco",    "CA"),
+    "ca10": ("Denver",           "CO"),
+    "ca11": ("Atlanta",          "GA"),
+    "cadc": ("Washington",       "DC"),
+    "cafc": ("Washington",       "DC"),
+    # DOJ / Federal
+    "olc":  ("Washington",       "DC"),
+    "scotus": ("Washington",     "DC"),
 }
 
 
