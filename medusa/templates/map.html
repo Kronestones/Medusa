@@ -995,6 +995,26 @@
         <p class="facts-source" style="padding:10px 14px 0;">Sources: WHO · UN Women · UNODC · HRC Fatal Violence Report · 2023 data</p>
       </div>
 
+      <!-- Press Panel -->
+      <div id="press-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
+        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
+          News and journalism covering male violence against women. Updated from live sources.
+        </div>
+        <div id="press-feed" style="padding:8px 0;">
+          <div style="padding:20px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;">LOADING...</div>
+        </div>
+      </div>
+
+      <!-- Research Panel -->
+      <div id="research-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
+        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
+          Published research and studies on male violence against women. Sources: PubMed, BJS, CDC, NIJ, Violence Policy Center.
+        </div>
+        <div id="research-feed" style="padding:8px 0;">
+          <div style="padding:20px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;">LOADING...</div>
+        </div>
+      </div>
+
       <!-- Disclosure -->
       <div id="disclosure">
         All information is sourced from public records. Medusa assumes no liability for any actions taken based on this information.<br>
@@ -1275,6 +1295,97 @@ async function triggerScan() {
 
 // ── Controls ──────────────────────────────────────────────────────────────────
 
+function renderPress() {
+  const feed = document.getElementById('press-feed');
+  feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">LOADING...</div>';
+
+  const sources = [
+    {name: "The 19th", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://19thnews.org/feed/")},
+    {name: "Ms. Magazine", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://msmagazine.com/feed/")},
+    {name: "Rewire News", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://rewirenewsgroup.com/feed/")},
+  ];
+
+  const keywords = ["domestic violence","sexual assault","rape","stalking","trafficking","femicide","intimate partner","violence against women","gender violence","abuse"];
+
+  Promise.all(sources.map(s =>
+    fetch(s.url).then(r => r.json()).then(d => ({name: s.name, xml: d.contents})).catch(() => null)
+  )).then(results => {
+    let articles = [];
+    for (const result of results) {
+      if (!result || !result.xml) continue;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(result.xml, "text/xml");
+      const items = doc.querySelectorAll("item");
+      items.forEach(item => {
+        const title = item.querySelector("title")?.textContent || "";
+        const desc  = item.querySelector("description")?.textContent || "";
+        const link  = item.querySelector("link")?.textContent || "";
+        const text  = (title + " " + desc).toLowerCase();
+        if (keywords.some(k => text.includes(k))) {
+          articles.push({title, desc, link, source: result.name});
+        }
+      });
+    }
+
+    if (articles.length === 0) {
+      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No relevant articles found right now. Check back soon.</div>';
+      return;
+    }
+
+    feed.innerHTML = articles.map(a => `
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+        <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">${a.source}</div>
+        <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:6px;">${a.title}</div>
+        <a href="${a.link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
+      </div>
+    `).join('');
+  });
+}
+
+function renderResearch() {
+  const feed = document.getElementById('research-feed');
+  feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">LOADING...</div>';
+
+  const url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=male+violence+against+women+intimate+partner&retmax=20&retmode=json&sort=date";
+
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      const ids = data.esearchresult?.idlist || [];
+      if (!ids.length) {
+        feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No studies found.</div>';
+        return;
+      }
+      const summaryUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`;
+      return fetch(summaryUrl).then(r => r.json());
+    })
+    .then(data => {
+      if (!data) return;
+      const results = data.result || {};
+      const uids = results.uids || [];
+      feed.innerHTML = uids.map(uid => {
+        const s = results[uid];
+        if (!s) return '';
+        const title   = s.title || "Untitled";
+        const authors = (s.authors || []).slice(0,3).map(a => a.name).join(", ");
+        const journal = s.fulljournalname || s.source || "";
+        const date    = s.pubdate || "";
+        const link    = `https://pubmed.ncbi.nlm.nih.gov/${uid}/`;
+        return `
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+            <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">PubMed · ${date}</div>
+            <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:4px;">${title}</div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:6px;">${authors}${journal ? " · " + journal : ""}</div>
+            <a href="${link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
+          </div>
+        `;
+      }).join('');
+    })
+    .catch(() => {
+      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">Error loading studies.</div>';
+    });
+}
+
 function toggleLayer(key, el) {
   if (hiddenLayers.has(key)) {
     hiddenLayers.delete(key);
@@ -1290,20 +1401,33 @@ function toggleLayer(key, el) {
 function switchTab(tab, el) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const gp = document.getElementById('global-panel');
-  const feed = document.getElementById('feed');
+  const gp       = document.getElementById('global-panel');
+  const feed     = document.getElementById('feed');
   const nameWrap = document.getElementById('name-search-wrap');
+  const pressPanel    = document.getElementById('press-panel');
+  const researchPanel = document.getElementById('research-panel');
+
+  // Hide all panels first
+  if (gp) gp.style.display = 'none';
+  if (feed) feed.style.display = 'none';
+  if (nameWrap) nameWrap.style.display = 'none';
+  if (pressPanel) pressPanel.style.display = 'none';
+  if (researchPanel) researchPanel.style.display = 'none';
+
   if (tab === 'global') {
     if (gp) gp.style.display = 'block';
-    if (feed) feed.style.display = 'none';
-    if (nameWrap) nameWrap.style.display = 'none';
+  } else if (tab === 'press') {
+    if (pressPanel) pressPanel.style.display = 'block';
+    renderPress();
+  } else if (tab === 'research') {
+    if (researchPanel) researchPanel.style.display = 'block';
+    renderResearch();
   } else {
-    if (gp) gp.style.display = 'none';
     if (feed) feed.style.display = 'block';
     if (nameWrap) nameWrap.style.display = 'block';
   }
   el.classList.add('active');
-  renderFeed();
+  if (!['press','research','global'].includes(tab)) renderFeed();
 }
 
 function filterFeed() {
