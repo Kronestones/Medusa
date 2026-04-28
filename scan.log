@@ -73,3 +73,49 @@
 
   [Medusa] 0 found, 0 new cases saved.
 
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] 1200 records fetched.
+[Medusa] CourtListener: 1200 raw records
+[AP RSS] 3 records fetched.
+[Medusa] AP News RSS: 3 raw records
+[Congress RSS] 0 records fetched.
+[Medusa] Congress RSS: 0 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[AG Press] 9 records fetched.
+[Medusa] AG Press: 9 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[Medusa] Total raw records: 1279
+[Medusa] After normalization: 1279 valid records
+[Medusa] After scope filter: 460 in-scope records
+[Medusa] After dedup: 425 unique records
+[Medusa] Scan complete. 425 cases ready.
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
