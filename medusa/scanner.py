@@ -36,6 +36,8 @@ from medusa.sources import ap_rss
 from medusa.sources import congress_rss
 from medusa.sources import fbi_stats
 from medusa.sources import ed_gov
+from medusa.sources import ag_press
+from medusa.sources import wiki_homicides
 
 
 # State centroids — fallback when Nominatim fails
@@ -192,6 +194,8 @@ class MedusaScanner:
             ("Congress RSS",  congress_rss.fetch),
             ("FBI CDE",       fbi_stats.fetch),
             ("ED.gov",        ed_gov.fetch),
+            ("AG Press",      ag_press.fetch),
+            ("Wiki Homicides", wiki_homicides.fetch),
         ]
 
         for name, fetch_fn in sources:

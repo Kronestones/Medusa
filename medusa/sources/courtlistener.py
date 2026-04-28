@@ -33,7 +33,8 @@ QUERIES = [
 
 # Only pull criminal cases from district courts
 COURT_TYPE_FILTER = "fd"    # federal district courts
-PAGE_SIZE = 20              # results per query (keep low — wide queries)
+PAGE_SIZE = 20              # results per query
+MAX_PAGES = 10             # pages per query = up to 200 results each
 
 
 def fetch() -> list[dict]:
@@ -57,30 +58,45 @@ def fetch() -> list[dict]:
 
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
     """Search opinions endpoint (v4/search), return normalized partial records."""
-    import requests as _req
-    try:
-        resp = _req.get(
-            f"{BASE}/search/",
-            params={
-                "q":        search_term,
-                "type":     "o",
-                "order_by": "score desc",
-                "page_size": PAGE_SIZE,
-            },
-            headers={
-                "User-Agent": "Medusa/1.2 (sentinel.commons@gmail.com)",
-                "Accept": "application/json",
-            },
-            timeout=15,
-        )
-        data = resp.json() if resp.ok else {}
-    except Exception as e:
-        print(f"[CourtListener] request error: {e}")
-        data = {}
-    if not data:
-        return []
-
-    results = data.get("results", [])
+    import requests as _req, time as _time, re as _re
+    all_results = []
+    cursor = None
+    for page in range(MAX_PAGES):
+        params = {
+            "q":         search_term,
+            "type":      "o",
+            "order_by":  "score desc",
+            "page_size": PAGE_SIZE,
+        }
+        if cursor:
+            params["cursor"] = cursor
+        try:
+            resp = _req.get(
+                f"{BASE}/search/",
+                params=params,
+                headers={
+                    "User-Agent": "Medusa/1.2 (sentinel.commons@gmail.com)",
+                    "Accept": "application/json",
+                },
+                timeout=15,
+            )
+            data = resp.json() if resp.ok else {}
+        except Exception as e:
+            print(f"[CourtListener] request error: {e}")
+            break
+        if not data:
+            break
+        page_results = data.get("results", [])
+        all_results.extend(page_results)
+        next_url = data.get("next")
+        if not next_url:
+            break
+        m = _re.search(r"cursor=([^&]+)", next_url)
+        cursor = m.group(1) if m else None
+        if not cursor:
+            break
+        _time.sleep(0.5)
+    results = all_results
     records = []
 
     for item in results:
@@ -115,16 +131,22 @@ def _parse_opinion(item: dict, vtype_hint: str) -> dict | None:
     posture  = item.get("posture") or ""
     syllabus = item.get("syllabus") or ""
     nature   = item.get("suitNature") or ""
-    snippet  = item.get("snippet") or ""
+    # Get snippet from nested opinions list
+    snippet = ""
+    opinions = item.get("opinions", [])
+    if opinions and isinstance(opinions, list):
+        snippet = opinions[0].get("snippet", "") or ""
+    if not snippet:
+        snippet = item.get("snippet") or ""
 
     summary = f"Court case: {case_name}."
     if court_str: summary += f" Filed in {court_str}."
     if nature: summary += f" Nature: {nature}."
-    if posture: summary += f" {posture[:150]}"
-    if syllabus: summary += f" {syllabus[:150]}"
-    if snippet: summary += f" {snippet[:150]}"
+    if posture: summary += f" {posture[:200]}"
+    if syllabus: summary += f" {syllabus[:200]}"
+    if snippet: summary += f" {snippet[:200]}"
 
-    vtype = _infer_violence_type(case_name, f"{posture} {syllabus} {nature}", vtype_hint)
+    vtype = _infer_violence_type(case_name, f"{posture} {syllabus} {nature} {snippet}", vtype_hint)
     absolute_url = item.get("absolute_url") or ""
     source_url = f"https://www.courtlistener.com{absolute_url}" if absolute_url else ""
 
