@@ -36,7 +36,6 @@ from medusa.record import (
 # Source modules
 from medusa.sources import courtlistener
 from medusa.sources import ap_rss
-from medusa.sources import congress_rss
 from medusa.sources import fbi_stats
 from medusa.sources import ed_gov
 from medusa.sources import ag_press
@@ -220,7 +219,6 @@ class MedusaScanner:
         sources = [
             ("CourtListener", courtlistener.fetch),
             ("AP News RSS",   ap_rss.fetch),
-            ("Congress RSS",  congress_rss.fetch),
             ("FBI CDE",       fbi_stats.fetch),
             ("ED.gov",        ed_gov.fetch),
             ("AG Press",      ag_press.fetch),

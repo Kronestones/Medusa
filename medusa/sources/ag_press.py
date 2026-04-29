@@ -16,6 +16,7 @@ AG_FEEDS = [
     ("Georgia AG",    "https://law.georgia.gov/rss.xml",      "GA"),
     ("California AG", "https://oag.ca.gov/rss.xml",           "CA"),
     ("Washington AG", "https://www.atg.wa.gov/rss.xml",       "WA"),
+    ("Colorado AG",   "https://coag.gov/press-releases/feed/","CO"),
 ]
 
 INCLUDE_KEYWORDS = [
