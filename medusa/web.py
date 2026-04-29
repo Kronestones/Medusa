@@ -130,6 +130,23 @@ def _run_scheduled_scan():
             if save_case(c):
                 saved += 1
         print(f"[Medusa] Scheduled scan complete. {saved} new cases saved.")
+
+        # Auto-backup after every scan
+        try:
+            import json
+            from datetime import datetime, timezone
+            cases = get_cases(limit=50000)
+            backup = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "total": len(cases),
+                "cases": cases,
+            }
+            with open("MEDUSA_BACKUP.json", "w") as f:
+                json.dump(backup, f, default=str)
+            print(f"[Medusa] Auto-backup complete. {len(cases)} cases saved.")
+        except Exception as be:
+            print(f"[Medusa] Backup error: {be}")
+
     except Exception as e:
         print(f"[Medusa] Scheduled scan error: {e}")
 

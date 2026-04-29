@@ -78,14 +78,32 @@ def fetch() -> list[dict]:
     return records
 
 
+# Years to search across — gives us different result sets per query
+SEARCH_YEARS = [str(y) for y in range(2025, 1999, -1)]  # 2025 back to 2000
+
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
-    """Search opinions endpoint (v4/search), return normalized partial records."""
-    import requests as _req, time as _time, re as _re
+    """Search opinions endpoint across multiple years for maximum coverage."""
+    import requests as _req
+    import time as _time
+    import re
+    all_year_results = []
+    for year in SEARCH_YEARS:
+        year_results = _search_year(search_term, vtype_hint, year)
+        all_year_results.extend(year_results)
+        _time.sleep(0.3)
+    return all_year_results
+
+def _search_year(search_term, vtype_hint, year):
+    """Search one year of opinions."""
+    import requests as _req
+    import time as _time
+    import re as _re
+    dated_term = f"{search_term} {year}"
     all_results = []
     cursor = None
     for page in range(MAX_PAGES):
         params = {
-            "q":         search_term,
+            "q":         dated_term,
             "type":      "o",
             "order_by":  "score desc",
             "page_size": PAGE_SIZE,
