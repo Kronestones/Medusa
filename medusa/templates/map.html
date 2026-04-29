@@ -36,9 +36,10 @@
       --assault:           #b7770d;
       --stalking:          #1a3a5c;
       --harassment:        #2471a3;
-      --trafficking:       #0e6655;
-      --child_abuse:       #922b21;
-      --coercive_control:  #4a4a4a;
+      --trafficking:       #16a085;
+      --child_abuse:       #f39c12;
+      --coercive_control:  #7f8c8d;
+      --trans_women:       #e91e8c;
     }
 
     html, body {
@@ -928,7 +929,7 @@
             <div class="legend-dot" style="background:var(--coercive_control)"></div>Coercive Ctrl
           </div>
           <div class="legend-row" onclick="toggleLayer('trans_women',this)">
-            <div class="legend-dot" style="background:#ff69b4"></div>Trans Women
+            <div class="legend-dot" style="background:#e91e8c"></div>Trans Women
           </div>
         </div>
       </div>
@@ -1041,17 +1042,24 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const TYPE_COLOR = {
+  // HOMICIDE tab — reds
   homicide:          '#c0392b',
   attempted_murder:  '#e74c3c',
+  // SEXUAL tab — purples
   rape:              '#8e44ad',
   sexual_assault:    '#9b59b6',
+  // DV tab — ambers/blues
   domestic_violence: '#d35400',
   assault:           '#e67e22',
   stalking:          '#2980b9',
   harassment:        '#3498db',
-  trafficking:       '#16a085',
-  child_abuse:       '#c0392b',
   coercive_control:  '#7f8c8d',
+  // TRAFFICKING — teal
+  trafficking:       '#16a085',
+  // CHILD ABUSE — gold
+  child_abuse:       '#f39c12',
+  // TRANS WOMEN — pink
+  trans_women:       '#e91e8c',
   unknown:           '#4e5568',
 };
 
