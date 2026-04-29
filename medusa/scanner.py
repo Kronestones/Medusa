@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 
 import requests
 
+from medusa.meta import ScanHistory, ScanRecord
 from medusa.record import (
     normalize_record, make_case_id,
     STATE_LARGEST_CITY,
@@ -177,6 +178,7 @@ class MedusaScanner:
     def __init__(self):
         self.last_scan   = None
         self.total_found = 0
+        self._history    = ScanHistory()
 
     def scan(self) -> list[dict]:
         """
@@ -198,12 +200,25 @@ class MedusaScanner:
             ("Wiki Homicides", wiki_homicides.fetch),
         ]
 
-        for name, fetch_fn in sources:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        def _fetch_source(name, fetch_fn):
             try:
                 results = fetch_fn()
                 print(f"[Medusa] {name}: {len(results)} raw records")
-                raw_records.extend(results)
+                return results
             except Exception as e:
+                print(f"[Medusa] {name} ERROR: {e}")
+                return []
+
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = {executor.submit(_fetch_source, name, fn): name for name, fn in sources}
+            for future in as_completed(futures):
+                raw_records.extend(future.result())
+
+        if False:
+            pass
+        except Exception as e:
                 print(f"[Medusa] {name} ERROR: {e}")
                 continue
 
@@ -248,4 +263,17 @@ class MedusaScanner:
         self.total_found += len(unique)
 
         print(f"[Medusa] Scan complete. {len(unique)} cases ready.")
+
+        # ── Meta-analysis ─────────────────────────────────────────
+        try:
+            scan_rec = ScanRecord.build(
+                found = len(raw_records),
+                saved = len(unique),
+                cases = unique,
+            )
+            self._history.record(scan_rec)
+            print(self._history.report())
+        except Exception as e:
+            print(f"[Medusa Meta] Error: {e}")
+
         return unique
