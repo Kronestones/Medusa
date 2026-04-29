@@ -902,28 +902,28 @@
             <div class="legend-dot" style="background:#e74c3c"></div>Homicide
           </div>
           <div class="legend-row" data-layer="attempted_murder" onclick="toggleLayer('attempted_murder',this)">
-            <div class="legend-dot" style="background:#ff6b6b"></div>Att. Murder
+            <div class="legend-dot" style="background:#ff6b6b;border-radius:2px;"></div>Att. Murder
           </div>
           <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)">
             <div class="legend-dot" style="background:#a855f7"></div>Rape
           </div>
           <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)">
-            <div class="legend-dot" style="background:#c084fc"></div>Sex. Assault
+            <div class="legend-dot" style="background:#c084fc;border-radius:2px;"></div>Sex. Assault
           </div>
           <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)">
             <div class="legend-dot" style="background:#f97316"></div>Dom. Violence
           </div>
           <div class="legend-row" data-layer="assault" onclick="toggleLayer('assault',this)">
-            <div class="legend-dot" style="background:#fb923c"></div>Assault
+            <div class="legend-dot" style="background:#fb923c;border-radius:2px;"></div>Assault
           </div>
           <div class="legend-row" data-layer="stalking" onclick="toggleLayer('stalking',this)">
-            <div class="legend-dot" style="background:#38bdf8"></div>Stalking
+            <div class="legend-dot" style="background:#38bdf8;border-radius:2px;transform:rotate(45deg);"></div>Stalking
           </div>
           <div class="legend-row" data-layer="harassment" onclick="toggleLayer('harassment',this)">
-            <div class="legend-dot" style="background:#7dd3fc"></div>Harassment
+            <div class="legend-dot" style="background:#7dd3fc;border-radius:2px;transform:rotate(45deg);"></div>Harassment
           </div>
           <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
-            <div class="legend-dot" style="background:#e879f9"></div>Coercive Ctrl
+            <div class="legend-dot" style="background:#e879f9;border-radius:2px;transform:rotate(45deg);"></div>Coercive Ctrl
           </div>
           <div class="legend-row" data-layer="trafficking" onclick="toggleLayer('trafficking',this)">
             <div class="legend-dot" style="background:#2dd4bf"></div>Trafficking
@@ -1120,15 +1120,35 @@ for (const t of Object.keys(TYPE_COLOR)) {
 
 // ── Markers ───────────────────────────────────────────────────────────────────
 
-function makeIcon(color) {
+// Shape by violence type
+const TYPE_SHAPE = {
+  homicide:          'circle',
+  rape:              'circle',
+  domestic_violence: 'circle',
+  trafficking:       'circle',
+  child_abuse:       'circle',
+  trans_women:       'circle',
+  attempted_murder:  'square',
+  sexual_assault:    'square',
+  assault:           'square',
+  stalking:          'diamond',
+  harassment:        'diamond',
+  coercive_control:  'diamond',
+};
+
+function makeIcon(color, type) {
+  const shape = TYPE_SHAPE[type] || 'circle';
+  let style = `width:11px;height:11px;background:${color};opacity:.9;box-shadow:0 0 5px ${color}66;`;
+  if (shape === 'circle') {
+    style += 'border-radius:50%;';
+  } else if (shape === 'square') {
+    style += 'border-radius:2px;';
+  } else if (shape === 'diamond') {
+    style += 'border-radius:2px;transform:rotate(45deg);';
+  }
   return L.divIcon({
     className: '',
-    html: `<div style="
-      width:12px;height:12px;border-radius:50%;
-      background:${color};opacity:.85;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 5px ${color}66;
-    "></div>`,
+    html: `<div style="${style}border:1px solid rgba(255,255,255,.15);"></div>`,
     iconSize:[12,12], iconAnchor:[6,6],
   });
 }
@@ -1160,7 +1180,7 @@ function renderMarkers() {
     }
     const jLat = c.lat + (hashJitter(_jid, 1) - 0.5) * jitterAmt;
     const jLng = c.lng + (hashJitter(_jid, 2) - 0.5) * jitterAmt;
-    const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
+    const m = L.marker([jLat, jLng], { icon: makeIcon(color, c.violence_type) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
       <div class="popup-id">${c.case_id}</div>
