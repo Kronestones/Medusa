@@ -243,12 +243,6 @@ class MedusaScanner:
             for future in as_completed(futures):
                 raw_records.extend(future.result())
 
-        if False:
-            pass
-        except Exception as e:
-                print(f"[Medusa] {name} ERROR: {e}")
-                continue
-
         print(f"[Medusa] Total raw records: {len(raw_records)}")
 
         # ── Watchdog — record source health ──────────────────────
