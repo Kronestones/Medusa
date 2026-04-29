@@ -119,3 +119,62 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
     raise RuntimeError("DATABASE_URL not set")
 RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Mission: To document male violence against women and children in the United States.
+[Medusa] For: The women and children who were not counted.
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[AP RSS] 2 records fetched.
+[Medusa] AP News RSS: 2 raw records
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[AG Press] 10 records fetched.
+[Medusa] AG Press: 10 raw records
+[CourtListener] 4786 records fetched.
+[Medusa] CourtListener: 4786 raw records
+[Medusa] Total raw records: 4865
+[Watchdog] Source health after 1 scans:
+  ✓  OK     CourtListener — last returned 4786
+  ✓  OK     AP News RSS — last returned 2
+  ✓  OK     FBI CDE — last returned 0
+  ✓  OK     ED.gov — last returned 0
+  ✓  OK     AG Press — last returned 0
+  ✓  OK     Wiki Homicides — last returned 67
+  → All sources healthy
+[Medusa] After normalization: 4865 valid records
+[Medusa] After scope filter: 4807 in-scope records
+[Medusa] After dedup: 1695 unique records
+[Medusa] Geocoded 78 unique locations for 1695 records.
+[Medusa] Scan complete. 1695 cases ready.
+[Medusa Meta] 2026-04-29T09:19:34.760713+00:00
+  Window: 1 scans | Yield: 34.8% | Trend: stable
+  Settling: False | Attractors: ['sexual_assault(37%)']
+  → Attractor sexual_assault at 37% — deprioritize
+  → Source concentration — add new sources
+  → Missing types entirely: ['rape', 'harassment', 'assault']
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set

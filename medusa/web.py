@@ -99,6 +99,46 @@ def api_scan():
     threading.Thread(target=_do_scan, daemon=True).start()
     return jsonify({"ok": True, "message": "Scan started."})
 
+@app.route("/api/press")
+def api_press():
+    import requests, xml.etree.ElementTree as ET
+    feeds = [
+        ("The 19th",     "https://19thnews.org/feed/"),
+        ("Ms. Magazine", "https://msmagazine.com/feed/"),
+        ("Rewire News",  "https://rewirenewsgroup.com/feed/"),
+        ("Guardian DV",  "https://www.theguardian.com/society/domestic-violence/rss"),
+        ("Guardian SA",  "https://www.theguardian.com/society/rape-and-sexual-assault/rss"),
+    ]
+    keywords = [
+        "domestic violence","sexual assault","rape","stalking","trafficking",
+        "femicide","intimate partner","violence against women","gender violence",
+        "abuse","epstein","rape chat","uber assault","ice detention","pregnant",
+        "andrew tate","exploitation","grooming","predator","harvey weinstein",
+        "maxwell","sex trafficking","child abuse","missing women",
+    ]
+    articles = []
+    for name, url in feeds:
+        try:
+            r = requests.get(url, headers={"User-Agent": "Medusa/1.2"}, timeout=8)
+            root = ET.fromstring(r.content)
+            for item in root.findall(".//item"):
+                title = item.findtext("title") or ""
+                desc  = item.findtext("description") or ""
+                link  = item.findtext("link") or ""
+                pub   = item.findtext("pubDate") or ""
+                text  = (title + " " + desc).lower()
+                if any(k in text for k in keywords):
+                    articles.append({
+                        "source": name,
+                        "title":  title,
+                        "desc":   desc[:200],
+                        "link":   link,
+                        "date":   pub[:16],
+                    })
+        except Exception as e:
+            print(f"[Press] {name} error: {e}")
+    return jsonify({"ok": True, "articles": articles})
+
 @app.route("/api/status")
 def api_status():
     s = _get_scanner()

@@ -1330,47 +1330,26 @@ function renderPress() {
   const feed = document.getElementById('press-feed');
   feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">LOADING...</div>';
 
-  const sources = [
-    {name: "The 19th", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://19thnews.org/feed/")},
-    {name: "Ms. Magazine", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://msmagazine.com/feed/")},
-    {name: "Rewire News", url: "https://api.allorigins.win/get?url=" + encodeURIComponent("https://rewirenewsgroup.com/feed/")},
-  ];
-
-  const keywords = ["domestic violence","sexual assault","rape","stalking","trafficking","femicide","intimate partner","violence against women","gender violence","abuse"];
-
-  Promise.all(sources.map(s =>
-    fetch(s.url).then(r => r.json()).then(d => ({name: s.name, xml: d.contents})).catch(() => null)
-  )).then(results => {
-    let articles = [];
-    for (const result of results) {
-      if (!result || !result.xml) continue;
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(result.xml, "text/xml");
-      const items = doc.querySelectorAll("item");
-      items.forEach(item => {
-        const title = item.querySelector("title")?.textContent || "";
-        const desc  = item.querySelector("description")?.textContent || "";
-        const link  = item.querySelector("link")?.textContent || "";
-        const text  = (title + " " + desc).toLowerCase();
-        if (keywords.some(k => text.includes(k))) {
-          articles.push({title, desc, link, source: result.name});
-        }
-      });
-    }
-
-    if (articles.length === 0) {
-      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No relevant articles found right now. Check back soon.</div>';
-      return;
-    }
-
-    feed.innerHTML = articles.map(a => `
-      <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
-        <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">${a.source}</div>
-        <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:6px;">${a.title}</div>
-        <a href="${a.link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
-      </div>
-    `).join('');
-  });
+  fetch('/api/press')
+    .then(r => r.json())
+    .then(data => {
+      const articles = data.articles || [];
+      if (!articles.length) {
+        feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No relevant articles right now. Check back soon.</div>';
+        return;
+      }
+      feed.innerHTML = articles.map(a => `
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
+          <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">${a.source} &nbsp;·&nbsp; ${a.date}</div>
+          <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:6px;">${a.title}</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">${a.desc}</div>
+          <a href="${a.link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
+        </div>
+      `).join('');
+    })
+    .catch(() => {
+      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">Error loading press feed.</div>';
+    });
 }
 
 function renderResearch() {
@@ -1678,7 +1657,76 @@ loadAll();
         No state allowed women to own property in their own name. Mississippi was the first &mdash; and required a husband&rsquo;s permission.
       </div>
 
-      <p class="facts-source" style="margin-top:14px;">Sources: Unchained At Last &middot; OJP &middot; CDC &middot; National Women&rsquo;s History Alliance &middot; Congress.gov</p>
+      <div class="fact-item">
+        <span class="fact-year">Until 1974</span>
+        Women could not start a business or sign a contract without a male relative&rsquo;s signature in many states. The Equal Credit Opportunity Act (1974) and state-by-state reforms through the 1960s&ndash;70s gradually removed these requirements. Some states required a husband&rsquo;s permission as late as the 1970s.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1994</span>
+        There was no federal law against domestic violence. Before the Violence Against Women Act (VAWA) passed in 1994, domestic violence was largely treated as a private family matter. Police routinely refused to intervene. Prosecutors declined to pursue cases. Judges dismissed them. Women had no federal legal protection in their own homes.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1972</span>
+        Women were barred from Ivy League universities. Yale and Princeton admitted women in 1969, Harvard in 1977. Title IX, prohibiting sex discrimination in education, passed in 1972 — but was fought by institutions for decades.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1975</span>
+        Women could not serve on juries in all states. Louisiana was the last to require women's jury service. Before that, women could be automatically excused simply for being women — meaning female victims were judged entirely by male juries.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1968</span>
+        Job advertisements were legally separated by sex. Employers could advertise "Help Wanted — Male" and refuse to consider women entirely. The EEOC did not ban sex-segregated job ads until 1968, and enforcement was weak for years after.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Until 1967</span>
+        Women were banned from running the Boston Marathon. In 1967, Kathrine Switzer registered under initials and became the first woman to officially run it. Race director Jock Semple physically attacked her mid-race to remove her bib. Women were not officially allowed to enter until 1972.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">2022 — Rights Removed</span>
+        Roe v. Wade was overturned by the Supreme Court on June 24, 2022. For the first time in American history, a constitutional right was taken away from a specific group of people. 26 states moved to ban or severely restrict abortion. Women in those states lost bodily autonomy overnight. Maternal mortality has risen in states with total bans.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today — Rape kits</span>
+        Over 100,000 rape kits sit untested in police evidence rooms across the United States. Each kit represents a survivor who reported. Many kits are never tested. Statutes of limitations expire. Perpetrators are never identified. The backlog is a policy choice.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today — Statutes of limitations</span>
+        Most states have statutes of limitations on rape and sexual assault, meaning survivors who report years later — as most do — cannot see their attacker prosecuted. The average survivor waits 11 years to report. In many states, that wait means no justice is legally possible.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today — Tampon tax</span>
+        22 states tax menstrual products as luxury items. Food, prescription drugs, and in some states, cowboy boots and yacht repairs are exempt. Menstrual products are not. This tax falls exclusively on people who menstruate and disproportionately affects low-income women.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today — No paid maternity leave</span>
+        The United States has no federal paid maternity leave. It is one of only six countries in the world without it — alongside Papua New Guinea, Marshall Islands, Micronesia, Nauru, and Palau. The Family and Medical Leave Act (1993) provides 12 weeks unpaid, only for eligible employees at companies with 50+ workers.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">Still today — Prison labor exception</span>
+        The 13th Amendment abolished slavery &ldquo;except as punishment for crime.&rdquo; Prison labor is legal and largely uncompensated. Women of color are incarcerated at disproportionate rates. Many are incarcerated for defending themselves against abusers. The system that failed to protect them then profits from their labor.
+      </div>
+
+      <div class="fact-item">
+        <span class="fact-year">ERA — Still Not Law</span>
+        The Equal Rights Amendment &mdash; which would guarantee constitutional equality regardless of sex &mdash; was first introduced in Congress in 1923. It passed Congress in 1972 and was sent to the states for ratification. 38 states have now ratified it, meeting the required threshold. But it has never been formally added to the Constitution. The deadline set by Congress has been contested, and the National Archivist has refused to certify it under political pressure. Without the ERA, sex discrimination has no explicit constitutional prohibition. Every legal protection women have can be legislatively undone.
+        <br><br>
+        <strong style="color:#c0392b;">Who has blocked it:</strong> Conservative legislators in unratified states blocked it for decades. Key opponents included Phyllis Schlafly (STOP ERA campaign), and more recently, the Trump administration directed the DOJ to argue the ERA deadline had expired. Alabama, Louisiana, and South Dakota have sued to prevent certification.
+        <br><br>
+        <a href="https://www.equalrightsamendment.org" target="_blank" style="color:#c0392b;text-decoration:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;">LEARN MORE ↗</a>
+      </div>
+
+      <p class="facts-source" style="margin-top:14px;">Sources: Unchained At Last &middot; OJP &middot; CDC &middot; National Women&rsquo;s History Alliance &middot; Congress.gov &middot; Equal Rights Amendment Coalition</p>
 
     </div>
   </div>
