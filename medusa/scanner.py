@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 import requests
 
 from medusa.meta import ScanHistory, ScanRecord
+from medusa.purpose import MISSION, CREATED_FOR
 from medusa.record import (
     normalize_record, make_case_id,
     STATE_LARGEST_CITY,
@@ -185,6 +186,8 @@ class MedusaScanner:
         Run all source modules. Returns enriched, deduplicated case dicts.
         """
         print("[Medusa] Starting free-source public records scan...")
+        print(f"[Medusa] Mission: {MISSION}")
+        print(f"[Medusa] For: {CREATED_FOR}")
         print("[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov")
 
         raw_records: list[dict] = []
