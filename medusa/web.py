@@ -135,15 +135,23 @@ def _run_scheduled_scan():
 
 
 def start_scheduler():
+    import threading, time
     from apscheduler.schedulers.background import BackgroundScheduler
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         _run_scheduled_scan,
         trigger="interval",
-        hours=24,
-        id="medusa_daily_scan",
+        hours=6,
+        id="medusa_scan",
         replace_existing=True,
     )
     scheduler.start()
-    print("[Medusa] 24-hour scan scheduler started.")
+    print("[Medusa] 6-hour scan scheduler started.")
+
+    # Startup scan after 30 seconds
+    def _startup():
+        time.sleep(30)
+        _run_scheduled_scan()
+    threading.Thread(target=_startup, daemon=True).start()
+
     return scheduler
