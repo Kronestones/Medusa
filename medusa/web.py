@@ -158,7 +158,7 @@ def start_scheduler():
     scheduler.add_job(
         _run_scheduled_scan,
         trigger="interval",
-        hours=6,
+        hours=2,
         id="medusa_scan",
         replace_existing=True,
     )
