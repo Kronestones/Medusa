@@ -27,6 +27,7 @@ import requests
 
 from medusa.meta import ScanHistory, ScanRecord
 from medusa.purpose import MISSION, CREATED_FOR
+from medusa.watchdog import SourceWatchdog
 from medusa.record import (
     normalize_record, make_case_id,
     STATE_LARGEST_CITY,
@@ -149,8 +150,11 @@ _VICTIM_TERMS = [
 def _is_in_scope(record: dict) -> bool:
     """
     Returns True only if record is male violence against women/children.
-    Checks title, summary, description. Drops female perps, off-topic cases,
-    and press releases with no victim context.
+
+    Court records (CourtListener, AG Press) get a lighter touch —
+    case names like "State v. Johnson" have no victim terms even when
+    the case is domestic violence. We trust the violence_type inference
+    for court sources and only apply strict victim filtering to news.
     """
     text = " ".join([
         str(record.get("title", "")),
@@ -159,9 +163,28 @@ def _is_in_scope(record: dict) -> bool:
         str(record.get("detail", "")),
     ]).lower()
 
-    # Drop female perpetrators
+    # Drop female perpetrators always
     if any(term in text for term in _FEMALE_PERP_TERMS):
         return False
+
+    # Drop out-of-scope subject matter always
+    if any(term in text for term in _OUT_OF_SCOPE_TERMS):
+        return False
+
+    # Court sources — trust violence_type inference, skip victim term check
+    court_sources = {"courtlistener", "pacer", "court", "attorney general",
+                     "ag press", "doj", "justice.gov"}
+    source = str(record.get("source_name", "")).lower()
+    if any(cs in source for cs in court_sources):
+        vtype = str(record.get("violence_type", ""))
+        if vtype and vtype != "unknown":
+            return True
+
+    # News sources — require victim context terms
+    if not any(term in text for term in _VICTIM_TERMS):
+        return False
+
+    return True
 
     # Drop out-of-scope subject matter
     if any(term in text for term in _OUT_OF_SCOPE_TERMS):
@@ -180,6 +203,7 @@ class MedusaScanner:
         self.last_scan   = None
         self.total_found = 0
         self._history    = ScanHistory()
+        self._watchdog   = SourceWatchdog()
 
     def scan(self) -> list[dict]:
         """
@@ -227,6 +251,17 @@ class MedusaScanner:
 
         print(f"[Medusa] Total raw records: {len(raw_records)}")
 
+        # ── Watchdog — record source health ──────────────────────
+        try:
+            source_counts = {}
+            for name, _ in sources:
+                source_counts[name] = len([r for r in raw_records
+                                          if r.get("source_name","").startswith(name.split()[0])])
+            self._watchdog.record_scan(source_counts)
+            print(self._watchdog.health_report())
+        except Exception as e:
+            print(f"[Watchdog] Error: {e}")
+
         # ── Normalize ─────────────────────────────────────────────────────────
         normalized = []
         for r in raw_records:
@@ -242,24 +277,33 @@ class MedusaScanner:
         normalized = [r for r in normalized if _is_in_scope(r)]
         print(f"[Medusa] After scope filter: {len(normalized)} in-scope records")
 
-        # ── Deduplicate by case_id ────────────────────────────────────────────
-        seen_ids: set[str] = set()
-        unique: list[dict] = []
+        # ── Deduplicate by case_id and summary fingerprint ─────────────────────
+        import hashlib as _hl
+        seen_ids    : set[str] = set()
+        seen_prints : set[str] = set()
+        unique      : list[dict] = []
+
         for r in normalized:
-            cid = r.get("case_id", "")
-            if cid in seen_ids:
+            cid        = r.get("case_id", "")
+            summary_fp = _hl.sha1(str(r.get("summary","")).lower().strip()[:120].encode()).hexdigest()[:16]
+
+            if cid in seen_ids or summary_fp in seen_prints:
                 continue
             seen_ids.add(cid)
+            seen_prints.add(summary_fp)
             unique.append(r)
 
         print(f"[Medusa] After dedup: {len(unique)} unique records")
 
-        # ── Geocode ───────────────────────────────────────────────────────────
+        # ── Geocode — batched by city/state to avoid redundant calls ───────────
+        geo_cache = {}
         for r in unique:
-            lat, lng = geocode(r["city"], r["state"])
-            r["lat"] = lat
-            r["lng"] = lng
-            time.sleep(0.2)    # Nominatim rate limit: 1 req/s max
+            key = f"{r.get('city','')},{r.get('state','')}"
+            if key not in geo_cache:
+                geo_cache[key] = geocode(r["city"], r["state"])
+                time.sleep(0.2)
+            r["lat"], r["lng"] = geo_cache[key]
+        print(f"[Medusa] Geocoded {len(geo_cache)} unique locations for {len(unique)} records.")
 
         # ── Finalize ──────────────────────────────────────────────────────────
         self.last_scan    = datetime.now(timezone.utc).isoformat()
