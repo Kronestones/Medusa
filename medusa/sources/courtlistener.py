@@ -21,42 +21,51 @@ BASE = "https://www.courtlistener.com/api/rest/v4"
 
 # Search terms → violence_type hint
 QUERIES = [
-    ("domestic violence assault intimate partner",           "domestic_violence"),
-    ("sexual assault rape conviction sentence",              "sexual_assault"),
-    ("stalking harassment restraining order violation",      "stalking"),
-    ("femicide murder intimate partner women",               "homicide"),
-    ("sex trafficking women forced prostitution",            "trafficking"),
-    ("attempted murder girlfriend wife assault",             "attempted_murder"),
-    ("sexual abuse minor child molestation",                 "child_abuse"),
-    ("rape conviction sentence women",                       "rape"),
-    ("domestic abuse restraining order violation",           "domestic_violence"),
-    ("violence against women act VAWA",                      "domestic_violence"),
-    ("strangulation choking domestic violence",              "attempted_murder"),
-    ("intimate partner homicide sentence",                   "homicide"),
-    ("child sexual exploitation online",                     "child_abuse"),
-    ("sex offender registration violation",                  "sexual_assault"),
-    ("human trafficking minor victim",                       "trafficking"),
-    ("protective order violation assault",                   "domestic_violence"),
-    ("sexual battery conviction women",                      "sexual_assault"),
-    ("coercive control domestic violence",                   "domestic_violence"),
-    ("marital rape spousal assault",                         "rape"),
-    ("dating violence college campus",                       "domestic_violence"),
-    ("cyberstalking harassment women online",                "stalking"),
-    ("forced marriage trafficking women",                    "trafficking"),
-    ("domestic violence homicide children witness",          "homicide"),
-    ("sexual assault military service women",                "sexual_assault"),
-    ("revenge porn intimate image abuse",                    "harassment"),
-    ("acid attack women disfigurement",                      "assault"),
-    ("female genital mutilation prosecution",                "assault"),
-    ("honor killing domestic violence",                      "homicide"),
-    ("child bride forced marriage",                          "trafficking"),
-    ("peeping voyeurism women conviction",                   "harassment"),
+    ("domestic violence assault intimate partner",      "domestic_violence"),
+    ("sexual assault rape conviction sentence",          "sexual_assault"),
+    ("stalking harassment restraining order violation",  "stalking"),
+    ("femicide murder intimate partner women",           "homicide"),
+    ("sex trafficking women forced prostitution",        "trafficking"),
+    ("attempted murder girlfriend wife assault",         "attempted_murder"),
+    ("sexual abuse minor child molestation",             "child_abuse"),
+    ("rape conviction sentence women",                   "rape"),
 ]
 
 # Only pull criminal cases from district courts
 COURT_TYPE_FILTER = "fd"    # federal district courts
 PAGE_SIZE = 20              # results per query
-MAX_PAGES = 10             # pages per query = up to 200 results each
+
+# NOS values that are definitively NOT what we want — hard reject
+_REJECT_NOS_KEYWORDS = {
+    "contract", "property", "bankruptcy", "patent", "antitrust",
+    "securities", "immigration", "tax", "labor", "employment",
+    "prisoner", "civil rights", "habeas corpus", "mandamus",
+    "administrative", "social security", "student loan", "insurance",
+    "foreclosure", "copyright", "trademark", "environment",
+    "forfeiture", "customs", "naturalization",
+}
+
+# Case name patterns that indicate this is NOT a violence case
+# (government/policy defendants, immigration, prisoner petitions)
+_REJECT_CASE_PATTERNS = [
+    re.compile(r"\bv\.?\s+trump\b",               re.I),  # v. Trump = policy
+    re.compile(r"\bv\.?\s+biden\b",               re.I),
+    re.compile(r"\bv\.?\s+dhs\b",                 re.I),
+    re.compile(r"\bv\.?\s+united states\b",       re.I),  # civil suits vs govt
+    re.compile(r"\bv\.?\s+u\.s\.\b",            re.I),
+    re.compile(r"\bv\.?\s+department of\b",       re.I),
+    re.compile(r"\bv\.?\s+secretary\b",            re.I),
+    re.compile(r"\bhabeas\b",                        re.I),
+    re.compile(r"\bmandamus\b",                      re.I),
+    re.compile(r"\bimmigration\b",                   re.I),
+    re.compile(r"\bdeportation\b",                   re.I),
+    re.compile(r"\bdetainee\b",                      re.I),
+    re.compile(r"\bprisoner\b",                      re.I),
+    re.compile(r"\binmate\b",                        re.I),
+]
+
+# The correct pattern for federal criminal cases: "United States v. [Defendant]"
+_CRIMINAL_CASE_RE = re.compile(r"^united states\s+v\.?\s+\w", re.I)
 
 
 def fetch() -> list[dict]:
@@ -74,134 +83,37 @@ def fetch() -> list[dict]:
                 seen_dockets.add(docket_id)
             records.append(r)
 
+    # Always include known documented-perpetrator cases (Carroll, Epstein, Maxwell, etc.)
+    records.extend(fetch_known_cases())
+
     print(f"[CourtListener] {len(records)} records fetched.")
     return records
 
 
-# Years to search across — gives us different result sets per query
-SEARCH_YEARS = [str(y) for y in range(2025, 1999, -1)]  # 2025 back to 2000
-
 def _search_dockets(search_term: str, vtype_hint: str) -> list[dict]:
-    """Search opinions endpoint across multiple years for maximum coverage."""
-    import requests as _req
-    import time as _time
-    import re
-    all_year_results = []
-    for year in SEARCH_YEARS:
-        year_results = _search_year(search_term, vtype_hint, year)
-        all_year_results.extend(year_results)
-        _time.sleep(0.3)
-    return all_year_results
+    """Search dockets endpoint, return normalized partial records."""
+    data = safe_json(
+        f"{BASE}/dockets/",
+        params={
+            "q":          search_term,
+            "court_type": COURT_TYPE_FILTER,
+            "order_by":   "date_filed",
+            "page_size":  PAGE_SIZE,
+        },
+        extra_headers={"Accept": "application/json"},
+    )
+    if not data:
+        return []
 
-def _search_year(search_term, vtype_hint, year):
-    """Search one year of opinions."""
-    import requests as _req
-    import time as _time
-    import re as _re
-    dated_term = f"{search_term} {year}"
-    all_results = []
-    cursor = None
-    for page in range(MAX_PAGES):
-        params = {
-            "q":         dated_term,
-            "type":      "o",
-            "order_by":  "score desc",
-            "page_size": PAGE_SIZE,
-        }
-        if cursor:
-            params["cursor"] = cursor
-        try:
-            resp = _req.get(
-                f"{BASE}/search/",
-                params=params,
-                headers={
-                    "User-Agent": "Medusa/1.2 (sentinel.commons@gmail.com)",
-                    "Accept": "application/json",
-                },
-                timeout=15,
-            )
-            data = resp.json() if resp.ok else {}
-        except Exception as e:
-            print(f"[CourtListener] request error: {e}")
-            break
-        if not data:
-            break
-        page_results = data.get("results", [])
-        all_results.extend(page_results)
-        next_url = data.get("next")
-        if not next_url:
-            break
-        m = _re.search(r"cursor=([^&]+)", next_url)
-        cursor = m.group(1) if m else None
-        if not cursor:
-            break
-        _time.sleep(0.5)
-    results = all_results
+    results = data.get("results", [])
     records = []
 
     for item in results:
-        rec = _parse_opinion(item, vtype_hint)
+        rec = _parse_docket(item, vtype_hint)
         if rec:
             records.append(rec)
 
     return records
-
-
-def _parse_opinion(item: dict, vtype_hint: str) -> dict | None:
-    """Convert a CourtListener search result to a partial MedusaRecord."""
-    case_name = item.get("caseNameFull") or item.get("caseName") or item.get("case_name") or ""
-    if not case_name:
-        return None
-
-    court_str = item.get("court_citation_string") or item.get("court") or ""
-    court_id  = item.get("court_id") or ""
-    city, state = _resolve_location(item, court_str)
-    if not city or not state:
-        for slug, (c, s) in _SLUG_MAP.items():
-            if slug in court_id.lower():
-                city, state = c, s
-                break
-        if not state:
-            return None
-
-    date_str = _clean_date(
-        item.get("dateFiled") or item.get("date_filed") or ""
-    )
-
-    posture  = item.get("posture") or ""
-    syllabus = item.get("syllabus") or ""
-    nature   = item.get("suitNature") or ""
-    # Get snippet from nested opinions list
-    snippet = ""
-    opinions = item.get("opinions", [])
-    if opinions and isinstance(opinions, list):
-        snippet = opinions[0].get("snippet", "") or ""
-    if not snippet:
-        snippet = item.get("snippet") or ""
-
-    summary = f"Court case: {case_name}."
-    if court_str: summary += f" Filed in {court_str}."
-    if nature: summary += f" Nature: {nature}."
-    if posture: summary += f" {posture[:200]}"
-    if syllabus: summary += f" {syllabus[:200]}"
-    if snippet: summary += f" {snippet[:200]}"
-
-    vtype = _infer_violence_type(case_name, f"{posture} {syllabus} {nature} {snippet}", vtype_hint)
-    absolute_url = item.get("absolute_url") or ""
-    source_url = f"https://www.courtlistener.com{absolute_url}" if absolute_url else ""
-
-    return {
-        "summary":       summary[:500],
-        "city":          city,
-        "state":         state,
-        "date_incident": date_str,
-        "violence_type": vtype,
-        "status":        "charged",
-        "source_url":    source_url,
-        "source_name":   "CourtListener / PACER",
-        "verified":      True,
-        "_docket_id":    item.get("id"),
-    }
 
 
 def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
@@ -210,11 +122,40 @@ def _parse_docket(item: dict, vtype_hint: str) -> dict | None:
     if not case_name:
         return None
 
-    # Skip civil/bankruptcy/appellate — we want criminal
+    # ── Hard reject: case name matches known non-violence patterns ────────────
+    for pattern in _REJECT_CASE_PATTERNS:
+        if pattern.search(case_name):
+            return None
+
+    # ── Nature of suit filtering ───────────────────────────────────────────────
     nature_of_suit = (item.get("nature_of_suit") or "").lower()
-    if any(x in nature_of_suit for x in ["contract", "property", "bankruptcy",
-                                           "civil rights — employment", "patent"]):
-        return None
+
+    # Hard reject on NOS if present and clearly non-criminal
+    if nature_of_suit:
+        if any(x in nature_of_suit for x in _REJECT_NOS_KEYWORDS):
+            return None
+
+    # ── Require criminal case structure ───────────────────────────────────────
+    # Federal criminal cases are "United States v. Defendant"
+    # Civil suits about violence (Carroll v. Trump) are still valid — keep them
+    # But prisoner petitions, immigration, and policy cases are not
+    is_us_criminal = bool(_CRIMINAL_CASE_RE.match(case_name.strip()))
+    is_civil_violence = not is_us_criminal  # could still be valid civil case
+
+    if is_civil_violence:
+        # For civil cases, require that the violence keywords appear in case name
+        # or nature_of_suit — otherwise it is almost certainly irrelevant
+        cn_lower = case_name.lower()
+        violence_in_name = any(kw in cn_lower for kw in [
+            "assault", "rape", "murder", "homicide", "domestic", "trafficking",
+            "stalking", "abuse", "harassment", "sexual", "violence",
+        ])
+        violence_in_nos = any(kw in nature_of_suit for kw in [
+            "assault", "sexual", "violence", "abuse", "trafficking",
+        ]) if nature_of_suit else False
+
+        if not violence_in_name and not violence_in_nos:
+            return None
 
     court_str = item.get("court_citation_string") or item.get("court") or ""
     city, state = _resolve_location(item, court_str)
@@ -329,90 +270,6 @@ _SLUG_MAP = {
     "wvnd": ("Clarksburg",    "WV"), "wvsd": ("Charleston",   "WV"),
     "wied": ("Milwaukee",     "WI"), "wiwd": ("Madison",      "WI"),
     "wyd":  ("Cheyenne",      "WY"),
-    # State supreme and appellate courts
-    "alaska": ("Anchorage",      "AK"),
-    "ariz":   ("Phoenix",        "AZ"),
-    "ark":    ("Little Rock",    "AR"),
-    "cal":    ("Los Angeles",    "CA"),
-    "colo":   ("Denver",         "CO"),
-    "conn":   ("Hartford",       "CT"),
-    "connappct": ("Hartford",    "CT"),
-    "dc":     ("Washington",     "DC"),
-    "fla":    ("Tallahassee",    "FL"),
-    "ga":     ("Atlanta",        "GA"),
-    "haw":    ("Honolulu",       "HI"),
-    "idaho":  ("Boise",          "ID"),
-    "ill":    ("Springfield",    "IL"),
-    "ind":    ("Indianapolis",   "IN"),
-    "iowa":   ("Des Moines",     "IA"),
-    "iowactapp": ("Des Moines",  "IA"),
-    "kan":    ("Topeka",         "KS"),
-    "ky":     ("Louisville",     "KY"),
-    "la":     ("Baton Rouge",    "LA"),
-    "me":     ("Augusta",        "ME"),
-    "mass":   ("Boston",         "MA"),
-    "mich":   ("Lansing",        "MI"),
-    "minn":   ("Minneapolis",    "MN"),
-    "miss":   ("Jackson",        "MS"),
-    "mo":     ("Jefferson City", "MO"),
-    "mont":   ("Helena",         "MT"),
-    "neb":    ("Lincoln",        "NE"),
-    "nev":    ("Las Vegas",      "NV"),
-    "nh":     ("Concord",        "NH"),
-    "nj":     ("Trenton",        "NJ"),
-    "nm":     ("Albuquerque",    "NM"),
-    "ny":     ("Albany",         "NY"),
-    "nc":     ("Raleigh",        "NC"),
-    "nd":     ("Bismarck",       "ND"),
-    "ohio":   ("Columbus",       "OH"),
-    "ohioctapp": ("Columbus",    "OH"),
-    "okla":   ("Oklahoma City",  "OK"),
-    "or":     ("Portland",       "OR"),
-    "pa":     ("Harrisburg",     "PA"),
-    "ri":     ("Providence",     "RI"),
-    "sc":     ("Columbia",       "SC"),
-    "sd":     ("Pierre",         "SD"),
-    "tenn":   ("Nashville",      "TN"),
-    "tenncrimapp": ("Nashville", "TN"),
-    "tex":    ("Austin",         "TX"),
-    "txctapp1":  ("Houston",     "TX"),
-    "txctapp2":  ("Fort Worth",  "TX"),
-    "txctapp3":  ("Austin",      "TX"),
-    "txctapp4":  ("San Antonio", "TX"),
-    "txctapp5":  ("Dallas",      "TX"),
-    "txctapp6":  ("Texarkana",   "TX"),
-    "txctapp7":  ("Amarillo",    "TX"),
-    "txctapp8":  ("El Paso",     "TX"),
-    "txctapp9":  ("Beaumont",    "TX"),
-    "txctapp10": ("Waco",        "TX"),
-    "txctapp11": ("Eastland",    "TX"),
-    "txctapp12": ("Tyler",       "TX"),
-    "txctapp13": ("Corpus Christi","TX"),
-    "txctapp14": ("Houston",     "TX"),
-    "utah":   ("Salt Lake City", "UT"),
-    "vt":     ("Montpelier",     "VT"),
-    "va":     ("Richmond",       "VA"),
-    "wash":   ("Olympia",        "WA"),
-    "wva":    ("Charleston",     "WV"),
-    "wis":    ("Madison",        "WI"),
-    "wyo":    ("Cheyenne",       "WY"),
-    # Federal circuits
-    "ca1":  ("Boston",           "MA"),
-    "ca2":  ("New York",         "NY"),
-    "ca3":  ("Philadelphia",     "PA"),
-    "ca4":  ("Richmond",         "VA"),
-    "ca5":  ("New Orleans",      "LA"),
-    "ca6":  ("Cincinnati",       "OH"),
-    "ca7":  ("Chicago",          "IL"),
-    "ca8":  ("St. Louis",        "MO"),
-    "ca9":  ("San Francisco",    "CA"),
-    "ca10": ("Denver",           "CO"),
-    "ca11": ("Atlanta",          "GA"),
-    "cadc": ("Washington",       "DC"),
-    "cafc": ("Washington",       "DC"),
-    # DOJ / Federal
-    "olc":  ("Washington",       "DC"),
-    "scotus": ("Washington",     "DC"),
 }
 
 
@@ -465,9 +322,94 @@ def _infer_violence_type(case_name: str, nos: str, hint: str) -> str:
 
 
 def _infer_status(item: dict) -> str:
-    # CourtListener doesn't always expose verdict — use date_terminated as proxy
+    # Check proceedings for conviction signals
+    case_name = (item.get("case_name") or "").lower()
+    nos = (item.get("nature_of_suit") or "").lower()
+    text = case_name + " " + nos
+    if any(x in text for x in ["sentenced", "guilty plea", "conviction", "pleaded guilty"]):
+        return "convicted"
     if item.get("date_terminated"):
-        return "convicted"     # case closed; approximate
+        return "charged"    # case closed but we don't know verdict — safer than "convicted"
     if item.get("date_filed"):
         return "charged"
     return "reported"
+
+
+# ── Known documented perpetrator cases ───────────────────────────────────────
+# These are civil or criminal cases where violence against women/children
+# has been documented by courts. We fetch these by docket number directly
+# so they are never filtered out by the general query logic.
+
+KNOWN_CASES = [
+    # E. Jean Carroll v. Donald J. Trump — sexual assault found by jury, 2023/2024
+    {
+        "docket": "22-cv-10016",
+        "court":  "nysd",
+        "summary": "E. Jean Carroll v. Donald J. Trump. Federal jury found Trump liable for sexual abuse and defamation. $83.3 million awarded in damages (Jan 2024). Southern District of New York.",
+        "city": "New York", "state": "NY",
+        "violence_type": "sexual_assault",
+        "status": "civil_judgment",
+        "source_url": "https://www.courtlistener.com/docket/66160066/",
+        "source_name": "CourtListener / PACER",
+        "date_incident": "2023-05-09",
+    },
+    # Carroll I — defamation + battery finding
+    {
+        "docket": "20-cv-07311",
+        "court":  "nysd",
+        "summary": "E. Jean Carroll v. Donald J. Trump (Carroll I). Court found Trump liable for battery and defamation. Southern District of New York.",
+        "city": "New York", "state": "NY",
+        "violence_type": "sexual_assault",
+        "status": "civil_judgment",
+        "source_url": "https://www.courtlistener.com/docket/17390929/",
+        "source_name": "CourtListener / PACER",
+        "date_incident": "2023-01-01",
+    },
+    # Jeffrey Epstein — US v. Epstein (trafficking, died before trial)
+    {
+        "docket": "19-cr-00490",
+        "court":  "nysd",
+        "summary": "United States v. Jeffrey Epstein. Federal indictment for sex trafficking of minors and conspiracy. Epstein died in custody August 2019. Southern District of New York.",
+        "city": "New York", "state": "NY",
+        "violence_type": "trafficking",
+        "status": "charged",
+        "source_url": "https://www.courtlistener.com/docket/15058562/",
+        "source_name": "CourtListener / PACER",
+        "date_incident": "2019-07-08",
+    },
+    # Ghislaine Maxwell — convicted Epstein co-conspirator
+    {
+        "docket": "20-cr-00330",
+        "court":  "nysd",
+        "summary": "United States v. Ghislaine Maxwell. Convicted on 5 federal counts including sex trafficking of minors. Sentenced to 20 years. Southern District of New York.",
+        "city": "New York", "state": "NY",
+        "violence_type": "trafficking",
+        "status": "convicted",
+        "source_url": "https://www.courtlistener.com/docket/17690117/",
+        "source_name": "CourtListener / PACER",
+        "date_incident": "2021-12-29",
+    },
+]
+
+
+def fetch_known_cases() -> list[dict]:
+    """
+    Return hardcoded records for documented perpetrator cases.
+    These bypass the query/filter pipeline entirely — the findings are
+    already established by courts and should always appear in Medusa.
+    """
+    records = []
+    for case in KNOWN_CASES:
+        records.append({
+            "summary":       case["summary"],
+            "city":          case["city"],
+            "state":         case["state"],
+            "date_incident": case["date_incident"],
+            "violence_type": case["violence_type"],
+            "status":        case["status"],
+            "source_url":    case["source_url"],
+            "source_name":   case["source_name"],
+            "verified":      True,
+        })
+    print(f"[CourtListener] {len(records)} known documented-perpetrator cases loaded.")
+    return records

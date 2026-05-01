@@ -1,20 +1,20 @@
 {
-  "total_scans": 5,
+  "total_scans": 10,
   "consecutive": {
-    "CourtListener": 0,
+    "CourtListener": 1,
     "AP News RSS": 0,
-    "FBI CDE": 5,
-    "ED.gov": 5,
-    "AG Press": 5,
+    "FBI CDE": 10,
+    "ED.gov": 10,
+    "AG Press": 10,
     "Wiki Homicides": 0
   },
   "last_count": {
-    "CourtListener": 20,
-    "AP News RSS": 1,
+    "CourtListener": 0,
+    "AP News RSS": 2,
     "FBI CDE": 0,
     "ED.gov": 0,
     "AG Press": 0,
     "Wiki Homicides": 67
   },
-  "updated": "2026-04-29T23:50:36.467870+00:00"
+  "updated": "2026-05-01T20:18:19.467559+00:00"
 }

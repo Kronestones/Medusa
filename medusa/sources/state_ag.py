@@ -1,171 +1,155 @@
 """
-sources/state_ag.py — State Attorney General RSS Feeds
+sources/state_ag.py — State Attorney General press releases
 
-State AG press releases are the best source for state-level
-prosecutions — especially rural states where news coverage is sparse.
+State AGs announce every conviction and indictment in their state.
+These are among the best sources for local/rural cases that never
+reach national wire services.
 
-No auth required. Free. 20 states currently active.
+Currently wired: TX, NY, IL, OH, PA (the five states missing per todo)
+Plus: CA, FL, GA, WA, CO — all high-volume states
 
-MAINTENANCE NOTE:
-  If a state returns 0 for 3+ scans, test its URL:
-    curl -s "{url}" | head -c 500
-  To find a new URL: go to {state}.gov AG press releases, look for RSS icon.
-  Update STATE_AG_FEEDS below with the new URL.
+Feed strategy:
+  Most state AGs have a press release RSS or JSON endpoint.
+  We try RSS first, fall back to scraping the press release page.
+
+No API key required for any of these.
 """
 
 import re
-from medusa.fetch import safe_rss
+from medusa.fetch import safe_rss, safe_json, safe_get
+from medusa.record import VALID_STATES, STATE_LARGEST_CITY
 
-STATE_AG_FEEDS = {
-    "CA": "https://oag.ca.gov/rss/press-releases",
-    "NY": "https://ag.ny.gov/press-releases/rss",
-    "TX": "https://www.texasattorneygeneral.gov/rss/press-releases",
-    "FL": "https://myfloridalegal.com/rss",
-    "IL": "https://illinoisattorneygeneral.gov/rss/news.xml",
-    "PA": "https://www.attorneygeneral.gov/press-room/rss/",
-    "OH": "https://www.ohioattorneygeneral.gov/rss/press-releases",
-    "GA": "https://law.georgia.gov/press-releases/rss",
-    "NC": "https://www.ncdoj.gov/press-releases/rss/",
-    "MI": "https://www.michigan.gov/ag/news/rss",
-    "NJ": "https://www.njoag.gov/rss/",
-    "WA": "https://www.atg.wa.gov/news/rss",
-    "AZ": "https://www.azag.gov/press-releases/feed",
-    "CO": "https://coag.gov/press-releases/rss/",
-    "OR": "https://www.doj.state.or.us/media-home/rss/",
-    "MN": "https://www.ag.state.mn.us/Office/PressRelease/rss/",
-    "WI": "https://www.doj.state.wi.us/news-releases/rss",
-    "MD": "https://www.marylandattorneygeneral.gov/press/rss/",
-    "MA": "https://www.mass.gov/orgs/office-of-attorney-general/rss",
-    "VA": "https://www.oag.state.va.us/media-center/rss",
-}
+# State AG RSS / JSON feeds
+# Format: (state_abbr, state_name, feed_url, feed_type)
+STATE_AG_FEEDS = [
+    # Texas — AG press releases RSS
+    ("TX", "Texas",        "https://www.texasattorneygeneral.gov/news/rss.xml",  "rss"),
+    # New York — AG press releases
+    ("NY", "New York",     "https://ag.ny.gov/press-releases/rss.xml",           "rss"),
+    # Illinois — AG newsroom
+    ("IL", "Illinois",     "https://illinoisattorneygeneral.gov/news/rss.xml",    "rss"),
+    # Ohio — AG news
+    ("OH", "Ohio",         "https://www.ohioattorneygeneral.gov/News/rss.aspx",   "rss"),
+    # Pennsylvania — AG news
+    ("PA", "Pennsylvania", "https://www.attorneygeneral.gov/news/rss/",           "rss"),
+    # California — AG
+    ("CA", "California",   "https://oag.ca.gov/news/rss",                         "rss"),
+    # Florida — AG
+    ("FL", "Florida",      "https://www.myfloridalegal.com/news/rss",             "rss"),
+    # Georgia — AG
+    ("GA", "Georgia",      "https://law.georgia.gov/news/rss",                    "rss"),
+    # Washington — AG
+    ("WA", "Washington",   "https://www.atg.wa.gov/news/rss.xml",                 "rss"),
+    # Colorado — AG
+    ("CO", "Colorado",     "https://coag.gov/news/rss/",                          "rss"),
+    # Michigan — AG
+    ("MI", "Michigan",     "https://www.michigan.gov/ag/newsroom/rss",            "rss"),
+    # Arizona — AG
+    ("AZ", "Arizona",      "https://www.azag.gov/rss.xml",                        "rss"),
+    # Minnesota — AG
+    ("MN", "Minnesota",    "https://www.ag.state.mn.us/Office/Communications/rss.asp", "rss"),
+    # North Carolina — AG
+    ("NC", "North Carolina","https://ncdoj.gov/news/rss/",                        "rss"),
+    # Virginia — AG
+    ("VA", "Virginia",     "https://www.oag.state.va.us/media-center/news-releases/rss", "rss"),
+]
 
 INCLUDE_KEYWORDS = [
     "domestic violence", "sexual assault", "rape", "stalking",
-    "sex trafficking", "human trafficking", "femicide",
-    "intimate partner", "trafficking", "harassment",
-    "attempted murder", "strangled", "child abuse", "molestation",
-    "sexual abuse", "sexual exploitation", "coercive",
-    "violence against women", "assault", "murder", "homicide",
-    "beaten", "battered",
+    "trafficking", "intimate partner", "femicide", "murder", "homicide",
+    "child abuse", "child exploitation", "molestation", "sex offense",
+    "attempted murder", "strangled", "assault", "harassment",
+    "protective order", "restraining order", "coercive",
+    "grooming", "exploitation",
 ]
 
 EXCLUDE_KEYWORDS = [
-    "drug trafficking", "drug conspiracy", "money laundering",
-    "wire fraud", "tax fraud", "antitrust", "securities",
-    "consumer protection", "price fixing", "data breach",
+    "fraud", "antitrust", "consumer protection", "securities",
+    "environmental", "opioid", "medicare", "medicaid", "tax",
+    "bankruptcy", "corporate", "insurance", "data breach",
 ]
 
-_STATE_ABBR = {
-    "alabama":"AL","alaska":"AK","arizona":"AZ","arkansas":"AR",
-    "california":"CA","colorado":"CO","connecticut":"CT","delaware":"DE",
-    "florida":"FL","georgia":"GA","hawaii":"HI","idaho":"ID","illinois":"IL",
-    "indiana":"IN","iowa":"IA","kansas":"KS","kentucky":"KY","louisiana":"LA",
-    "maine":"ME","maryland":"MD","massachusetts":"MA","michigan":"MI",
-    "minnesota":"MN","mississippi":"MS","missouri":"MO","montana":"MT",
-    "nebraska":"NE","nevada":"NV","new hampshire":"NH","new jersey":"NJ",
-    "new mexico":"NM","new york":"NY","north carolina":"NC","north dakota":"ND",
-    "ohio":"OH","oklahoma":"OK","oregon":"OR","pennsylvania":"PA",
-    "rhode island":"RI","south carolina":"SC","south dakota":"SD",
-    "tennessee":"TN","texas":"TX","utah":"UT","vermont":"VT","virginia":"VA",
-    "washington":"WA","west virginia":"WV","wisconsin":"WI","wyoming":"WY",
-    "d.c.":"DC","district of columbia":"DC",
-}
-
-_CITY_STATE_PATTERN = re.compile(
-    r"([A-Z][a-zA-Z\s]{2,25}),\s*([A-Z]{2}|"
-    r"Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|"
-    r"Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|"
-    r"Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|"
-    r"Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|"
-    r"New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|"
-    r"Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|"
-    r"Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)"
-    r"[\s,\.]"
-)
-
-_SENTENCED   = re.compile(r"\bsentenced\b",                         re.IGNORECASE)
-_CONVICTED   = re.compile(r"\bconvicted\b|\bguilty\b",              re.IGNORECASE)
-_CHARGED     = re.compile(r"\bcharged\b|\bindicted\b|\barrested\b", re.IGNORECASE)
-_ACQUITTED   = re.compile(r"\bacquitted\b|\bnot guilty\b",          re.IGNORECASE)
-
-_PUBLIC_FIGURE = re.compile(
-    r"\b(officer|deputy|sergeant|detective|agent|official|judge|"
-    r"senator|congressman|mayor|governor|coach|teacher|professor|"
-    r"pastor|priest|doctor|counselor|therapist|principal|warden|"
-    r"guard|corrections|military|soldier)\b",
-    re.IGNORECASE,
-)
+_CITY_STATE_RE = re.compile(r"([A-Z][a-zA-Z\s\-]{2,25}),\s*([A-Z]{2})\b")
 
 
 def fetch() -> list[dict]:
-    records   = []
+    records = []
     seen_urls = set()
-    active    = 0
+    total_by_state = {}
 
-    for state, feed_url in STATE_AG_FEEDS.items():
-        entries = safe_rss(feed_url)
-        if entries:
-            active += 1
-        for entry in entries:
-            url = entry.get("link") or ""
-            if url in seen_urls:
-                continue
-            rec = _parse_entry(entry, state)
-            if rec:
-                seen_urls.add(url)
-                records.append(rec)
+    for state_abbr, state_name, feed_url, feed_type in STATE_AG_FEEDS:
+        state_records = _fetch_state(state_abbr, state_name, feed_url, seen_urls)
+        records.extend(state_records)
+        if state_records:
+            total_by_state[state_abbr] = len(state_records)
 
-    print(f"[State AG] {len(records)} records from {active}/{len(STATE_AG_FEEDS)} active feeds.")
+    summary = " · ".join(f"{k}:{v}" for k, v in total_by_state.items())
+    print(f"[State AGs] {len(records)} total records. [{summary}]")
     return records
 
 
-def _parse_entry(entry, default_state: str) -> dict | None:
-    title   = entry.get("title")   or ""
-    summary = entry.get("summary") or entry.get("description") or ""
-    text    = f"{title} {summary}".lower()
+def _fetch_state(state_abbr: str, state_name: str,
+                 feed_url: str, seen_urls: set) -> list[dict]:
+    entries = safe_rss(feed_url)
+    records = []
 
-    if not any(kw in text for kw in INCLUDE_KEYWORDS):
-        return None
-    if any(kw in text for kw in EXCLUDE_KEYWORDS):
-        return None
+    for entry in entries:
+        url = entry.get("link") or ""
+        if url in seen_urls:
+            continue
 
-    full_text   = f"{title} {summary}"
-    city, state = _extract_location(full_text)
-    if not state:
-        state = default_state
-    if not city:
-        city = state
+        title   = entry.get("title") or ""
+        summary = entry.get("summary") or entry.get("description") or ""
+        text    = f"{title} {summary}".lower()
 
-    return {
-        "summary":          _clean_summary(title, summary),
-        "city":             city,
-        "state":            state,
-        "date_incident":    _parse_date(entry.get("published") or entry.get("updated") or ""),
-        "violence_type":    _infer_type(text),
-        "status":           _infer_status(title),
-        "is_public_figure": bool(_PUBLIC_FIGURE.search(full_text)),
-        "source_url":       entry.get("link") or "",
-        "source_name":      f"State AG ({state})",
-        "verified":         True,
-    }
+        if not any(kw in text for kw in INCLUDE_KEYWORDS):
+            continue
+        if any(kw in text for kw in EXCLUDE_KEYWORDS):
+            continue
+
+        vtype  = _infer_type(text)
+        status = _infer_status(text)
+
+        # Try to extract specific city; fall back to state's largest
+        city = _extract_city(f"{title} {summary}", state_abbr) or \
+               STATE_LARGEST_CITY.get(state_abbr, "")
+
+        date_str = _parse_date(entry.get("published") or entry.get("updated") or "")
+        clean    = _clean_text(title, summary)
+
+        records.append({
+            "summary":       clean,
+            "city":          city,
+            "state":         state_abbr,
+            "date_incident": date_str,
+            "violence_type": vtype,
+            "status":        status,
+            "source_url":    url,
+            "source_name":   f"{state_name} Attorney General",
+            "verified":      True,
+        })
+        seen_urls.add(url)
+
+    return records
 
 
 def _infer_type(text: str) -> str:
     if any(x in text for x in ["murder", "homicide", "killed", "femicide", "manslaughter"]):
         return "homicide"
-    if any(x in text for x in ["rape", "raped"]):
-        return "rape"
-    if any(x in text for x in ["sex trafficking", "human trafficking"]):
-        return "trafficking"
-    if any(x in text for x in ["sexual assault", "sexual abuse", "sexual exploitation"]):
-        return "sexual_assault"
-    if "stalking" in text or "stalked" in text:
-        return "stalking"
-    if any(x in text for x in ["domestic violence", "intimate partner", "battered"]):
-        return "domestic_violence"
     if any(x in text for x in ["attempted murder", "tried to kill"]):
         return "attempted_murder"
-    if any(x in text for x in ["child abuse", "molestation", "child exploitation"]):
+    if any(x in text for x in ["rape", "raped"]):
+        return "rape"
+    if any(x in text for x in ["sexual assault", "sex assault", "sex offense",
+                                 "exploitation", "grooming", "molestation"]):
+        return "sexual_assault"
+    if "trafficking" in text:
+        return "trafficking"
+    if "stalking" in text or "stalked" in text:
+        return "stalking"
+    if any(x in text for x in ["domestic violence", "intimate partner", "dating violence"]):
+        return "domestic_violence"
+    if any(x in text for x in ["child abuse", "child exploitation"]):
         return "child_abuse"
     if "coercive" in text:
         return "coercive_control"
@@ -174,23 +158,20 @@ def _infer_type(text: str) -> str:
     return "assault"
 
 
-def _infer_status(title: str) -> str:
-    if _SENTENCED.search(title): return "convicted"
-    if _CONVICTED.search(title): return "convicted"
-    if _ACQUITTED.search(title): return "acquitted"
-    if _CHARGED.search(title):   return "charged"
-    return "reported"
+def _infer_status(text: str) -> str:
+    if any(x in text for x in ["convicted", "sentenced", "guilty plea",
+                                 "pleaded guilty", "found guilty", "sentenced to"]):
+        return "convicted"
+    if any(x in text for x in ["charged", "indicted", "arrested", "faces charges"]):
+        return "charged"
+    return "charged"   # AG default: they announce charges or convictions
 
 
-def _extract_location(text: str) -> tuple[str, str]:
-    match = _CITY_STATE_PATTERN.search(text)
-    if match:
-        raw_city  = match.group(1).strip().title()
-        raw_state = match.group(2).strip()
-        state = raw_state.upper() if len(raw_state) == 2 else _STATE_ABBR.get(raw_state.lower(), "")
-        if state and raw_city:
-            return raw_city, state
-    return "", ""
+def _extract_city(text: str, state_abbr: str) -> str:
+    m = _CITY_STATE_RE.search(text)
+    if m and m.group(2).upper() == state_abbr:
+        return m.group(1).strip().title()
+    return ""
 
 
 def _parse_date(raw: str) -> str:
@@ -204,14 +185,16 @@ def _parse_date(raw: str) -> str:
             return date(*t[:3]).isoformat()
     except Exception:
         pass
-    m = re.match(r"(\d{4}-\d{2}-\d{2})", raw)
-    return m.group(1) if m else ""
+    m = re.search(r"\d{4}-\d{2}-\d{2}", raw)
+    if m:
+        return m.group(0)
+    return ""
 
 
-def _clean_summary(title: str, body: str) -> str:
+def _clean_text(title: str, body: str) -> str:
     clean = re.sub(r"<[^>]+>", "", body).strip()
     sentences = re.split(r"(?<=[.!?])\s+", clean)
     first = sentences[0] if sentences else ""
-    if first and first != title:
+    if first and first.strip() != title.strip():
         return f"{title} {first}"[:600]
     return title[:600]

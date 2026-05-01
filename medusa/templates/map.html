@@ -5,41 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medusa — Every Act Documented</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:wght@300;400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #0a0a0a;
-      --surface:     #0f110e;
-      --surface2:    #141a13;
-      --border:      #1e2a1e;
-      --text:        #e8e4d9;
-      --muted:       #5a6b57;
-      --dim:         #2d3d2a;
-      --green:       #2d6a4f;
-      --green2:      #40916c;
-      --gold:        #b5935a;
-      --gold2:       #d4a96a;
-      --bone:        #e8e4d9;
+      --bg:          #090a0d;
+      --surface:     #0f1115;
+      --surface2:    #161920;
+      --border:      #1f2330;
+      --text:        #cdd0db;
+      --muted:       #4e5568;
+      --dim:         #353a4a;
 
       /* type colors */
-      --homicide:          #8b1a1a;
-      --attempted_murder:  #c0392b;
-      --rape:              #4a235a;
-      --sexual_assault:    #6c3483;
-      --domestic_violence: #7d3c0a;
-      --assault:           #b7770d;
-      --stalking:          #1a3a5c;
-      --harassment:        #2471a3;
+      --homicide:          #c0392b;
+      --attempted_murder:  #e74c3c;
+      --rape:              #8e44ad;
+      --sexual_assault:    #9b59b6;
+      --domestic_violence: #d35400;
+      --assault:           #e67e22;
+      --stalking:          #2980b9;
+      --harassment:        #3498db;
       --trafficking:       #16a085;
-      --child_abuse:       #f39c12;
+      --child_abuse:       #c0392b;
       --coercive_control:  #7f8c8d;
-      --trans_women:       #e91e8c;
     }
 
     html, body {
@@ -50,13 +44,11 @@
       font-size: 14px;
     }
 
-    html,body{height:100%;margin:0;padding:0;background:var(--bg);color:var(--text);}
     #shell {
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      position: relative;
     }
 
     /* ── Header ── */
@@ -78,35 +70,14 @@
       font-size: 20px;
       font-weight: 700;
       letter-spacing: 6px;
-      color: var(--bone);
+      color: #fff;
       line-height: 1;
     }
 
-    .grand-total {
-      font-family: 'Space Mono', monospace;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--bone);
-      line-height: 1;
-      min-width: 60px;
-      text-align: right;
+    #logo em {
+      font-style: normal;
+      color: #c0392b;
     }
-
-    #header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    #menu-btn {
-      font-size: 20px;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      padding: 4px 8px;
-    }
-    #menu-btn:hover { color: #fff; }
 
     #tagline {
       font-family: 'Space Mono', monospace;
@@ -114,15 +85,6 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--muted);
-    }
-
-    #tagline2 {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 11px;
-      font-style: italic;
-      color: var(--green2);
-      margin-top: 2px;
-      letter-spacing: 0.3px;
     }
 
     #stats-bar {
@@ -159,8 +121,8 @@
       letter-spacing: 1.5px;
       text-transform: uppercase;
       background: transparent;
-      color: var(--green2);
-      border: 1px solid var(--green);
+      color: #c0392b;
+      border: 1px solid #c0392b;
       padding: 6px 12px;
       border-radius: 3px;
       cursor: pointer;
@@ -168,26 +130,23 @@
       white-space: nowrap;
     }
 
-    #scan-btn:hover  { background: var(--green); color: var(--bone); }
+    #scan-btn:hover  { background: #c0392b; color: #fff; }
     #scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── Body ── */
     #body {
       display: flex;
       flex: 1;
-      min-height: 0;
-      height: calc(100vh - 60px);
       overflow: hidden;
       position: relative;
     }
 
-    #map { flex: 1; z-index: 1; min-height: 0; height: 100%; width: 100%; }
+    #map { flex: 1; z-index: 1; }
 
     /* ── Sidebar ── */
     #sidebar {
       width: 310px;
       min-width: 310px;
-      transition: transform 0.3s ease;
       background: var(--surface);
       border-left: 1px solid var(--border);
       display: flex;
@@ -524,337 +483,6 @@
     .popup-meta a:hover { text-decoration: underline; }
 
     .popup-badges { margin: 6px 0 2px; display: flex; gap: 5px; flex-wrap: wrap; }
-  
-    @media(max-width:640px){
-      #header{padding:8px 12px;flex-wrap:wrap;gap:8px;}
-      #branding{flex:1;}
-      #logo{font-size:16px;letter-spacing:4px;}
-      #tagline{font-size:7px;}
-      #tagline2{font-size:11px;}
-      #header-right{gap:8px;}
-      #s-total{font-size:20px;}
-      #scan-btn{font-size:8px;padding:5px 10px;}
-      #body{flex-direction:column;}
-      #map{flex:1;width:100%;min-height:0;}
-      #sidebar{
-        position:fixed;
-        top:0;left:0;right:0;bottom:0;
-        width:100vw;
-        max-width:100vw;
-        overflow-x:hidden;
-        transform:translateX(100%);
-        z-index:999;
-        border-left:none;
-      }
-      #sidebar.open{transform:translateX(0);}
-      #menu-btn{display:flex;align-items:center;justify-content:center;}
-    }
-
-  
-    /* ── National Statistics Panel ── */
-    #national-stats {
-      position: absolute;
-      bottom: 24px;
-      left: 12px;
-      z-index: 10;
-      background: rgba(10, 10, 10, 0.92);
-      border: 1px solid #1e2a1e;
-      border-radius: 4px;
-      padding: 12px 14px;
-      width: 230px;
-      backdrop-filter: blur(4px);
-      cursor: pointer;
-    }
-    #national-stats h4 {
-      font-family: 'Space Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #b5935a;
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-    .ns-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 3px 0;
-      border-bottom: 1px solid #1e2a1e;
-    }
-    .ns-row:last-of-type { border-bottom: none; }
-    .ns-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      color: #5a6b57;
-      letter-spacing: 0.5px;
-    }
-    .ns-value {
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      color: #e8e4d9;
-    }
-    #national-stats .ns-disclaimer {
-      font-family: 'Crimson Pro', serif;
-      font-size: 10px;
-      font-style: italic;
-      color: #5a6b57;
-      margin-top: 8px;
-      line-height: 1.4;
-    }
-    #national-stats .ns-source {
-      font-family: 'Space Mono', monospace;
-      font-size: 7px;
-      color: #2d3d2a;
-      margin-top: 5px;
-      letter-spacing: 0.3px;
-    }
-    #ns-toggle {
-      position: absolute;
-      bottom: 24px;
-      left: 12px;
-      z-index: 10;
-      background: rgba(10,10,10,0.85);
-      border: 1px solid #1e2a1e;
-      border-radius: 4px;
-      padding: 5px 10px;
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #b5935a;
-      cursor: pointer;
-      display: none;
-    }
-
-  
-    /* ── Global panel ── */
-    .global-intro {
-      font-family: 'Crimson Pro', serif;
-      font-size: 12px;
-      font-style: italic;
-      color: var(--muted);
-      padding: 12px 14px 8px;
-      line-height: 1.6;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .global-region {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: #40916c;
-      padding: 12px 14px 6px;
-    }
-
-    #global-panel .fact-row {
-      padding: 4px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    #global-panel .facts-source {
-      padding: 0 14px 14px;
-    }
-
-    /* ── Name search ── */
-    #name-search-wrap {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    #name-search {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      padding: 8px 10px;
-      border-radius: 3px;
-      outline: none;
-    }
-
-    #name-search::placeholder { color: var(--muted); }
-    #name-search:focus { border-color: #2d6a4f; }
-
-    #name-disclaimer {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.6;
-      display: none;
-    }
-
-    #name-disclaimer.visible { display: block; }
-
-    #name-results {
-      margin-top: 8px;
-    }
-
-    .name-hit {
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      background: var(--surface2);
-    }
-
-    .name-hit-type {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #c0392b;
-      margin-bottom: 4px;
-    }
-
-    .name-hit-summary {
-      font-family: 'Crimson Pro', serif;
-      font-size: 12px;
-      color: var(--text);
-      line-height: 1.55;
-      margin-bottom: 6px;
-    }
-
-    .name-hit-meta {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      color: var(--muted);
-    }
-
-    .name-no-results {
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: var(--muted);
-      padding: 8px 0;
-      text-align: center;
-    }
-
-    /* ── Facts dot & drawer ── */
-    #facts-dot {
-      position: fixed;
-      bottom: 22px;
-      left: 22px;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #1a2a22;
-      border: 1.5px solid #2d6a4f;
-      color: #40916c;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 2000;
-      transition: background 0.2s, border-color 0.2s;
-      user-select: none;
-    }
-    #facts-dot:hover { background: #2d6a4f; color: #fff; border-color: #40916c; }
-
-    #facts-drawer {
-      position: fixed;
-      bottom: 72px;
-      left: 16px;
-      width: 310px;
-      max-height: 70vh;
-      background: #0d1117;
-      border: 1px solid #1f2d25;
-      border-radius: 6px;
-      z-index: 1999;
-      display: none;
-      flex-direction: column;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-      overflow: hidden;
-    }
-    #facts-drawer.open { display: flex; }
-
-    #facts-close {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    #facts-close:hover { color: var(--text); }
-
-    #facts-inner {
-      overflow-y: auto;
-      padding: 16px 16px 18px;
-      scrollbar-width: thin;
-      scrollbar-color: #1f2d25 transparent;
-    }
-
-    .facts-section-head {
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: #40916c;
-      margin-bottom: 10px;
-    }
-
-    .fact-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 4px 0;
-      border-bottom: 1px solid #141a1f;
-    }
-    .fact-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      color: var(--text);
-    }
-    .fact-val {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 9px;
-      color: #c0392b;
-      font-weight: 700;
-    }
-
-    .fact-item {
-      font-family: 'Crimson Pro', serif;
-      font-size: 12px;
-      color: var(--text);
-      line-height: 1.6;
-      padding: 9px 0;
-      border-bottom: 1px solid #141a1f;
-    }
-    .fact-year {
-      display: block;
-      font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #c0392b;
-      margin-bottom: 3px;
-    }
-
-    .facts-note {
-      font-family: 'Crimson Pro', serif;
-      font-size: 11px;
-      font-style: italic;
-      color: var(--muted);
-      margin-top: 10px;
-      line-height: 1.6;
-    }
-    .facts-source {
-      font-family: 'Space Mono', monospace;
-      font-size: 7.5px;
-      letter-spacing: 0.5px;
-      color: var(--dim);
-      margin-top: 6px;
-      line-height: 1.7;
-    }
-
   </style>
 </head>
 <body>
@@ -864,34 +492,47 @@
   <!-- Header -->
   <div id="header">
     <div id="branding">
-      <div id="logo">MEDUSA</div>
-      <div id="tagline2">Live tracking male violence against women and children across America.</div>
+      <div id="logo">ME<em>DU</em>SA</div>
+      <div id="tagline">Every Act Documented · United States</div>
     </div>
-    <div id="header-right">
-      <div id="s-total" class="grand-total">—</div>
-      <button id="menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+
+    <div id="stats-bar">
+      <div class="stat">
+        <div class="stat-num" id="s-total">—</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="s-homicide">—</div>
+        <div class="stat-label">Homicide</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="s-sa">—</div>
+        <div class="stat-label">Sex. Assault</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="s-dv">—</div>
+        <div class="stat-label">Dom. Violence</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="s-pf">—</div>
+        <div class="stat-label">Public Figures</div>
+      </div>
     </div>
+
+    <button id="scan-btn" onclick="triggerScan()">⟳ Scan Records</button>
+  </div>
 
   <!-- Body -->
-  <div id="body" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;overflow:hidden;">
+  <div id="body">
 
-    <div id="map" style="flex:1;min-height:0;z-index:1;"></div>
+    <div id="map"></div>
 
     <div id="sidebar">
 
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0"><span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted)">CASES</span><button onclick="toggleSidebar()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0">✕</button></div>
       <!-- Search -->
       <div id="search-wrap">
         <input id="search" type="text" placeholder="Search cases, cities, states…"
                oninput="filterFeed()" />
-      </div>
-
-      <!-- Name search -->
-      <div id="name-search-wrap">
-        <input id="name-search" type="text" placeholder="Search by name…"
-               oninput="searchByName()" />
-        <div id="name-disclaimer">Public court records only. Multiple people may share the same name.</div>
-        <div id="name-results"></div>
       </div>
 
       <!-- Legend -->
@@ -899,40 +540,34 @@
         <h3>Case Type</h3>
         <div class="legend-grid">
           <div class="legend-row" data-layer="homicide" onclick="toggleLayer('homicide',this)">
-            <div class="legend-dot" style="background:#e74c3c"></div>Homicide
+            <div class="legend-dot" style="background:var(--homicide)"></div>Homicide
           </div>
           <div class="legend-row" data-layer="attempted_murder" onclick="toggleLayer('attempted_murder',this)">
-            <div class="legend-dot" style="background:#ff6b6b;border-radius:2px;transform:rotate(45deg);"></div>Att. Murder
+            <div class="legend-dot" style="background:var(--attempted_murder)"></div>Att. Murder
           </div>
           <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)">
-            <div class="legend-dot" style="background:#a855f7"></div>Rape
+            <div class="legend-dot" style="background:var(--rape)"></div>Rape
           </div>
           <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)">
-            <div class="legend-dot" style="background:#c084fc;border-radius:2px;transform:rotate(45deg);"></div>Sex. Assault
+            <div class="legend-dot" style="background:var(--sexual_assault)"></div>Sex. Assault
           </div>
           <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)">
-            <div class="legend-dot" style="background:#f97316"></div>Dom. Violence
+            <div class="legend-dot" style="background:var(--domestic_violence)"></div>Dom. Violence
           </div>
           <div class="legend-row" data-layer="assault" onclick="toggleLayer('assault',this)">
-            <div class="legend-dot" style="background:#fb923c;border-radius:2px;transform:rotate(45deg);"></div>Assault
+            <div class="legend-dot" style="background:var(--assault)"></div>Assault
           </div>
           <div class="legend-row" data-layer="stalking" onclick="toggleLayer('stalking',this)">
-            <div class="legend-dot" style="background:#38bdf8;border-radius:2px;transform:rotate(45deg);"></div>Stalking
+            <div class="legend-dot" style="background:var(--stalking)"></div>Stalking
           </div>
           <div class="legend-row" data-layer="harassment" onclick="toggleLayer('harassment',this)">
-            <div class="legend-dot" style="background:#84cc16;border-radius:2px;transform:rotate(45deg);"></div>Harassment
-          </div>
-          <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
-            <div class="legend-dot" style="background:#e879f9;border-radius:2px;transform:rotate(45deg);"></div>Coercive Ctrl
+            <div class="legend-dot" style="background:var(--harassment)"></div>Harassment
           </div>
           <div class="legend-row" data-layer="trafficking" onclick="toggleLayer('trafficking',this)">
-            <div class="legend-dot" style="background:#2dd4bf"></div>Trafficking
+            <div class="legend-dot" style="background:var(--trafficking)"></div>Trafficking
           </div>
-          <div class="legend-row" data-layer="child_abuse" onclick="toggleLayer('child_abuse',this)">
-            <div class="legend-dot" style="background:#fbbf24"></div>Child Abuse
-          </div>
-          <div class="legend-row" data-layer="trans_women" onclick="toggleLayer('trans_women',this)">
-            <div class="legend-dot" style="background:#f472b6"></div>Trans Women
+          <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
+            <div class="legend-dot" style="background:var(--coercive_control)"></div>Coercive Ctrl
           </div>
         </div>
       </div>
@@ -944,9 +579,6 @@
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
-        <div class="tab"         onclick="switchTab('press',this)">Press</div>
-        <div class="tab"         onclick="switchTab('research',this)">Research</div>
-        <div class="tab"         onclick="switchTab('global',this)">Global</div>
       </div>
 
       <!-- Feed -->
@@ -956,75 +588,14 @@
         </div>
       </div>
 
-      <!-- Global stats panel -->
-      <div id="global-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
-        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
-          Global estimates from WHO, UN Women, and UNODC. Medusa documents US cases only.
-        </div>
-
-        <div class="global-region">GLOBAL</div>
-        <div class="fact-row"><span class="fact-label">Women experience violence</span><span class="fact-val">1 IN 3</span></div>
-        <div class="fact-row"><span class="fact-label">Killed by intimate partner</span><span class="fact-val">~89,000 / YR</span></div>
-        <div class="fact-row"><span class="fact-label">Girls married before 18</span><span class="fact-val">~12M / YR</span></div>
-        <div class="fact-row"><span class="fact-label">Women in forced labour</span><span class="fact-val">~6.3M</span></div>
-
-        <div class="global-region">AFRICA</div>
-        <div class="fact-row"><span class="fact-label">Intimate partner violence</span><span class="fact-val">1 IN 3</span></div>
-        <div class="fact-row"><span class="fact-label">Female genital mutilation</span><span class="fact-val">200M+</span></div>
-        <div class="fact-row"><span class="fact-label">Child marriage W. Africa</span><span class="fact-val">~40%</span></div>
-
-        <div class="global-region">ASIA &amp; PACIFIC</div>
-        <div class="fact-row"><span class="fact-label">Partner violence S. Asia</span><span class="fact-val">~40%</span></div>
-        <div class="fact-row"><span class="fact-label">Dowry-related deaths India</span><span class="fact-val">~7,000 / YR</span></div>
-        <div class="fact-row"><span class="fact-label">Missing women sex-selective</span><span class="fact-val">~1.7M / YR</span></div>
-
-        <div class="global-region">LATIN AMERICA</div>
-        <div class="fact-row"><span class="fact-label">Femicide rate</span><span class="fact-val">HIGHEST</span></div>
-        <div class="fact-row"><span class="fact-label">Honduras femicide</span><span class="fact-val">~6 PER 100K</span></div>
-        <div class="fact-row"><span class="fact-label">Child marriage</span><span class="fact-val">~24% OF GIRLS</span></div>
-
-        <div class="global-region">MIDDLE EAST &amp; N. AFRICA</div>
-        <div class="fact-row"><span class="fact-label">Partner violence</span><span class="fact-val">~37%</span></div>
-        <div class="fact-row"><span class="fact-label">Honour killings global</span><span class="fact-val">~5,000 / YR</span></div>
-
-        <div class="global-region">EUROPE</div>
-        <div class="fact-row"><span class="fact-label">Partner violence</span><span class="fact-val">~22%</span></div>
-        <div class="fact-row"><span class="fact-label">Sexual violence</span><span class="fact-val">~11%</span></div>
-
-        <div class="global-region">TRANS VIOLENCE — US</div>
-        <div class="fact-row"><span class="fact-label">Trans people killed 2024</span><span class="fact-val">~50+</span></div>
-        <div class="fact-row"><span class="fact-label">Trans women of color killed</span><span class="fact-val">~80% OF TOTAL</span></div>
-        <div class="fact-row"><span class="fact-label">Trans people experiencing violence</span><span class="fact-val">1 IN 4</span></div>
-
-        <p class="facts-source" style="padding:10px 14px 0;">Sources: WHO · UN Women · UNODC · HRC Fatal Violence Report · 2023 data</p>
-      </div>
-
-      <!-- Press Panel -->
-      <div id="press-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
-        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
-          News and journalism covering male violence against women. Updated from live sources.
-        </div>
-        <div id="press-feed" style="padding:8px 0;">
-          <div style="padding:20px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;">LOADING...</div>
-        </div>
-      </div>
-
-      <!-- Research Panel -->
-      <div id="research-panel" style="display:none;overflow-y:auto;flex:1;padding-bottom:16px;">
-        <div style="font-family:'Crimson Pro',serif;font-size:12px;font-style:italic;color:var(--muted);padding:12px 14px 8px;line-height:1.6;border-bottom:1px solid var(--border);">
-          Published research and studies on male violence against women. Sources: PubMed, BJS, CDC, NIJ, Violence Policy Center.
-        </div>
-        <div id="research-feed" style="padding:8px 0;">
-          <div style="padding:20px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;">LOADING...</div>
-        </div>
-      </div>
-
       <!-- Disclosure -->
       <div id="disclosure">
-        All information is sourced from public records. Medusa assumes no liability for any actions taken based on this information.<br>
-        Medusa is free. Donations above operating costs go to <a href="https://the-commons.onrender.com" target="_blank" style="color:#c0392b">The Commons</a> redistribution fund.<br>
-        <a href="https://buymeacoffee.com/sentinel.commons" target="_blank" style="display:inline-block;margin-top:6px;background:#FFDD00;color:#000;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:6px 14px;border-radius:4px;text-decoration:none;letter-spacing:1px;">☕ BUY ME A COFFEE</a><br><br>
-        
+        Sources: police reports · court records · DOJ/FBI releases ·
+        congressional records · civil suits · investigative journalism ·
+        Title IX findings · public news archives.<br>
+        No victim names stored. Sources always cited.<br>
+        Built on <a href="https://github.com/Kronestones/Themis" target="_blank">Project Themis</a>
+        · Krone the Architect · Powers Tracey Lynn · 2026
       </div>
 
     </div>
@@ -1045,24 +616,17 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 
 const TYPE_COLOR = {
-  // HOMICIDE tab — reds
   homicide:          '#c0392b',
   attempted_murder:  '#e74c3c',
-  // SEXUAL tab — purples
   rape:              '#8e44ad',
   sexual_assault:    '#9b59b6',
-  // DV tab — ambers/blues
   domestic_violence: '#d35400',
   assault:           '#e67e22',
   stalking:          '#2980b9',
   harassment:        '#3498db',
-  coercive_control:  '#7f8c8d',
-  // TRAFFICKING — teal
   trafficking:       '#16a085',
-  // CHILD ABUSE — gold
-  child_abuse:       '#f39c12',
-  // TRANS WOMEN — pink
-  trans_women:       '#e91e8c',
+  child_abuse:       '#c0392b',
+  coercive_control:  '#7f8c8d',
   unknown:           '#4e5568',
 };
 
@@ -1097,7 +661,7 @@ const DV_TYPES     = new Set(['domestic_violence','coercive_control','stalking']
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 
-const map = L.map('map', { center:[39.5,-98.35], zoom:4, zoomControl:false });
+const map = L.map('map', { center:[39.5,-98.35], zoom:4 });
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -1105,8 +669,6 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // ── State ─────────────────────────────────────────────────────────────────────
-
-map.on('zoomend', () => { if (allCases.length) renderMarkers(); });
 
 let allCases     = [];
 let activeTab    = 'all';
@@ -1120,35 +682,15 @@ for (const t of Object.keys(TYPE_COLOR)) {
 
 // ── Markers ───────────────────────────────────────────────────────────────────
 
-// Shape by violence type
-const TYPE_SHAPE = {
-  homicide:          'circle',
-  rape:              'circle',
-  domestic_violence: 'circle',
-  trafficking:       'circle',
-  child_abuse:       'circle',
-  trans_women:       'circle',
-  attempted_murder:  'diamond',
-  sexual_assault:    'diamond',
-  assault:           'diamond',
-  stalking:          'diamond',
-  harassment:        'diamond',
-  coercive_control:  'diamond',
-};
-
-function makeIcon(color, type) {
-  const shape = TYPE_SHAPE[type] || 'circle';
-  let style = `width:11px;height:11px;background:${color};opacity:.9;box-shadow:0 0 5px ${color}66;`;
-  if (shape === 'circle') {
-    style += 'border-radius:50%;';
-  } else if (shape === 'square') {
-    style += 'border-radius:2px;';
-  } else if (shape === 'diamond') {
-    style += 'border-radius:2px;transform:rotate(45deg);';
-  }
+function makeIcon(color) {
   return L.divIcon({
     className: '',
-    html: `<div style="${style}border:1px solid rgba(255,255,255,.15);"></div>`,
+    html: `<div style="
+      width:12px;height:12px;border-radius:50%;
+      background:${color};opacity:.85;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 5px ${color}66;
+    "></div>`,
     iconSize:[12,12], iconAnchor:[6,6],
   });
 }
@@ -1167,20 +709,11 @@ function renderMarkers() {
     const pfTag = c.is_public_figure
       ? '<span class="pf-badge">Public Figure</span>' : '';
 
-    // Zoom-adaptive jitter — spreads stacked dots at national view, tightens on zoom
-    const zoomLevel = map.getZoom();
-    const jitterAmt = Math.max(0.005, 0.35 / Math.pow(2, zoomLevel - 4));
-    const _jid = c.case_id || c.source_url || (c.lat + ',' + c.lng);
-    function hashJitter(str, seed) {
-      let h = seed;
-      for (let i = 0; i < (str||'').length; i++) {
-        h = Math.imul(31, h) + str.charCodeAt(i) | 0;
-      }
-      return (h >>> 0) / 0xFFFFFFFF;
-    }
-    const jLat = c.lat + (hashJitter(_jid, 1) - 0.5) * jitterAmt;
-    const jLng = c.lng + (hashJitter(_jid, 2) - 0.5) * jitterAmt;
-    const m = L.marker([jLat, jLng], { icon: makeIcon(color, c.violence_type) });
+    // Jitter: spread cases that share the exact same coordinates (same city centroid)
+    // so they do not all stack on one dot. Max spread ~5 miles.
+    const jLat = c.lat + (Math.random() - 0.5) * 0.08;
+    const jLng = c.lng + (Math.random() - 0.5) * 0.08;
+    const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
       <div class="popup-id">${c.case_id}</div>
@@ -1326,76 +859,6 @@ async function triggerScan() {
 
 // ── Controls ──────────────────────────────────────────────────────────────────
 
-function renderPress() {
-  const feed = document.getElementById('press-feed');
-  feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">LOADING...</div>';
-
-  fetch('/api/press')
-    .then(r => r.json())
-    .then(data => {
-      const articles = data.articles || [];
-      if (!articles.length) {
-        feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No relevant articles right now. Check back soon.</div>';
-        return;
-      }
-      feed.innerHTML = articles.map(a => `
-        <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
-          <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">${a.source} &nbsp;·&nbsp; ${a.date}</div>
-          <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:6px;">${a.title}</div>
-          <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">${a.desc}</div>
-          <a href="${a.link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
-        </div>
-      `).join('');
-    })
-    .catch(() => {
-      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">Error loading press feed.</div>';
-    });
-}
-
-function renderResearch() {
-  const feed = document.getElementById('research-feed');
-  feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">LOADING...</div>';
-
-  const url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=male+violence+against+women+intimate+partner&retmax=20&retmode=json&sort=date";
-
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      const ids = data.esearchresult?.idlist || [];
-      if (!ids.length) {
-        feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">No studies found.</div>';
-        return;
-      }
-      const summaryUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.join(",")}&retmode=json`;
-      return fetch(summaryUrl).then(r => r.json());
-    })
-    .then(data => {
-      if (!data) return;
-      const results = data.result || {};
-      const uids = results.uids || [];
-      feed.innerHTML = uids.map(uid => {
-        const s = results[uid];
-        if (!s) return '';
-        const title   = s.title || "Untitled";
-        const authors = (s.authors || []).slice(0,3).map(a => a.name).join(", ");
-        const journal = s.fulljournalname || s.source || "";
-        const date    = s.pubdate || "";
-        const link    = `https://pubmed.ncbi.nlm.nih.gov/${uid}/`;
-        return `
-          <div style="padding:12px 14px;border-bottom:1px solid var(--border);">
-            <div style="font-size:7px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;">PubMed · ${date}</div>
-            <div style="font-family:'Crimson Pro',serif;font-size:13px;line-height:1.5;margin-bottom:4px;">${title}</div>
-            <div style="font-size:9px;color:var(--muted);margin-bottom:6px;">${authors}${journal ? " · " + journal : ""}</div>
-            <a href="${link}" target="_blank" style="font-size:8px;letter-spacing:1px;color:#c0392b;text-decoration:none;">READ ↗</a>
-          </div>
-        `;
-      }).join('');
-    })
-    .catch(() => {
-      feed.innerHTML = '<div style="padding:20px 14px;color:var(--muted);font-family:Space Mono,monospace;font-size:9px;">Error loading studies.</div>';
-    });
-}
-
 function toggleLayer(key, el) {
   if (hiddenLayers.has(key)) {
     hiddenLayers.delete(key);
@@ -1411,33 +874,8 @@ function toggleLayer(key, el) {
 function switchTab(tab, el) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const gp       = document.getElementById('global-panel');
-  const feed     = document.getElementById('feed');
-  const nameWrap = document.getElementById('name-search-wrap');
-  const pressPanel    = document.getElementById('press-panel');
-  const researchPanel = document.getElementById('research-panel');
-
-  // Hide all panels first
-  if (gp) gp.style.display = 'none';
-  if (feed) feed.style.display = 'none';
-  if (nameWrap) nameWrap.style.display = 'none';
-  if (pressPanel) pressPanel.style.display = 'none';
-  if (researchPanel) researchPanel.style.display = 'none';
-
-  if (tab === 'global') {
-    if (gp) gp.style.display = 'block';
-  } else if (tab === 'press') {
-    if (pressPanel) pressPanel.style.display = 'block';
-    renderPress();
-  } else if (tab === 'research') {
-    if (researchPanel) researchPanel.style.display = 'block';
-    renderResearch();
-  } else {
-    if (feed) feed.style.display = 'block';
-    if (nameWrap) nameWrap.style.display = 'block';
-  }
   el.classList.add('active');
-  if (!['press','research','global'].includes(tab)) renderFeed();
+  renderFeed();
 }
 
 function filterFeed() {
@@ -1453,9 +891,11 @@ function focusCase(lat, lng) {
 
 function updateStats(total, s) {
   const bt = s.by_type || {};
-  const t = total || allCases.length;
-  const el = document.getElementById('s-total');
-  if (el) animateCounter(el, t, 1200);
+  document.getElementById('s-total').textContent    = total || allCases.length;
+  document.getElementById('s-homicide').textContent = (bt.homicide||0) + (bt.attempted_murder||0);
+  document.getElementById('s-sa').textContent       = (bt.rape||0) + (bt.sexual_assault||0);
+  document.getElementById('s-dv').textContent       = (bt.domestic_violence||0) + (bt.coercive_control||0) + (bt.stalking||0);
+  document.getElementById('s-pf').textContent       = s.public_figures || 0;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -1472,294 +912,9 @@ function fmtDate(iso) {
   } catch { return iso; }
 }
 
-
-// ── Live counter ──────────────────────────────────────────────────────────────
-const SERVER_TOTAL = {{ total|default(0) }};
-
-function animateCounter(el, target, duration) {
-  if (!el) return;
-  const start    = parseInt(el.textContent.replace(/,/g, '')) || 0;
-  const range    = target - start;
-  const step     = Math.ceil(duration / Math.abs(range || 1));
-  let   current  = start;
-  if (range === 0) { el.textContent = target.toLocaleString(); return; }
-  const timer = setInterval(() => {
-    current += range > 0 ? 1 : -1;
-    el.textContent = current.toLocaleString();
-    if (current === target) clearInterval(timer);
-  }, step);
-}
-
-// Run on load with server total, then update when API responds
-// Counter — runs immediately with server total
-// then updates again when API responds via updateStats
-setTimeout(() => {
-  const el = document.getElementById('s-total');
-  if (el && SERVER_TOTAL > 0) animateCounter(el, SERVER_TOTAL, 1200);
-}, 200);
-
-// ── Sidebar toggle ───────────────────────────────────────────────────────────
-function toggleSidebar() {
-  const s = document.getElementById('sidebar');
-  s.classList.toggle('open');
-  const dot = document.getElementById('facts-dot');
-  if (dot) dot.style.display = s.classList.contains('open') ? 'none' : 'flex';
-}
-
 // ── Boot ──────────────────────────────────────────────────────────────────────
-
-// Force map to correct height
-function fixMapHeight(){
-  const header = document.getElementById('header');
-  const body = document.getElementById('body');
-  const h = header ? header.offsetHeight : 80;
-  body.style.top = h + 'px';
-  map.invalidateSize();
-}
-window.addEventListener('resize', fixMapHeight);
-setTimeout(fixMapHeight, 100);
-// ── Name search ──────────────────────────────────────────────────────────────
-
-function searchByName() {
-  const q = document.getElementById('name-search').value.trim().toLowerCase();
-  const disclaimer = document.getElementById('name-disclaimer');
-  const results = document.getElementById('name-results');
-
-  if (q.length < 2) {
-    disclaimer.classList.remove('visible');
-    results.innerHTML = '';
-    return;
-  }
-
-  disclaimer.classList.add('visible');
-
-  const hits = allCases.filter(c =>
-    (c.summary || '').toLowerCase().includes(q)
-  );
-
-  if (hits.length === 0) {
-    results.innerHTML = '<div class="name-no-results">No documented cases found.</div>';
-    return;
-  }
-
-  results.innerHTML = hits.slice(0, 20).map(c => `
-    <div class="name-hit">
-      <div class="name-hit-type">${c.violence_type || 'unknown'}</div>
-      <div class="name-hit-summary">${(c.summary || '').slice(0, 180)}${c.summary && c.summary.length > 180 ? '…' : ''}</div>
-      <div class="name-hit-meta">${c.city || ''}, ${c.state || ''} &nbsp;·&nbsp; ${c.status || ''}</div>
-    </div>
-  `).join('');
-}
-
-// ── Facts drawer ─────────────────────────────────────────────────────────────
-function toggleFacts() {
-  document.getElementById('facts-drawer').classList.toggle('open');
-}
-
 loadAll();
-
-// Auto-scan every 24 hours
-setInterval(async()=>{
-  try{
-    await fetch('/api/scan',{method:'POST'});
-    await // Force map to correct height
-function fixMapHeight(){
-  const header = document.getElementById('header');
-  const body = document.getElementById('body');
-  const h = header ? header.offsetHeight : 80;
-  body.style.top = h + 'px';
-  map.invalidateSize();
-}
-window.addEventListener('resize', fixMapHeight);
-setTimeout(fixMapHeight, 100);
-loadAll();
-  }catch(e){}
-}, 24*60*60*1000);
 </script>
-
-
-  <!-- Facts Dot -->
-  <div id="facts-dot" onclick="toggleFacts()" title="The Law &amp; The Numbers">&#9651;</div>
-
-  <div id="facts-drawer">
-    <div id="facts-close" onclick="toggleFacts()">&#10005;</div>
-    <div id="facts-inner">
-
-      <div class="facts-section-head">THE NUMBERS</div>
-
-      <div class="fact-row">
-        <span class="fact-label">Domestic violence</span>
-        <span class="fact-val">~10M / yr</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-label">Sexual assault</span>
-        <span class="fact-val">~460K / yr</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-label">Rape (reported)</span>
-        <span class="fact-val">~130K / yr</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-label">Stalking</span>
-        <span class="fact-val">~7.5M / yr</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-label">IPV homicide</span>
-        <span class="fact-val">~1,500 / yr</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-label">Children abused</span>
-        <span class="fact-val">~700K / yr</span>
-      </div>
-
-      <p class="facts-note">These are national estimates. Medusa documents only publicly recorded, court-filed cases &mdash; a fraction of what actually occurs.</p>
-      <p class="facts-source">Sources: CDC NISVS &middot; FBI UCR &middot; BJS NCVS &middot; 2023 data</p>
-
-      <div class="facts-section-head" style="margin-top:18px;">THE LAW</div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1993</span>
-        Marital rape was legal in at least one state. North Carolina was the last to criminalize it &mdash; July 5, 1993. Until 1976, every single state had a spousal exemption allowing a husband to rape his wife with no legal consequences.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today</span>
-        Some states still treat marital rape differently than stranger rape &mdash; shorter reporting windows, reduced penalties, or additional force requirements. South Carolina requires proof of a weapon or extreme violence to prosecute spousal rape.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Child marriage</span>
-        Child marriage is still legal in 34 states. California, Mississippi, New Mexico, and Oklahoma set no minimum age &mdash; a child of any age can marry with parental consent. Nearly 315,000 children, mostly girls, were legally married in the U.S. between 2000 and 2021.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Marriage as escape</span>
-        In most states, marriage is a legal defense to statutory rape. Marrying a child you sexually abused makes the prior abuse legal. At least 66,000 child marriages since 2000 involved an age gap that would otherwise be a sex crime.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1974</span>
-        Women could not get a credit card in their own name. The Equal Credit Opportunity Act was not passed until 1974.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1973</span>
-        Women could be legally fired for being pregnant. The Pregnancy Discrimination Act did not pass until 1978.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1920</span>
-        Women could not vote. The 19th Amendment was ratified August 18, 1920 &mdash; 144 years after the nation was founded.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1839</span>
-        No state allowed women to own property in their own name. Mississippi was the first &mdash; and required a husband&rsquo;s permission.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1974</span>
-        Women could not start a business or sign a contract without a male relative&rsquo;s signature in many states. The Equal Credit Opportunity Act (1974) and state-by-state reforms through the 1960s&ndash;70s gradually removed these requirements. Some states required a husband&rsquo;s permission as late as the 1970s.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1994</span>
-        There was no federal law against domestic violence. Before the Violence Against Women Act (VAWA) passed in 1994, domestic violence was largely treated as a private family matter. Police routinely refused to intervene. Prosecutors declined to pursue cases. Judges dismissed them. Women had no federal legal protection in their own homes.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1972</span>
-        Women were barred from Ivy League universities. Yale and Princeton admitted women in 1969, Harvard in 1977. Title IX, prohibiting sex discrimination in education, passed in 1972 — but was fought by institutions for decades.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1975</span>
-        Women could not serve on juries in all states. Louisiana was the last to require women's jury service. Before that, women could be automatically excused simply for being women — meaning female victims were judged entirely by male juries.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1968</span>
-        Job advertisements were legally separated by sex. Employers could advertise "Help Wanted — Male" and refuse to consider women entirely. The EEOC did not ban sex-segregated job ads until 1968, and enforcement was weak for years after.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Until 1967</span>
-        Women were banned from running the Boston Marathon. In 1967, Kathrine Switzer registered under initials and became the first woman to officially run it. Race director Jock Semple physically attacked her mid-race to remove her bib. Women were not officially allowed to enter until 1972.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">2022 — Rights Removed</span>
-        Roe v. Wade was overturned by the Supreme Court on June 24, 2022. For the first time in American history, a constitutional right was taken away from a specific group of people. 26 states moved to ban or severely restrict abortion. Women in those states lost bodily autonomy overnight. Maternal mortality has risen in states with total bans.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today — Rape kits</span>
-        Over 100,000 rape kits sit untested in police evidence rooms across the United States. Each kit represents a survivor who reported. Many kits are never tested. Statutes of limitations expire. Perpetrators are never identified. The backlog is a policy choice.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today — Statutes of limitations</span>
-        Most states have statutes of limitations on rape and sexual assault, meaning survivors who report years later — as most do — cannot see their attacker prosecuted. The average survivor waits 11 years to report. In many states, that wait means no justice is legally possible.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today — Tampon tax</span>
-        22 states tax menstrual products as luxury items. Food, prescription drugs, and in some states, cowboy boots and yacht repairs are exempt. Menstrual products are not. This tax falls exclusively on people who menstruate and disproportionately affects low-income women.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today — No paid maternity leave</span>
-        The United States has no federal paid maternity leave. It is one of only six countries in the world without it — alongside Papua New Guinea, Marshall Islands, Micronesia, Nauru, and Palau. The Family and Medical Leave Act (1993) provides 12 weeks unpaid, only for eligible employees at companies with 50+ workers.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Still today — Prison labor exception</span>
-        The 13th Amendment abolished slavery &ldquo;except as punishment for crime.&rdquo; Prison labor is legal and largely uncompensated. Women of color are incarcerated at disproportionate rates. Many are incarcerated for defending themselves against abusers. The system that failed to protect them then profits from their labor.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">ERA — Still Not Law</span>
-        The Equal Rights Amendment &mdash; which would guarantee constitutional equality regardless of sex &mdash; was first introduced in Congress in 1923. It passed Congress in 1972 and was sent to the states for ratification. 38 states have now ratified it, meeting the required threshold. But it has never been formally added to the Constitution. The deadline set by Congress has been contested, and the National Archivist has refused to certify it under political pressure. Without the ERA, sex discrimination has no explicit constitutional prohibition. Every legal protection women have can be legislatively undone.
-        <br><br>
-        <strong style="color:#c0392b;">Who has blocked it:</strong> Conservative legislators in unratified states blocked it for decades. Key opponents included Phyllis Schlafly (STOP ERA campaign), and more recently, the Trump administration directed the DOJ to argue the ERA deadline had expired. Alabama, Louisiana, and South Dakota have sued to prevent certification.
-        <br><br>
-        <a href="https://www.equalrightsamendment.org" target="_blank" style="color:#c0392b;text-decoration:none;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;">LEARN MORE ↗</a>
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">SAVE Act — 2024</span>
-        The Safeguard American Voter Eligibility Act requires proof of citizenship to register to vote. Critics and legal experts document that millions of women who changed their name at marriage lack matching documentation between their birth certificate and current ID. The act disproportionately disenfranchises married women, widows, and divorced women whose documents reflect different names. It passed the House in 2024.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Sexual assault insurance</span>
-        In multiple states, insurance companies have classified sexual assault as a &ldquo;pre-existing condition,&rdquo; denying survivors coverage for mental health treatment, pregnancy care, STI treatment, and emergency services resulting from assault. Idaho and other states have had documented cases of insurers denying rape-related claims. Employer health plans, university policies, and church liability insurance have all been used to limit survivor access to care while protecting institutions.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Church abuse — documented</span>
-        The Catholic Church paid over $4 billion in abuse settlements in the United States. A 2022 independent investigation into the Southern Baptist Convention documented over 700 abusers and found SBC leadership actively covered up abuse and resisted a survivor registry. Churches have used liability insurance and non-disclosure agreements to silence survivors. In many states, clergy-penitent privilege has been used to prevent abuse from being reported to law enforcement. Some states have passed mandatory reporting exceptions for clergy — many have not.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Medical brutality — "Hysteria"</span>
-        From the 1800s through the mid-20th century, women who expressed distress, sexual autonomy, or political dissent were diagnosed with &ldquo;hysteria&rdquo; — a catch-all diagnosis applied exclusively to women. Treatment included forced removal of the ovaries (oophorectomy), clitoridectomy, institutionalization, and lobotomy. J. Marion Sims, called the &ldquo;father of gynecology,&rdquo; developed surgical techniques by operating on enslaved Black women without anesthesia. Lobotomies were disproportionately performed on women — Rosemary Kennedy was lobotomized at age 23 at her father's request, leaving her permanently incapacitated.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Forced sterilization — still legal</span>
-        Buck v. Bell (1927) — the Supreme Court ruling upholding forced sterilization of &ldquo;unfit&rdquo; persons — has never been overturned. It remains valid law. Over 60,000 Americans were forcibly sterilized under eugenics programs targeting women of color, disabled women, incarcerated women, and poor women. California sterilized over 20,000 people. North Carolina's program ran until 1977. ICE detention facilities were found in 2020 to have performed hysterectomies on detained women without informed consent.
-      </div>
-
-      <div class="fact-item">
-        <span class="fact-year">Mental institutionalization</span>
-        Until well into the 20th century, husbands could have wives committed to mental institutions without evidence of mental illness and without the woman's consent. Women were institutionalized for adultery, political activism, menopause, &ldquo;excessive&rdquo; sexual desire, and refusal to obey. Once institutionalized, women had no legal recourse. Their property transferred to their husband. Release required the husband's permission.
-      </div>
-
-      <p class="facts-source" style="margin-top:14px;">Sources: Unchained At Last &middot; OJP &middot; CDC &middot; National Women&rsquo;s History Alliance &middot; Congress.gov &middot; Equal Rights Amendment Coalition</p>
-
-    </div>
-  </div>
 
 </body>
 </html>

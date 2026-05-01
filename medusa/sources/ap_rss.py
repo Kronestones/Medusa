@@ -16,11 +16,13 @@ from medusa.record import normalize_violence_type, normalize_status
 
 # AP RSS feeds — public, no key
 AP_FEEDS = [
-    "https://rss.nytimes.com/services/xml/rss/nyt/US.xml",
-    "https://feeds.npr.org/1003/rss.xml",
-    "https://www.theguardian.com/us-news/rss",
-    "https://www.theguardian.com/society/domestic-violence/rss",
-    "https://www.theguardian.com/society/rape-and-sexual-assault/rss",
+    "https://feeds.apnews.com/rss/apf-topnews",
+    "https://feeds.apnews.com/rss/apf-usnews",
+    # Topic-specific (may vary by availability)
+    "https://apnews.com/rss/tag/crime",
+    "https://apnews.com/rss/tag/courts",
+    "https://apnews.com/rss/tag/domestic-violence",
+    "https://apnews.com/rss/tag/sexual-assault",
 ]
 
 # Keywords that indicate violence against women coverage
@@ -37,8 +39,6 @@ INCLUDE_KEYWORDS = [
 EXCLUDE_KEYWORDS = [
     "ukraine", "israel", "gaza", "russia", "china", "iran",
     "afghanistan", "syria", "iraq", "pakistan",
-    "uk ", "britain", "england", "scotland", "wales",
-    "coroner", "inquest", "bbc", "nhs",
 ]
 
 # US state names and abbreviations for location extraction

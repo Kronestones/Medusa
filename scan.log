@@ -178,3 +178,129 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
     raise RuntimeError("DATABASE_URL not set")
 RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+[Meta] 10 scan records loaded.
+[Watchdog] Loaded. 6 scans tracked.
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Mission: To document male violence against women and children in the United States.
+[Medusa] For: The women and children who were not counted.
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[AG Press] 11 records fetched.
+[Medusa] AG Press: 11 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[AP RSS] 1 records fetched.
+[Medusa] AP News RSS: 1 raw records
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] 8119 records fetched.
+[Medusa] CourtListener: 8119 raw records
+[Medusa] Total raw records: 8198
+[Watchdog] Source health after 7 scans:
+  ❌ DEAD   FBI CDE — 7 consecutive zeros
+  ❌ DEAD   ED.gov — 7 consecutive zeros
+  ❌ DEAD   AG Press — 7 consecutive zeros
+  ✓  OK     CourtListener — last returned 8119
+  ✓  OK     AP News RSS — last returned 1
+  ✓  OK     Wiki Homicides — last returned 67
+  → 3 dead sources — fix feeds or remove from scanner
+[Medusa] After normalization: 8198 valid records
+[Medusa] After scope filter: 8141 in-scope records
+[Medusa] After dedup: 2980 unique records
+[Medusa] Geocoded 88 unique locations for 2980 records.
+[Medusa] Scan complete. 2980 cases ready.
+[Medusa Meta] 2026-04-30T09:23:53.572854+00:00
+  Window: 10 scans | Yield: 42.4% | Trend: stable
+  Settling: False | Attractors: None
+  → Source concentration — add new sources
+  → Missing types entirely: ['harassment', 'coercive_control']
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+[Meta] 11 scan records loaded.
+[Watchdog] Loaded. 7 scans tracked.
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting free-source public records scan...
+[Medusa] Mission: To document male violence against women and children in the United States.
+[Medusa] For: The women and children who were not counted.
+[Medusa] Sources: CourtListener · AP RSS · Congress RSS · FBI CDE · ED.gov
+[ED.gov] 0 records fetched.
+[Medusa] ED.gov: 0 raw records
+[AP RSS] 2 records fetched.
+[Medusa] AP News RSS: 2 raw records
+[FBI CDE] 0 aggregate records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[AG Press] 10 records fetched.
+[Medusa] AG Press: 10 raw records
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] request error: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Read timed out. (read timeout=15)
+[CourtListener] 5679 records fetched.
+[Medusa] CourtListener: 5679 raw records
+[Medusa] Total raw records: 5758
+[Watchdog] Source health after 8 scans:
+  ❌ DEAD   FBI CDE — 8 consecutive zeros
+  ❌ DEAD   ED.gov — 8 consecutive zeros
+  ❌ DEAD   AG Press — 8 consecutive zeros
+  ✓  OK     CourtListener — last returned 5679
+  ✓  OK     AP News RSS — last returned 2
+  ✓  OK     Wiki Homicides — last returned 67
+  → 3 dead sources — fix feeds or remove from scanner
+[Medusa] After normalization: 5758 valid records
+[Medusa] After scope filter: 5701 in-scope records
+[Medusa] After dedup: 1851 unique records
+[Medusa] Geocoded 87 unique locations for 1851 records.
+[Medusa] Scan complete. 1851 cases ready.
+[Medusa Meta] 2026-05-01T09:23:12.783770+00:00
+  Window: 10 scans | Yield: 41.5% | Trend: falling
+  Settling: False | Attractors: None
+  → Source concentration — add new sources
+  → Missing types entirely: ['coercive_control']
+  → Yield declining — add AG feeds or Wikipedia sources
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
