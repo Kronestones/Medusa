@@ -661,6 +661,18 @@ const DV_TYPES     = new Set(['domestic_violence','coercive_control','stalking']
 
 // ── Map ───────────────────────────────────────────────────────────────────────
 
+function seededRand(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
+  return [((h1>>>0) / 0xffffffff), ((h2>>>0) / 0xffffffff)];
+}
+
 const map = L.map('map', { center:[39.5,-98.35], zoom:4 });
 
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -709,10 +721,12 @@ function renderMarkers() {
     const pfTag = c.is_public_figure
       ? '<span class="pf-badge">Public Figure</span>' : '';
 
-    // Jitter: spread cases that share the exact same coordinates (same city centroid)
-    // so they do not all stack on one dot. Max spread ~5 miles.
-    const jLat = c.lat + (Math.random() - 0.5) * 0.08;
-    const jLng = c.lng + (Math.random() - 0.5) * 0.08;
+    // Stable jitter seeded from case_id — dots don't jump on re-render.
+    // Scale shrinks as zoom increases so dots converge on real location.
+    const jSeed  = seededRand(c.case_id || c.summary || "");
+    const jScale = Math.max(0.001, 0.09 / Math.pow(2, map.getZoom() - 4));
+    const jLat   = c.lat + (jSeed[0] - 0.5) * jScale;
+    const jLng   = c.lng + (jSeed[1] - 0.5) * jScale * 1.4;
     const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
