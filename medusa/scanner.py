@@ -1,46 +1,24 @@
 """
-scanner.py — Medusa orchestrator (v1.2)
-
-Coordinates all free public API source modules.
-No Claude API calls. No web search API. Sources speak directly.
-
-Sources:
-  CourtListener  — federal docket mirror, free REST API, no key
-  AP News RSS    — wire service crime/justice feeds, no key
-  Congress RSS   — Judiciary committee hearings, no key
-  FBI CDE        — aggregate crime statistics, no key
-  ED.gov         — Title IX / OCR resolution agreements, no key
-
-Flow:
-  1. Each source module fetches and returns partial MedusaRecord dicts
-  2. Orchestrator normalizes, deduplicates, geocodes
-  3. Returns enriched list to main.py for DB persistence
-
-All geocoding via Nominatim (OpenStreetMap) — free, no key.
+scanner.py — Medusa orchestrator (v1.3)
 """
 
 import time
-import hashlib
 from datetime import datetime, timezone
-
 import requests
 
-from medusa.record import (
-    normalize_record, make_case_id,
-    STATE_LARGEST_CITY,
-)
+from medusa.record import normalize_record, make_case_id, STATE_LARGEST_CITY
 
-# Source modules
+# Source modules — ALL active sources
 from medusa.sources import courtlistener
 from medusa.sources import ap_rss
-from medusa.sources import propublica      # replaces dead congress_rss
+from medusa.sources import doj_press      # 94 US Attorney districts — primary source
+from medusa.sources import doj            # DOJ/OVW/CRT/FBI feeds
+from medusa.sources import wiki_homicides # Wikipedia state homicide lists
+from medusa.sources import ag_press       # State AG RSS feeds
 from medusa.sources import fbi_stats
-from medusa.sources import ed_gov
 from medusa.sources import marshall_project
-from medusa.sources import state_ag
+from medusa.sources import propublica
 
-
-# State centroids — fallback when Nominatim fails
 STATE_COORDS = {
     "AL": (32.806671, -86.791130), "AK": (61.370716,-152.404419),
     "AZ": (33.729759,-111.431221), "AR": (34.969704, -92.373123),
@@ -86,7 +64,7 @@ def geocode(city: str, state: str) -> tuple:
                 "limit":        1,
                 "countrycodes": "us",
             },
-            headers={"User-Agent": "Medusa/1.2 (sentinel.commons@gmail.com)"},
+            headers={"User-Agent": "Medusa/1.3 (sentinel.commons@gmail.com)"},
             timeout=5,
         )
         if resp.ok:
@@ -110,41 +88,43 @@ class MedusaScanner:
         self.total_found = 0
 
     def scan(self) -> list[dict]:
-        """
-        Run all source modules. Returns enriched, deduplicated case dicts.
-        """
-        print("[Medusa] Starting free-source public records scan...")
+        print("[Medusa] Starting scan...")
 
         raw_records: list[dict] = []
 
-        # ── Collect from each source ──────────────────────────────────────────
         sources = [
-            ("CourtListener",        courtlistener.fetch),
-            ("AP News RSS",          ap_rss.fetch),
-            ("DOJ / ProPublica",     propublica.fetch),
-            ("FBI CDE",              fbi_stats.fetch),
-            ("ED.gov OCR/Clery",     ed_gov.fetch),
-            ("Marshall Project",     marshall_project.fetch),
-            ("State AGs",            state_ag.fetch),
+            # Tier 1 — highest yield, most reliable
+            ("DOJ Press (94 districts)", doj_press.fetch),
+            ("DOJ / OVW / FBI",          doj.fetch),
+            ("Wiki Homicides",           wiki_homicides.fetch),
+            ("AP News RSS",              ap_rss.fetch),
+            # Tier 2 — good when feeds are live
+            ("AG Press",                 ag_press.fetch),
+            ("CourtListener",            courtlistener.fetch),
+            ("Marshall Project",         marshall_project.fetch),
+            ("ProPublica / DOJ OVW",     propublica.fetch),
+            # Tier 3 — aggregate/statistical
+            ("FBI CDE",                  fbi_stats.fetch),
         ]
 
-        print("[Medusa] Sources: CourtListener · AP RSS · DOJ/OVW · FBI CDE · ED.gov · Marshall Project · State AGs")
-
+        source_counts = {}
         for name, fetch_fn in sources:
             try:
                 results = fetch_fn()
-                print(f"[Medusa] {name}: {len(results)} raw records")
+                count = len(results)
+                source_counts[name] = count
+                print(f"[Medusa] {name}: {count} raw records")
                 raw_records.extend(results)
             except Exception as e:
                 print(f"[Medusa] {name} ERROR: {e}")
+                source_counts[name] = 0
                 continue
 
         print(f"[Medusa] Total raw records: {len(raw_records)}")
 
-        # ── Normalize ─────────────────────────────────────────────────────────
+        # Normalize
         normalized = []
         for r in raw_records:
-            # Strip internal-only keys before normalize
             r.pop("_docket_id", None)
             cleaned = normalize_record(r)
             if cleaned:
@@ -152,7 +132,7 @@ class MedusaScanner:
 
         print(f"[Medusa] After normalization: {len(normalized)} valid records")
 
-        # ── Deduplicate by case_id ────────────────────────────────────────────
+        # Deduplicate
         seen_ids: set[str] = set()
         unique: list[dict] = []
         for r in normalized:
@@ -164,16 +144,23 @@ class MedusaScanner:
 
         print(f"[Medusa] After dedup: {len(unique)} unique records")
 
-        # ── Geocode ───────────────────────────────────────────────────────────
+        # Geocode
+        geocoded = 0
         for r in unique:
             lat, lng = geocode(r["city"], r["state"])
             r["lat"] = lat
             r["lng"] = lng
-            time.sleep(0.2)    # Nominatim rate limit: 1 req/s max
+            if lat:
+                geocoded += 1
+            time.sleep(0.2)
 
-        # ── Finalize ──────────────────────────────────────────────────────────
+        print(f"[Medusa] Geocoded {geocoded} unique locations for {len(unique)} records.")
+
         self.last_scan    = datetime.now(timezone.utc).isoformat()
         self.total_found += len(unique)
+
+        # Expose source counts for watchdog
+        self.last_source_counts = source_counts
 
         print(f"[Medusa] Scan complete. {len(unique)} cases ready.")
         return unique
