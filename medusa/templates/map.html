@@ -71,10 +71,10 @@
 
     #logo {
       font-family: 'Space Mono', monospace;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       font-style: normal;
-      letter-spacing: 6px;
+      letter-spacing: 5px;
       color: #e8e4d9;
       line-height: 1;
     }
@@ -88,8 +88,9 @@
       font-family: 'Crimson Pro', Georgia, serif;
       font-style: italic;
       font-size: 12px;
-      letter-spacing: 0.3px;
-      color: var(--muted);
+      letter-spacing: 0.2px;
+      color: #40916c;
+      line-height: 1.4;
     }
 
     #stats-bar {
@@ -112,7 +113,7 @@
       line-height: 1;
     }
 
-    .stat-label {
+    .stat-label-hidden {
       font-family: 'Space Mono', monospace;
       font-size: 8px;
       letter-spacing: 1px;
@@ -120,23 +121,8 @@
       color: var(--muted);
     }
 
-    #scan-btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      background: transparent;
-      color: #40916c;
-      border: 1px solid #40916c;
-      padding: 6px 12px;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
 
     #scan-btn:hover  { background: #2d6a4f; color: #e8e4d9; }
-    #scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── Body ── */
     #body {
@@ -582,26 +568,21 @@
     .law-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
 
     #sidebar-toggle {
-      position: absolute;
-      top: 12px; right: 12px;
-      z-index: 1001;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 12px;
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
+      background: transparent;
+      border: none;
+      padding: 6px 4px;
+      color: #40916c;
+      font-size: 20px;
+      line-height: 1;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-      transition: background 0.15s;
+      letter-spacing: -1px;
     }
     #sidebar-toggle:hover { background: var(--surface2); }
 
     #header-right {
       display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-    #scan-btn, #sidebar-toggle {
+    #sidebar-toggle {
       background: transparent;
       border: 1px solid #2a2e2a;
       border-radius: 6px;
@@ -618,8 +599,7 @@
       min-width: 34px;
       height: 34px;
     }
-    #scan-btn:hover, #sidebar-toggle:hover { background: #181a18; }
-    #scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #sidebar-toggle:hover { color: #2d6a4f; }
 
     .article-item {
       padding: 12px 14px;
@@ -662,15 +642,11 @@
   <div id="header">
     <div id="branding">
       <div id="logo">ME<em>DU</em>SA</div>
-      <div id="tagline">Every act documented · United States</div>
+      <div id="tagline">Live tracking male violence against women and children across America.</div>
     </div>
 
     <div id="header-right">
-      <div class="stat">
-        <div class="stat-num" id="s-total">—</div>
-        <div class="stat-label">Cases</div>
-      </div>
-      <button id="scan-btn" onclick="triggerScan()">⟳</button>
+      <div class="stat-num" id="s-total">—</div>
       <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
   </div>
