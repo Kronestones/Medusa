@@ -594,32 +594,27 @@
     #sidebar-toggle:hover { background: var(--surface2); }
 
     #header-right {
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-    #scan-btn {
+    #scan-btn, #sidebar-toggle {
       background: transparent;
       border: 1px solid #2a2e2a;
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 7px 11px;
       color: #e8e4d9;
       font-family: 'Space Mono', monospace;
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 1;
       cursor: pointer;
       transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
     }
-    #scan-btn:hover { background: #181a18; }
+    #scan-btn:hover, #sidebar-toggle:hover { background: #181a18; }
     #scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #sidebar-toggle {
-      background: transparent;
-      border: 1px solid #2a2e2a;
-      border-radius: 6px;
-      padding: 6px 12px;
-      color: #e8e4d9;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    #sidebar-toggle:hover { background: #181a18; }
 
     .article-item {
       padding: 12px 14px;
