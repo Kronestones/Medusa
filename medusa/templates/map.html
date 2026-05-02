@@ -37,6 +37,7 @@
       --trafficking:       #16a085;
       --child_abuse:       #c0392b;
       --coercive_control:  #7f8c8d;
+      --trans_violence:    #c471ed;
     }
 
     html, body {
@@ -145,7 +146,7 @@
       position: relative;
     }
 
-    #map { flex: 1; z-index: 1; }
+    #map { flex: 1; z-index: 1; position: relative; }
 
     /* ── Sidebar ── */
     #sidebar {
@@ -234,22 +235,26 @@
     /* ── Tabs ── */
     #filter-tabs {
       display: flex;
+      gap: 0;
       border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
       flex-shrink: 0;
     }
+    #filter-tabs::-webkit-scrollbar { display: none; }
 
     .tab {
-      flex: 1;
-      padding: 7px 0;
-      text-align: center;
       font-family: 'Space Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      padding: 10px 14px;
       cursor: pointer;
+      color: var(--muted);
       border-bottom: 2px solid transparent;
-      transition: all 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color 0.15s;
     }
 
     .tab:hover { color: var(--text); }
@@ -526,7 +531,7 @@
       font-size: 8px; color: var(--muted); margin-top: 5px; line-height: 1.5;
     }
     #panel-toggle {
-      position: absolute; bottom: 24px; left: 12px; z-index: 1000;
+      position: absolute; bottom: 24px; left: 12px; z-index: 2000;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 6px; padding: 8px 12px; font-size: 16px;
       cursor: pointer; color: var(--text);
@@ -534,7 +539,7 @@
     }
     #panel-toggle:hover { background: var(--surface2); }
     #info-panel {
-      position: absolute; bottom: 70px; left: 12px; z-index: 1000;
+      position: absolute; bottom: 70px; left: 12px; z-index: 2000;
       width: 290px; max-height: 65vh;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 8px; display: none; flex-direction: column;
@@ -779,6 +784,9 @@
           <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
             <div class="legend-dot" style="background:var(--coercive_control)"></div>Coercive Ctrl
           </div>
+          <div class="legend-row" data-layer="trans_violence" onclick="toggleLayer('trans_violence',this)">
+            <div class="legend-dot" style="background:var(--trans_violence)"></div>Trans Violence
+          </div>
         </div>
       </div>
 
@@ -789,6 +797,7 @@
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
+        <div class="tab"         onclick="switchTab('trans',this)">Trans</div>
         <div class="tab"         onclick="switchTab('press',this)">Press</div>
         <div class="tab"         onclick="switchTab('research',this)">Research</div>
         <div class="tab"         onclick="switchTab('international',this)">Global</div>
@@ -843,6 +852,7 @@ const TYPE_COLOR = {
   trafficking:       '#16a085',
   child_abuse:       '#c0392b',
   coercive_control:  '#7f8c8d',
+  trans_violence:    '#c471ed',
   unknown:           '#4e5568',
 };
 
@@ -858,6 +868,7 @@ const TYPE_LABEL = {
   trafficking:       'Human Trafficking',
   child_abuse:       'Child Abuse',
   coercive_control:  'Coercive Control',
+  trans_violence:    'Trans Violence',
   unknown:           'Unknown',
 };
 
@@ -974,6 +985,7 @@ function getFilteredCases() {
   if (activeTab === 'homicide')  items = items.filter(c => c.violence_type === 'homicide' || c.violence_type === 'attempted_murder');
   else if (activeTab === 'sexual') items = items.filter(c => SEXUAL_TYPES.has(c.violence_type));
   else if (activeTab === 'dv')   items = items.filter(c => DV_TYPES.has(c.violence_type));
+  else if (activeTab === 'trans') items = items.filter(c => c.violence_type === 'trans_violence');
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
   // Search filter
