@@ -152,11 +152,12 @@
       min-width: 310px;
       background: var(--surface);
       border-left: 1px solid var(--border);
-      display: flex;
+      display: none;
       flex-direction: column;
       overflow: hidden;
       z-index: 2;
     }
+    #sidebar.open { display: flex; }
 
     /* ── Search ── */
     #search-wrap {
@@ -573,6 +574,23 @@
       font-size: 9px; color: var(--text); margin-bottom: 2px;
     }
     .law-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    #sidebar-toggle {
+      position: absolute;
+      top: 12px; right: 12px;
+      z-index: 1001;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transition: background 0.15s;
+    }
+    #sidebar-toggle:hover { background: var(--surface2); }
   </style>
 </head>
 <body>
@@ -616,6 +634,7 @@
   <div id="body">
 
     <div id="map"></div>
+    <button id="sidebar-toggle" onclick="toggleSidebar()">☰ CASES</button>
 
     <button id="panel-toggle" onclick="toggleInfoPanel()">📊</button>
 
@@ -1055,7 +1074,11 @@ function filterFeed() {
 }
 
 function closeSidebar() {
-  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
 }
 
 function toggleInfoPanel() {
