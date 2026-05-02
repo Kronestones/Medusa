@@ -3,7 +3,7 @@ sources/doj.py - DOJ Press Releases + US Attorney Office announcements
 """
 import re
 from medusa.fetch import safe_rss
-from medusa.record import district_to_city, normalize_state, STATE_LARGEST_CITY
+from medusa.record import district_to_city, STATE_LARGEST_CITY
 
 DOJ_FEEDS = [  # USAO removed — was hanging scans
     "https://www.justice.gov/news/press-releases/rss",

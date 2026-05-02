@@ -304,3 +304,56 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
     raise RuntimeError("DATABASE_URL not set")
 RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting scan...
+[DOJ Press] 0 records fetched.
+[Medusa] DOJ Press (94 districts): 0 raw records
+[DOJ] 22 records fetched.
+[Medusa] DOJ / OVW / FBI: 22 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[fetch] FAIL https://feeds.apnews.com/rss/apf-topnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-topnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.apnews.com/rss/apf-usnews: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/apf-usnews (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 7] No address associated with hostname)"))
+[AP RSS] 0 records fetched.
+[Medusa] AP News RSS: 0 raw records
+[AG Press] Florida AG: 4 records
+[AG Press] Georgia AG: 3 records
+[AG Press] 7 total records fetched.
+[Medusa] AG Press: 7 raw records
+[CourtListener] 4 known documented-perpetrator cases loaded.
+[CourtListener] 4 records fetched.
+[Medusa] CourtListener: 4 raw records
+[Marshall Project] 0 records.
+[DOJ CEOS] 0 records.
+[Medusa] Marshall Project: 0 raw records
+[ProPublica/DOJ] 0 records fetched.
+[Medusa] ProPublica / DOJ OVW: 0 raw records
+[FBI CDE] 0 aggregate state records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Medusa] Total raw records: 100
+[Medusa] After normalization: 100 valid records
+[Medusa] After dedup: 99 unique records
+[Medusa] Geocoded 99 unique locations for 99 records.
+[Medusa] Scan complete. 99 cases ready.
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
