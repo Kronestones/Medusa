@@ -129,7 +129,7 @@
     #body {
       display: flex;
       flex: 1;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
     }
 
@@ -145,11 +145,11 @@
       display: none;
       flex-direction: column;
       overflow: hidden;
-      z-index: 100;
-      position: absolute;
+      z-index: 9999;
+      position: fixed;
       top: 0;
       right: 0;
-      height: 100%;
+      height: 100vh;
     }
     #sidebar.open { display: flex; }
 
@@ -606,24 +606,7 @@
     #header-right {
       display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-    #sidebar-toggle {
-      background: transparent;
-      border: 1px solid #2a2e2a;
-      border-radius: 6px;
-      padding: 7px 11px;
-      color: #e8e4d9;
-      font-family: 'Space Mono', monospace;
-      font-size: 13px;
-      line-height: 1;
-      cursor: pointer;
-      transition: background 0.15s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      height: 34px;
-    }
-    #sidebar-toggle:hover { color: #2d6a4f; }
+
 
     .article-item {
       padding: 12px 14px;
