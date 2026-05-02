@@ -187,9 +187,9 @@
     }
 
     .legend-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .legend-row {
@@ -517,7 +517,7 @@
       font-size: 8px; color: var(--muted); margin-top: 5px; line-height: 1.5;
     }
     #panel-toggle {
-      position: absolute; bottom: 80px; left: 14px; z-index: 2000;
+      position: absolute; bottom: 24px; left: 90px; z-index: 2000;
       background: #2d6a4f;
       border: none;
       border-radius: 50%;
@@ -736,37 +736,40 @@
         <h3>Case Type</h3>
         <div class="legend-grid">
           <div class="legend-row" data-layer="homicide" onclick="toggleLayer('homicide',this)">
-            <div class="legend-dot" style="color:#c0392b;font-size:14px;line-height:1;width:18px;text-align:center">▲</div>Homicide
+            <div class="legend-dot" style="color:#c0392b">▲</div><span>Homicide</span>
           </div>
           <div class="legend-row" data-layer="attempted_murder" onclick="toggleLayer('attempted_murder',this)">
-            <div class="legend-dot" style="color:#e74c3c;font-size:14px;line-height:1;width:18px;text-align:center">▲</div>Att. Murder
+            <div class="legend-dot" style="color:#e55039">▽</div><span>Att. Murder</span>
           </div>
           <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)">
-            <div class="legend-dot" style="color:#8e44ad;font-size:14px;line-height:1;width:18px;text-align:center">◆</div>Rape
+            <div class="legend-dot" style="color:#8e44ad">◆</div><span>Rape</span>
           </div>
           <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)">
-            <div class="legend-dot" style="color:#9b59b6;font-size:14px;line-height:1;width:18px;text-align:center">◆</div>Sex. Assault
+            <div class="legend-dot" style="color:#a569bd">◇</div><span>Sex. Assault</span>
           </div>
           <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)">
-            <div class="legend-dot" style="color:#d35400;font-size:14px;line-height:1;width:18px;text-align:center">●</div>Dom. Violence
+            <div class="legend-dot" style="color:#d35400">●</div><span>Dom. Violence</span>
           </div>
           <div class="legend-row" data-layer="assault" onclick="toggleLayer('assault',this)">
-            <div class="legend-dot" style="color:#e67e22;font-size:14px;line-height:1;width:18px;text-align:center">■</div>Assault
+            <div class="legend-dot" style="color:#e67e22">■</div><span>Assault</span>
           </div>
           <div class="legend-row" data-layer="stalking" onclick="toggleLayer('stalking',this)">
-            <div class="legend-dot" style="color:#2980b9;font-size:14px;line-height:1;width:18px;text-align:center">▬</div>Stalking
+            <div class="legend-dot" style="color:#2471a3">⬟</div><span>Stalking</span>
           </div>
           <div class="legend-row" data-layer="harassment" onclick="toggleLayer('harassment',this)">
-            <div class="legend-dot" style="color:#3498db;font-size:14px;line-height:1;width:18px;text-align:center">▬</div>Harassment
+            <div class="legend-dot" style="color:#5dade2">〰</div><span>Harassment</span>
           </div>
           <div class="legend-row" data-layer="trafficking" onclick="toggleLayer('trafficking',this)">
-            <div class="legend-dot" style="color:#16a085;font-size:14px;line-height:1;width:18px;text-align:center">✦</div>Trafficking
+            <div class="legend-dot" style="color:#16a085">✦</div><span>Trafficking</span>
+          </div>
+          <div class="legend-row" data-layer="child_abuse" onclick="toggleLayer('child_abuse',this)">
+            <div class="legend-dot" style="color:#922b21">✚</div><span>Child Abuse</span>
           </div>
           <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
-            <div class="legend-dot" style="color:#7f8c8d;font-size:14px;line-height:1;width:18px;text-align:center">■</div>Coercive Ctrl
+            <div class="legend-dot" style="color:#717d7e">▪</div><span>Coercive Ctrl</span>
           </div>
           <div class="legend-row" data-layer="trans_violence" onclick="toggleLayer('trans_violence',this)">
-            <div class="legend-dot" style="color:#c471ed;font-size:14px;line-height:1;width:18px;text-align:center">●</div>Trans Violence
+            <div class="legend-dot" style="color:#c471ed">⬡</div><span>Trans Violence</span>
           </div>
         </div>
       </div>
@@ -823,15 +826,15 @@
 
 const TYPE_COLOR = {
   homicide:          '#c0392b',
-  attempted_murder:  '#e74c3c',
+  attempted_murder:  '#e55039',
   rape:              '#8e44ad',
-  sexual_assault:    '#9b59b6',
+  sexual_assault:    '#a569bd',
   domestic_violence: '#d35400',
   assault:           '#e67e22',
-  stalking:          '#2980b9',
-  harassment:        '#3498db',
+  stalking:          '#2471a3',
+  harassment:        '#5dade2',
   trafficking:       '#16a085',
-  child_abuse:       '#c0392b',
+  child_abuse:       '#922b21',
   coercive_control:  '#7f8c8d',
   trans_violence:    '#c471ed',
   unknown:           '#4e5568',
@@ -906,17 +909,17 @@ for (const t of Object.keys(TYPE_COLOR)) {
 // circle=○  square=□  diamond=◇  triangle=△  star=✦  cross=+  pill=▬
 const TYPE_SHAPE = {
   homicide:          'triangle',
-  attempted_murder:  'triangle_sm',
+  attempted_murder:  'triangle_down',
   rape:              'diamond',
-  sexual_assault:    'diamond_sm',
+  sexual_assault:    'diamond_outline',
   domestic_violence: 'circle',
   assault:           'square',
-  stalking:          'pill',
-  harassment:        'pill_sm',
+  stalking:          'pentagon',
+  harassment:        'wave',
   trafficking:       'star',
   child_abuse:       'cross',
   coercive_control:  'square_sm',
-  trans_violence:    'circle_sm',
+  trans_violence:    'hexagon',
   unknown:           'circle_sm',
 };
 
@@ -979,6 +982,41 @@ function makeIcon(color, vtype) {
       color:${color};
       filter:drop-shadow(0 0 3px ${color});
     ">+</div>`;
+  } else if (shape === 'triangle_down') {
+    html = `<div style="
+      width:0;height:0;
+      border-left:6px solid transparent;
+      border-right:6px solid transparent;
+      border-top:10px solid ${color};
+      opacity:.9;
+      filter:drop-shadow(0 0 3px ${color});
+    "></div>`;
+  } else if (shape === 'diamond_outline') {
+    html = `<div style="
+      width:10px;height:10px;
+      border:2px solid ${color};
+      transform:rotate(45deg);
+      opacity:.9;
+      box-shadow:0 0 5px ${color}88;
+    "></div>`;
+  } else if (shape === 'pentagon') {
+    html = `<div style="
+      font-size:13px;line-height:1;
+      color:${color};
+      filter:drop-shadow(0 0 3px ${color});
+    ">⬟</div>`;
+  } else if (shape === 'wave') {
+    html = `<div style="
+      font-size:16px;line-height:1;
+      color:${color};
+      filter:drop-shadow(0 0 3px ${color});
+    ">〰</div>`;
+  } else if (shape === 'hexagon') {
+    html = `<div style="
+      font-size:13px;line-height:1;
+      color:${color};
+      filter:drop-shadow(0 0 3px ${color});
+    ">⬡</div>`;
   } else if (shape === 'pill') {
     html = `<div style="
       width:14px;height:8px;${base}
