@@ -517,13 +517,20 @@
       font-size: 8px; color: var(--muted); margin-top: 5px; line-height: 1.5;
     }
     #panel-toggle {
-      position: absolute; bottom: 24px; left: 12px; z-index: 2000;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 6px; padding: 8px 12px; font-size: 16px;
-      cursor: pointer; color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background 0.15s;
+      position: absolute; bottom: 80px; left: 14px; z-index: 2000;
+      background: #2d6a4f;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      color: #e8e4d9;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+      transition: background 0.15s;
     }
-    #panel-toggle:hover { background: var(--surface2); }
+    #panel-toggle:hover { background: #40916c; }
     #info-panel {
       position: absolute; bottom: 70px; left: 12px; z-index: 2000;
       width: 290px; max-height: 65vh;
@@ -570,12 +577,13 @@
     #sidebar-toggle {
       background: transparent;
       border: none;
-      padding: 6px 4px;
+      outline: none;
+      padding: 4px 6px;
       color: #40916c;
-      font-size: 20px;
+      font-size: 22px;
       line-height: 1;
       cursor: pointer;
-      letter-spacing: -1px;
+      -webkit-appearance: none;
     }
     #sidebar-toggle:hover { background: var(--surface2); }
 
@@ -656,7 +664,7 @@
 
     <div id="map"></div>
 
-    <button id="panel-toggle" onclick="toggleInfoPanel()">📊</button>
+    <button id="panel-toggle" onclick="toggleInfoPanel()">THE NUMBERS</button>
 
     <div id="info-panel">
       <div id="info-panel-header">
@@ -693,10 +701,6 @@
           <div class="info-law"><div class="law-name">Dobbs v. Jackson (2022)</div><div class="law-detail">Eliminated federal abortion rights. Active litigation in 20+ states. Disproportionate impact on rape and incest survivors.</div></div>
           <div class="info-law"><div class="law-name">Women's Bureau — Proposed Closure 2025</div><div class="law-detail">Trump budget proposed eliminating the 105-year-old Women's Bureau, which administered VAWA workplace grants covering 50M+ workers.</div></div>
         </div>
-
-        <div class="info-section">
-          <div class="info-section-title">IF YOU NEED HELP</div>
-          <div class="info-law"><div class="law-name">National DV Hotline</div><div class="law-detail">1-800-799-7233 · thehotline.org · 24/7</div></div>
           <div class="info-law"><div class="law-name">RAINN Sexual Assault Hotline</div><div class="law-detail">1-800-656-4673 · rainn.org · 24/7</div></div>
           <div class="info-law"><div class="law-name">National Human Trafficking Hotline</div><div class="law-detail">1-888-373-7888 · humantraffickinghotline.org</div></div>
         </div>
