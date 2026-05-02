@@ -735,37 +735,37 @@
         <h3>Case Type</h3>
         <div class="legend-grid">
           <div class="legend-row" data-layer="homicide" onclick="toggleLayer('homicide',this)">
-            <div class="legend-dot" style="background:var(--homicide)"></div>Homicide
+            <div class="legend-dot" style="color:#c0392b;font-size:14px;line-height:1;width:18px;text-align:center">▲</div>Homicide
           </div>
           <div class="legend-row" data-layer="attempted_murder" onclick="toggleLayer('attempted_murder',this)">
-            <div class="legend-dot" style="background:var(--attempted_murder)"></div>Att. Murder
+            <div class="legend-dot" style="color:#e74c3c;font-size:14px;line-height:1;width:18px;text-align:center">▲</div>Att. Murder
           </div>
           <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)">
-            <div class="legend-dot" style="background:var(--rape)"></div>Rape
+            <div class="legend-dot" style="color:#8e44ad;font-size:14px;line-height:1;width:18px;text-align:center">◆</div>Rape
           </div>
           <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)">
-            <div class="legend-dot" style="background:var(--sexual_assault)"></div>Sex. Assault
+            <div class="legend-dot" style="color:#9b59b6;font-size:14px;line-height:1;width:18px;text-align:center">◆</div>Sex. Assault
           </div>
           <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)">
-            <div class="legend-dot" style="background:var(--domestic_violence)"></div>Dom. Violence
+            <div class="legend-dot" style="color:#d35400;font-size:14px;line-height:1;width:18px;text-align:center">●</div>Dom. Violence
           </div>
           <div class="legend-row" data-layer="assault" onclick="toggleLayer('assault',this)">
-            <div class="legend-dot" style="background:var(--assault)"></div>Assault
+            <div class="legend-dot" style="color:#e67e22;font-size:14px;line-height:1;width:18px;text-align:center">■</div>Assault
           </div>
           <div class="legend-row" data-layer="stalking" onclick="toggleLayer('stalking',this)">
-            <div class="legend-dot" style="background:var(--stalking)"></div>Stalking
+            <div class="legend-dot" style="color:#2980b9;font-size:14px;line-height:1;width:18px;text-align:center">▬</div>Stalking
           </div>
           <div class="legend-row" data-layer="harassment" onclick="toggleLayer('harassment',this)">
-            <div class="legend-dot" style="background:var(--harassment)"></div>Harassment
+            <div class="legend-dot" style="color:#3498db;font-size:14px;line-height:1;width:18px;text-align:center">▬</div>Harassment
           </div>
           <div class="legend-row" data-layer="trafficking" onclick="toggleLayer('trafficking',this)">
-            <div class="legend-dot" style="background:var(--trafficking)"></div>Trafficking
+            <div class="legend-dot" style="color:#16a085;font-size:14px;line-height:1;width:18px;text-align:center">✦</div>Trafficking
           </div>
           <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
-            <div class="legend-dot" style="background:var(--coercive_control)"></div>Coercive Ctrl
+            <div class="legend-dot" style="color:#7f8c8d;font-size:14px;line-height:1;width:18px;text-align:center">■</div>Coercive Ctrl
           </div>
           <div class="legend-row" data-layer="trans_violence" onclick="toggleLayer('trans_violence',this)">
-            <div class="legend-dot" style="background:var(--trans_violence)"></div>Trans Violence
+            <div class="legend-dot" style="color:#c471ed;font-size:14px;line-height:1;width:18px;text-align:center">●</div>Trans Violence
           </div>
         </div>
       </div>
@@ -901,16 +901,105 @@ for (const t of Object.keys(TYPE_COLOR)) {
 
 // ── Markers ───────────────────────────────────────────────────────────────────
 
-function makeIcon(color) {
+// Shape definitions per violence type
+// circle=○  square=□  diamond=◇  triangle=△  star=✦  cross=+  pill=▬
+const TYPE_SHAPE = {
+  homicide:          'triangle',
+  attempted_murder:  'triangle_sm',
+  rape:              'diamond',
+  sexual_assault:    'diamond_sm',
+  domestic_violence: 'circle',
+  assault:           'square',
+  stalking:          'pill',
+  harassment:        'pill_sm',
+  trafficking:       'star',
+  child_abuse:       'cross',
+  coercive_control:  'square_sm',
+  trans_violence:    'circle_sm',
+  unknown:           'circle_sm',
+};
+
+function makeIcon(color, vtype) {
+  const shape = TYPE_SHAPE[vtype] || 'circle';
+  let html = '';
+
+  const glow = `box-shadow:0 0 6px ${color}88;`;
+  const base = `background:${color};opacity:.9;border:1px solid rgba(255,255,255,.15);${glow}`;
+
+  if (shape === 'triangle') {
+    // Upward triangle — homicide
+    html = `<div style="
+      width:0;height:0;
+      border-left:8px solid transparent;
+      border-right:8px solid transparent;
+      border-bottom:14px solid ${color};
+      opacity:.9;
+      filter:drop-shadow(0 0 4px ${color});
+    "></div>`;
+  } else if (shape === 'triangle_sm') {
+    html = `<div style="
+      width:0;height:0;
+      border-left:6px solid transparent;
+      border-right:6px solid transparent;
+      border-bottom:10px solid ${color};
+      opacity:.9;
+      filter:drop-shadow(0 0 3px ${color});
+    "></div>`;
+  } else if (shape === 'diamond') {
+    html = `<div style="
+      width:11px;height:11px;${base}
+      transform:rotate(45deg);
+    "></div>`;
+  } else if (shape === 'diamond_sm') {
+    html = `<div style="
+      width:9px;height:9px;${base}
+      transform:rotate(45deg);
+    "></div>`;
+  } else if (shape === 'square') {
+    html = `<div style="
+      width:12px;height:12px;${base}
+      border-radius:2px;
+    "></div>`;
+  } else if (shape === 'square_sm') {
+    html = `<div style="
+      width:9px;height:9px;${base}
+      border-radius:1px;
+    "></div>`;
+  } else if (shape === 'star') {
+    html = `<div style="
+      font-size:14px;line-height:1;
+      color:${color};
+      filter:drop-shadow(0 0 3px ${color});
+      text-shadow:none;
+    ">✦</div>`;
+  } else if (shape === 'cross') {
+    html = `<div style="
+      font-size:16px;line-height:1;font-weight:900;
+      color:${color};
+      filter:drop-shadow(0 0 3px ${color});
+    ">+</div>`;
+  } else if (shape === 'pill') {
+    html = `<div style="
+      width:14px;height:8px;${base}
+      border-radius:4px;
+    "></div>`;
+  } else if (shape === 'pill_sm') {
+    html = `<div style="
+      width:10px;height:6px;${base}
+      border-radius:3px;
+    "></div>`;
+  } else {
+    // default circle
+    html = `<div style="
+      width:11px;height:11px;${base}
+      border-radius:50%;
+    "></div>`;
+  }
+
   return L.divIcon({
     className: '',
-    html: `<div style="
-      width:12px;height:12px;border-radius:50%;
-      background:${color};opacity:.85;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 5px ${color}66;
-    "></div>`,
-    iconSize:[12,12], iconAnchor:[6,6],
+    html: html,
+    iconSize: [16,16], iconAnchor: [8,8],
   });
 }
 
@@ -934,7 +1023,7 @@ function renderMarkers() {
     const jScale = Math.max(0.001, 0.09 / Math.pow(2, map.getZoom() - 4));
     const jLat   = c.lat + (jSeed[0] - 0.5) * jScale;
     const jLng   = c.lng + (jSeed[1] - 0.5) * jScale * 1.4;
-    const m = L.marker([jLat, jLng], { icon: makeIcon(color) });
+    const m = L.marker([jLat, jLng], { icon: makeIcon(color, vt) });
     m.bindPopup(`
       <div class="popup-type" style="color:${color}">${label}</div>
       <div class="popup-id">${c.case_id}</div>
@@ -1036,9 +1125,11 @@ async function loadAll() {
     renderFeed();
     updateStats(cJ.total, sJ);
   } catch(e) {
-    console.error(e);
+    console.error('loadAll error:', e);
+    // Retry once after 2s in case of cold start
+    setTimeout(loadAll, 2000);
     document.getElementById('feed').innerHTML =
-      '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">ERROR LOADING CASES</div>';
+      '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING…</div>';
   } finally {
     document.getElementById('loading').classList.add('hidden');
   }
