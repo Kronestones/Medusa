@@ -620,6 +620,38 @@
       transition: background 0.15s;
     }
     #sidebar-toggle:hover { background: #181a18; }
+
+    .article-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .article-item:hover { background: var(--surface2); }
+    .article-source {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px; letter-spacing: 0.15em;
+      color: var(--accent); margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .article-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 15px; color: var(--text);
+      line-height: 1.4; margin-bottom: 4px;
+    }
+    .article-desc {
+      font-size: 12px; color: var(--muted);
+      line-height: 1.5; margin-bottom: 5px;
+    }
+    .article-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px; color: var(--dim);
+    }
+    .article-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px; color: var(--accent);
+      text-decoration: none;
+    }
+    .article-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -762,6 +794,9 @@
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
+        <div class="tab"         onclick="switchTab('press',this)">Press</div>
+        <div class="tab"         onclick="switchTab('research',this)">Research</div>
+        <div class="tab"         onclick="switchTab('international',this)">Global</div>
       </div>
 
       <!-- Feed -->
@@ -1077,7 +1112,36 @@ function switchTab(tab, el) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  renderFeed();
+  if (tab === 'press')         { loadArticleFeed('/api/press', 'Press & News'); }
+  else if (tab === 'research') { loadArticleFeed('/api/research', 'Research & Studies'); }
+  else if (tab === 'international') { loadArticleFeed('/api/international', 'Global'); }
+  else                         { renderFeed(); }
+}
+
+async function loadArticleFeed(endpoint, label) {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = `<div style="padding:28px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-align:center;">LOADING ${label.toUpperCase()}…</div>`;
+  try {
+    const res  = await fetch(endpoint);
+    const data = await res.json();
+    const articles = data.articles || [];
+    if (articles.length === 0) {
+      feed.innerHTML = `<div style="padding:28px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-align:center;">NO ${label.toUpperCase()} ARTICLES FOUND</div>`;
+      return;
+    }
+    feed.innerHTML = articles.map(a => `
+      <div class="article-item" onclick="window.open('${a.link}','_blank')">
+        <div class="article-source">${a.source}</div>
+        <div class="article-title">${a.title}</div>
+        <div class="article-desc">${a.desc}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="article-date">${a.date}</span>
+          <a class="article-link" href="${a.link}" target="_blank" rel="noopener">Read ↗</a>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    feed.innerHTML = `<div style="padding:20px;color:var(--accent);font-family:'Space Mono',monospace;font-size:9px;text-align:center;">ERROR LOADING ${label.toUpperCase()}</div>`;
+  }
 }
 
 function filterFeed() {

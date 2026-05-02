@@ -139,6 +139,88 @@ def api_press():
             print(f"[Press] {name} error: {e}")
     return jsonify({"ok": True, "articles": articles})
 
+
+@app.route("/api/research")
+def api_research():
+    import requests, xml.etree.ElementTree as ET
+    feeds = [
+        ("CDC Newsroom",       "https://tools.cdc.gov/api/v2/resources/media/277590.rss"),
+        ("WHO News",           "https://www.who.int/rss-feeds/news-english.xml"),
+        ("JAMA Network",       "https://jamanetwork.com/rss/site_3/67.xml"),
+        ("NIJ Research",       "https://nij.ojp.gov/rss.xml"),
+        ("Lancet",             "https://www.thelancet.com/rssfeed/lancet_online.xml"),
+    ]
+    keywords = [
+        "domestic violence","sexual assault","rape","intimate partner",
+        "gender violence","femicide","trafficking","stalking","coercive control",
+        "sexual abuse","child abuse","violence against women","gender based",
+        "reproductive coercion","strangulation","harassment",
+    ]
+    articles = []
+    for name, url in feeds:
+        try:
+            r = requests.get(url, headers={"User-Agent": "Medusa/1.2"}, timeout=8)
+            root = ET.fromstring(r.content)
+            for item in root.findall(".//item"):
+                title = item.findtext("title") or ""
+                desc  = item.findtext("description") or ""
+                link  = item.findtext("link") or ""
+                pub   = item.findtext("pubDate") or ""
+                text  = (title + " " + desc).lower()
+                if any(k in text for k in keywords):
+                    articles.append({
+                        "source": name,
+                        "title":  title,
+                        "desc":   desc[:200],
+                        "link":   link,
+                        "date":   pub[:16],
+                    })
+        except Exception as e:
+            print(f"[Research] {name} error: {e}")
+    return jsonify({"ok": True, "articles": articles})
+
+
+@app.route("/api/international")
+def api_international():
+    import requests, xml.etree.ElementTree as ET
+    feeds = [
+        ("UN Women",           "https://www.unwomen.org/en/rss-feeds/news"),
+        ("Amnesty Intl",       "https://www.amnesty.org/en/feed/"),
+        ("Guardian Global",    "https://www.theguardian.com/society/gender/rss"),
+        ("Reuters World",      "https://feeds.reuters.com/reuters/worldNews"),
+        ("Human Rights Watch", "https://www.hrw.org/rss/world-report-chapters.xml"),
+        ("BBC Gender",         "https://feeds.bbci.co.uk/news/world/rss.xml"),
+    ]
+    keywords = [
+        "domestic violence","sexual assault","rape","femicide","trafficking",
+        "violence against women","gender violence","child marriage","forced marriage",
+        "honour killing","fgm","female genital","reproductive rights","abortion",
+        "stalking","intimate partner","women rights","girls rights",
+        "maternal","gender based violence","missing women",
+    ]
+    articles = []
+    for name, url in feeds:
+        try:
+            r = requests.get(url, headers={"User-Agent": "Medusa/1.2"}, timeout=8)
+            root = ET.fromstring(r.content)
+            for item in root.findall(".//item"):
+                title = item.findtext("title") or ""
+                desc  = item.findtext("description") or ""
+                link  = item.findtext("link") or ""
+                pub   = item.findtext("pubDate") or ""
+                text  = (title + " " + desc).lower()
+                if any(k in text for k in keywords):
+                    articles.append({
+                        "source": name,
+                        "title":  title,
+                        "desc":   desc[:200],
+                        "link":   link,
+                        "date":   pub[:16],
+                    })
+        except Exception as e:
+            print(f"[International] {name} error: {e}")
+    return jsonify({"ok": True, "articles": articles})
+
 @app.route("/api/status")
 def api_status():
     s = _get_scanner()
