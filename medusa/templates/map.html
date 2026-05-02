@@ -56,9 +56,9 @@
 
     /* ── Header ── */
     #header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 9px 18px;
+      background: #0a0a0a;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 10px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -69,11 +69,11 @@
     #branding { display: flex; flex-direction: column; gap: 1px; }
 
     #logo {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 22px;
-      font-weight: 300;
-      font-style: italic;
-      letter-spacing: 4px;
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      font-style: normal;
+      letter-spacing: 6px;
       color: #e8e4d9;
       line-height: 1;
     }
@@ -86,8 +86,8 @@
     #tagline {
       font-family: 'Crimson Pro', Georgia, serif;
       font-style: italic;
-      font-size: 11px;
-      letter-spacing: 0.5px;
+      font-size: 12px;
+      letter-spacing: 0.3px;
       color: var(--muted);
     }
 
@@ -592,6 +592,34 @@
       transition: background 0.15s;
     }
     #sidebar-toggle:hover { background: var(--surface2); }
+
+    #header-right {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    #scan-btn {
+      background: transparent;
+      border: 1px solid #2a2e2a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #e8e4d9;
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #scan-btn:hover { background: #181a18; }
+    #scan-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #sidebar-toggle {
+      background: transparent;
+      border: 1px solid #2a2e2a;
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: #e8e4d9;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    #sidebar-toggle:hover { background: #181a18; }
   </style>
 </head>
 <body>
@@ -602,40 +630,23 @@
   <div id="header">
     <div id="branding">
       <div id="logo">ME<em>DU</em>SA</div>
-      <div id="tagline">Every Act Documented · United States</div>
+      <div id="tagline">Every act documented · United States</div>
     </div>
 
-    <div id="stats-bar">
+    <div id="header-right">
       <div class="stat">
         <div class="stat-num" id="s-total">—</div>
-        <div class="stat-label">Total</div>
+        <div class="stat-label">Cases</div>
       </div>
-      <div class="stat">
-        <div class="stat-num" id="s-homicide">—</div>
-        <div class="stat-label">Homicide</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-sa">—</div>
-        <div class="stat-label">Sex. Assault</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-dv">—</div>
-        <div class="stat-label">Dom. Violence</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="s-pf">—</div>
-        <div class="stat-label">Public Figures</div>
-      </div>
+      <button id="scan-btn" onclick="triggerScan()">⟳</button>
+      <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
-
-    <button id="scan-btn" onclick="triggerScan()">⟳ Scan Records</button>
   </div>
 
   <!-- Body -->
   <div id="body">
 
     <div id="map"></div>
-    <button id="sidebar-toggle" onclick="toggleSidebar()">☰ CASES</button>
 
     <button id="panel-toggle" onclick="toggleInfoPanel()">📊</button>
 
