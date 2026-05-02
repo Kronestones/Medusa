@@ -1043,7 +1043,7 @@ function renderMarkers() {
           : (c.source_name ? `📰 ${c.source_name}` : '')
         }
       </div>
-    `, { maxWidth: 310 });
+    `, { maxWidth: 310, autoClose: false, closeOnClick: false });
     layer.addLayer(m);
   }
 }
