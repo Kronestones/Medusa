@@ -425,7 +425,7 @@
     .pulse-dot {
       width: 7px; height: 7px;
       border-radius: 50%;
-      background: #c0392b;
+      background: #40916c;
       animation: pulse 1.2s ease-in-out infinite;
     }
 
@@ -494,6 +494,85 @@
     #logo-sub   { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.15em; }
     .tab        { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.08em; }
     h3          { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.15em; color: var(--muted); }
+
+    #sidebar-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 14px 10px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #sidebar-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px; letter-spacing: 0.2em; color: var(--muted);
+    }
+    #sidebar-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 16px; cursor: pointer; padding: 2px 6px;
+      line-height: 1; border-radius: 3px;
+    }
+    #sidebar-close:hover { color: var(--text); background: var(--surface2); }
+    #name-search-wrap { padding: 10px 14px 0; flex-shrink: 0; }
+    #name-search {
+      width: 100%; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 3px;
+      padding: 7px 10px; color: var(--text);
+      font-family: 'Space Mono', monospace; font-size: 10px; outline: none;
+    }
+    #name-search::placeholder { color: var(--muted); }
+    #name-search:focus { border-color: var(--accent); }
+    #name-search-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px; color: var(--muted); margin-top: 5px; line-height: 1.5;
+    }
+    #panel-toggle {
+      position: absolute; bottom: 24px; left: 12px; z-index: 1000;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 12px; font-size: 16px;
+      cursor: pointer; color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background 0.15s;
+    }
+    #panel-toggle:hover { background: var(--surface2); }
+    #info-panel {
+      position: absolute; bottom: 70px; left: 12px; z-index: 1000;
+      width: 290px; max-height: 65vh;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; display: none; flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7); overflow: hidden;
+    }
+    #info-panel.open { display: flex; }
+    #info-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+      font-size: 9px; letter-spacing: 0.2em; color: var(--muted); flex-shrink: 0;
+    }
+    #info-panel-header button {
+      background: none; border: none; color: var(--muted);
+      font-size: 14px; cursor: pointer;
+    }
+    #info-panel-body {
+      overflow-y: auto; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .info-section { display: flex; flex-direction: column; gap: 4px; }
+    .info-section-title {
+      font-family: 'Space Mono', monospace; font-size: 8px;
+      letter-spacing: 0.15em; color: var(--accent); margin-bottom: 4px;
+    }
+    .info-stat {
+      font-size: 12px; color: var(--text); line-height: 1.5;
+      padding: 5px 0; border-bottom: 1px solid var(--border);
+    }
+    .info-stat:last-child { border-bottom: none; }
+    .info-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; color: var(--accent); margin-right: 3px;
+    }
+    .info-law { margin-bottom: 7px; }
+    .law-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px; color: var(--text); margin-bottom: 2px;
+    }
+    .law-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -538,7 +617,69 @@
 
     <div id="map"></div>
 
+    <button id="panel-toggle" onclick="toggleInfoPanel()">📊</button>
+
+    <div id="info-panel">
+      <div id="info-panel-header">
+        <span>STATISTICS &amp; LAW</span>
+        <button onclick="toggleInfoPanel()">✕</button>
+      </div>
+      <div id="info-panel-body">
+
+        <div class="info-section">
+          <div class="info-section-title">BY THE NUMBERS</div>
+          <div class="info-stat"><span class="info-num">1 in 3</span> women experience physical violence by an intimate partner in their lifetime</div>
+          <div class="info-stat"><span class="info-num">1 in 5</span> women have been raped — 48.7% first before age 18</div>
+          <div class="info-stat"><span class="info-num">55%</span> of female homicide victims are killed by a current or former male partner</div>
+          <div class="info-stat"><span class="info-num">500×</span> increased homicide risk when an abuser has access to a gun</div>
+          <div class="info-stat"><span class="info-num">10M+</span> women and children affected by male violence every year in the US</div>
+          <div class="info-stat"><span class="info-num">Every 11 min</span> a woman is killed by a man in the US</div>
+          <div class="info-stat" style="font-size:10px;color:var(--muted)">Source: CDC NISVS</div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-section-title">WHO COMMITS THE VIOLENCE</div>
+          <div class="info-stat">Over <span class="info-num">80%</span> of perpetrators are known to the victim</div>
+          <div class="info-stat"><span class="info-num">38%</span> of all murders of women worldwide committed by intimate partners (WHO)</div>
+          <div class="info-stat">Women of color face rates <span class="info-num">30–50%</span> higher than white women</div>
+          <div class="info-stat"><span class="info-num">96%</span> of employed DV victims experience problems at work due to abuse</div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-section-title">FEDERAL PROTECTIONS</div>
+          <div class="info-law"><div class="law-name">Violence Against Women Act (VAWA)</div><div class="law-detail">Federal law — tools and grants for DV, sexual assault, stalking response.</div></div>
+          <div class="info-law"><div class="law-name">Title IX (1972)</div><div class="law-detail">Prohibits sex discrimination in federally funded education. Schools must respond to sexual assault.</div></div>
+          <div class="info-law"><div class="law-name">Title VII — Civil Rights Act</div><div class="law-detail">Prohibits workplace sexual harassment and sex discrimination.</div></div>
+          <div class="info-law"><div class="law-name">18 U.S.C. § 2261 — Interstate DV</div><div class="law-detail">Federal crime to cross state lines to commit domestic violence or violate a protective order.</div></div>
+          <div class="info-law"><div class="law-name">Dobbs v. Jackson (2022)</div><div class="law-detail">Eliminated federal abortion rights. Active litigation in 20+ states. Disproportionate impact on rape and incest survivors.</div></div>
+          <div class="info-law"><div class="law-name">Women's Bureau — Proposed Closure 2025</div><div class="law-detail">Trump budget proposed eliminating the 105-year-old Women's Bureau, which administered VAWA workplace grants covering 50M+ workers.</div></div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-section-title">IF YOU NEED HELP</div>
+          <div class="info-law"><div class="law-name">National DV Hotline</div><div class="law-detail">1-800-799-7233 · thehotline.org · 24/7</div></div>
+          <div class="info-law"><div class="law-name">RAINN Sexual Assault Hotline</div><div class="law-detail">1-800-656-4673 · rainn.org · 24/7</div></div>
+          <div class="info-law"><div class="law-name">National Human Trafficking Hotline</div><div class="law-detail">1-888-373-7888 · humantraffickinghotline.org</div></div>
+        </div>
+
+      </div>
+    </div>
+
     <div id="sidebar">
+
+      <!-- Sidebar header -->
+      <div id="sidebar-header">
+        <span id="sidebar-title">CASES</span>
+        <button id="sidebar-close" onclick="closeSidebar()">✕</button>
+      </div>
+
+      <!-- Name search -->
+      <div id="name-search-wrap">
+        <input id="name-search" type="text"
+               placeholder="Search by name, e.g. Epstein…"
+               oninput="filterFeed()" />
+        <div id="name-search-note">Public court records only. Multiple people may share the same name.</div>
+      </div>
 
       <!-- Search -->
       <div id="search-wrap">
@@ -906,8 +1047,19 @@ function switchTab(tab, el) {
 }
 
 function filterFeed() {
-  searchText = document.getElementById('search').value.trim();
+  const main = document.getElementById('search').value.trim();
+  const nameEl = document.getElementById('name-search');
+  const name = nameEl ? nameEl.value.trim() : '';
+  searchText = name || main;
   renderFeed();
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').style.display = 'none';
+}
+
+function toggleInfoPanel() {
+  document.getElementById('info-panel').classList.toggle('open');
 }
 
 function focusCase(lat, lng) {
