@@ -52,9 +52,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
-      max-height: 100vh;
       overflow: hidden;
-      position: relative;
     }
 
     /* ── Header ── */
@@ -67,8 +65,6 @@
       justify-content: space-between;
       flex-shrink: 0;
       gap: 16px;
-      position: relative;
-      z-index: 10000;
     }
 
     #branding { display: flex; flex-direction: column; gap: 1px; }
@@ -135,26 +131,20 @@
       flex: 1;
       overflow: hidden;
       position: relative;
-      z-index: 1;
     }
 
     #map { flex: 1; z-index: 1; position: relative; }
 
     /* ── Sidebar ── */
     #sidebar {
-      width: 85vw;
-      max-width: 380px;
-      min-width: 280px;
+      width: 310px;
+      min-width: 310px;
       background: var(--surface);
       border-left: 1px solid var(--border);
       display: none;
       flex-direction: column;
       overflow: hidden;
-      z-index: 9999;
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
+      z-index: 2;
     }
     #sidebar.open { display: flex; }
 
@@ -198,9 +188,9 @@
     }
 
     .legend-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .legend-row {
@@ -223,8 +213,8 @@
     .legend-row.disabled { opacity: 0.3; }
 
     .legend-dot {
-      width: 8px;
-      height: 8px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -611,7 +601,24 @@
     #header-right {
       display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
-
+    #sidebar-toggle {
+      background: transparent;
+      border: 1px solid #2a2e2a;
+      border-radius: 6px;
+      padding: 7px 11px;
+      color: #e8e4d9;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+    }
+    #sidebar-toggle:hover { color: #2d6a4f; }
 
     .article-item {
       padding: 12px 14px;
@@ -659,7 +666,7 @@
 
     <div id="header-right">
       <div class="stat-num" id="s-total">—</div>
-      <button id="sidebar-toggle" onclick="toggleSidebar()" style="font-size:20px;background:none;border:none;color:#40916c;cursor:pointer;padding:4px 8px;z-index:10001;position:relative;">&#9776;</button>
+      <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
   </div>
 
@@ -678,7 +685,7 @@
       <div id="info-panel-body">
 
         <div class="info-section">
-          <div class="info-section-title">The Numbers</div>
+          <div class="info-section-title">THE NUMBERS</div>
           <div class="info-row"><span class="info-label">Domestic violence</span><span class="info-val">~10M / yr</span></div>
           <div class="info-row"><span class="info-label">Sexual assault</span><span class="info-val">~480K / yr</span></div>
           <div class="info-row"><span class="info-label">Rape (reported)</span><span class="info-val">~130K / yr</span></div>
@@ -690,181 +697,62 @@
         </div>
 
         <div class="info-section">
-          <div class="info-section-title">Who Commits It</div>
+          <div class="info-section-title">WHO COMMITS IT</div>
           <div class="info-row"><span class="info-label">Known to victim</span><span class="info-val">&gt;80%</span></div>
           <div class="info-row"><span class="info-label">Killed by intimate partner</span><span class="info-val">55%</span></div>
           <div class="info-row"><span class="info-label">Gun increases DV homicide risk</span><span class="info-val">500×</span></div>
-          <div class="info-row"><span class="info-label">Trans victims who are women of color</span><span class="info-val">&gt;85%</span></div>
+          <div class="info-row"><span class="info-label">Trans victims who are WOC</span><span class="info-val">&gt;85%</span></div>
         </div>
 
         <div class="info-section">
-          <div class="info-section-title">Laws That Protected Women</div>
-
+          <div class="info-section-title">LAWS THAT PROTECTED WOMEN</div>
           <div class="law-block">
             <div class="law-era">1973 — Overturned 2022</div>
-            <div class="law-text"><strong>Roe v. Wade.</strong> Established federal constitutional right to abortion. Protected for 49 years. Overturned by Dobbs v. Jackson (2022) in a 6-3 decision by a court shaped by three Trump appointees. As of 2025, 21 states have banned or severely restricted abortion — including cases of rape and incest.</div>
+            <div class="law-text"><strong>Roe v. Wade.</strong> Federal right to abortion protected 49 years. Overturned by Dobbs v. Jackson (2022), 6-3, by a court shaped by three Trump appointees. As of 2025, 21 states have banned or severely restricted abortion including rape and incest cases.</div>
           </div>
-
           <div class="law-block">
             <div class="law-era">1994 — Active</div>
-            <div class="law-text"><strong>Violence Against Women Act (VAWA).</strong> Federal law funding DV shelters, rape crisis centers, legal aid, and law enforcement training. Reauthorized through 2027. Proposed cuts in 2025 Trump budget would gut its grant programs.</div>
+            <div class="law-text"><strong>Violence Against Women Act (VAWA).</strong> Funds DV shelters, rape crisis centers, legal aid. Reauthorized through 2027. 2025 Trump budget proposed gutting its grant programs.</div>
           </div>
-
           <div class="law-block">
-            <div class="law-era">1972 — Active but weakened</div>
-            <div class="law-text"><strong>Title IX.</strong> Prohibits sex discrimination in federally funded education. The Trump/DeVos administration narrowed its scope in 2020, raising the burden of proof for campus sexual assault survivors and allowing schools to use live cross-examination of victims. Biden restored protections in 2022. Trump administration rolled them back again in 2025.</div>
+            <div class="law-era">1972 — Weakened 2025</div>
+            <div class="law-text"><strong>Title IX.</strong> Prohibits sex discrimination in federally funded education. Trump/DeVos narrowed it in 2020. Biden restored it 2022. Trump rolled it back again 2025.</div>
           </div>
-
-          <div class="law-block">
-            <div class="law-era">1964 — Active</div>
-            <div class="law-text"><strong>Title VII — Civil Rights Act.</strong> Prohibits workplace sexual harassment and sex-based discrimination. Has never been meaningfully enforced against unpaid domestic workers, agricultural workers, or workers at companies under 15 employees.</div>
-          </div>
-
           <div class="law-block">
             <div class="law-era">1994 — Active</div>
-            <div class="law-text"><strong>18 U.S.C. § 2261 — Interstate Domestic Violence.</strong> Federal crime to cross state lines to commit DV or violate a protective order. Rarely prosecuted.</div>
+            <div class="law-text"><strong>18 U.S.C. § 2261.</strong> Federal crime to cross state lines to commit DV or violate a protective order. Rarely prosecuted.</div>
           </div>
         </div>
 
         <div class="info-section">
-          <div class="info-section-title">Laws That Have Hurt Women</div>
-
+          <div class="info-section-title">LAWS THAT HAVE HURT WOMEN</div>
           <div class="law-block">
             <div class="law-era">Never Passed</div>
-            <div class="law-text"><strong>Equal Rights Amendment (ERA).</strong> "Equality of rights under the law shall not be denied or abridged by the United States or by any State on account of sex." Passed Congress in 1972. Never ratified. Needs 38 states — currently has 38, but five states attempted to rescind. Republican-controlled legislatures have blocked ratification for over 50 years. Without the ERA, sex discrimination has no explicit constitutional prohibition.</div>
+            <div class="law-text"><strong>Equal Rights Amendment.</strong> "Equality of rights shall not be denied on account of sex." Passed Congress 1972. Never ratified. Republican legislatures have blocked it for over 50 years. Without ERA, sex discrimination has no explicit constitutional prohibition.</div>
           </div>
-
           <div class="law-block">
             <div class="law-era">Legal in 37 states</div>
-            <div class="law-text"><strong>Child Marriage.</strong> Only 13 states have enacted a complete ban on child marriage. In the remaining states, children — predominantly girls — can be married with parental or judicial consent, sometimes as young as 12. Child marriage is frequently used to legitimize statutory rape and prevents victims from accessing domestic violence shelters, filing for divorce, or leaving without parental consent.</div>
+            <div class="law-text"><strong>Child Marriage.</strong> Only 13 states have a complete ban. Girls can be married with parental or judicial consent, sometimes as young as 12. Frequently used to legitimize statutory rape.</div>
           </div>
-
           <div class="law-block">
             <div class="law-era">1873 — Being Revived</div>
-            <div class="law-text"><strong>Comstock Act.</strong> Victorian-era law prohibiting mailing "obscene" materials. Originally used to ban contraception. Conservative legal advocates and Trump DOJ officials have argued it bans mailing abortion medication (mifepristone) across state lines — which would effectively end medication abortion nationally, including in states where abortion is legal.</div>
+            <div class="law-text"><strong>Comstock Act.</strong> Victorian law being used by conservatives to ban mailing abortion medication across state lines — which would end medication abortion nationally even in states where it is legal.</div>
           </div>
-
           <div class="law-block">
-            <div class="law-era">1993 — Partially</div>
-            <div class="law-text"><strong>Marital Rape Laws.</strong> Marital rape was legal in all 50 states until 1993 when North Carolina became the last to criminalize it. However, some states still treat it differently — shorter reporting windows, reduced penalties, or requiring proof of additional force. South Carolina requires proof of a weapon or extreme violence to prosecute spousal rape.</div>
+            <div class="law-era">Until 1993</div>
+            <div class="law-text"><strong>Marital Rape.</strong> Legal in all 50 states until North Carolina criminalized it July 5, 1993. Some states still require proof of extra force to prosecute spousal rape.</div>
           </div>
-
           <div class="law-block">
             <div class="law-era">2025</div>
-            <div class="law-text"><strong>SAVE Act.</strong> Requires documentary proof of citizenship to register to vote. Disproportionately impacts women, who are more likely to have name discrepancies between their birth certificate and current ID due to marriage. An estimated 69 million women lack the documentation required under SAVE Act provisions.</div>
+            <div class="law-text"><strong>SAVE Act.</strong> Requires documentary proof of citizenship to vote. Disproportionately impacts women with name changes from marriage. An estimated 69 million women lack required documentation.</div>
           </div>
-
           <div class="law-block">
             <div class="law-era">2025</div>
-            <div class="law-text"><strong>Women's Bureau — Proposed Elimination.</strong> Trump 2025 budget proposed closing the 105-year-old DOL Women's Bureau, which administered VAWA workplace grants, supported state paid leave programs covering 50M+ workers, and provided resources for workplace harassment victims. DOGE simultaneously canceled Women in Apprenticeship grants, calling them "wasteful DEI."</div>
-          </div>
-
-          <div class="law-block">
-            <div class="law-era">2025</div>
-            <div class="law-text"><strong>Title IX Rollback.</strong> Trump administration rescinded Biden-era Title IX protections for transgender students and narrowed sexual harassment definitions again, making it harder for campus assault survivors to pursue complaints.</div>
-          </div>
-
-        </div>
-
-      </div>
-
-    <div id="sidebar">
-
-      <!-- Sidebar header -->
-      <div id="sidebar-header">
-        <span id="sidebar-title">CASES</span>
-        <button id="sidebar-close" onclick="closeSidebar()">✕</button>
-      </div>
-
-      <!-- Name search -->
-      <div id="name-search-wrap">
-        <input id="name-search" type="text"
-               placeholder="Search by name, e.g. Epstein…"
-               oninput="filterFeed()" />
-        <div id="name-search-note">Public court records only. Multiple people may share the same name.</div>
-      </div>
-
-      <!-- Search -->
-      <div id="search-wrap">
-        <input id="search" type="text" placeholder="Search cases, cities, states…"
-                           oninput="filterFeed()" />
-      </div>
-
-      <!-- Legend -->
-      <div id="legend">
-        <h3>Case Type</h3>
-        <div class="legend-grid">
-          <div class="legend-row" data-layer="homicide" onclick="toggleLayer('homicide',this)">
-            <div class="legend-dot"><div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid #c0392b;display:inline-block;"></div></div><span>Homicide</span>
-          </div>
-          <div class="legend-row" data-layer="attempted_murder" onclick="toggleLayer('attempted_murder',this)">
-            <div class="legend-dot"><div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:12px solid #e55039;display:inline-block;"></div></div><span>Att. Murder</span>
-          </div>
-          <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)">
-            <div class="legend-dot"><div style="width:11px;height:11px;background:#8e44ad;transform:rotate(45deg);display:inline-block;"></div></div><span>Rape</span>
-          </div>
-          <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)">
-            <div class="legend-dot"><div style="width:10px;height:10px;border:2px solid #a569bd;transform:rotate(45deg);display:inline-block;"></div></div><span>Sex. Assault</span>
-          </div>
-          <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)">
-            <div class="legend-dot"><div style="width:12px;height:12px;border-radius:50%;background:#d35400;display:inline-block;"></div></div><span>Dom. Violence</span>
-          </div>
-          <div class="legend-row" data-layer="assault" onclick="toggleLayer('assault_murder',this)">
-            <div class="legend-dot"><div style="width:11px;height:11px;background:#e67e22;border-radius:2px;display:inline-block;"></div></div><span>Assault</span>
-          </div>
-          <div class="legend-row" data-layer="stalking" onclick="toggleLayer('stalking',this)">
-            <div class="legend-dot"><div style="width:12px;height:11px;background:#2471a3;clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);display:inline-block;"></div></div><span>Stalking</span>
-          </div>
-          <div class="legend-row" data-layer="harassment" onclick="toggleLayer('harassment',this)">
-            <div class="legend-dot"><div style="width:12px;height:12px;border-radius:50%;border:2px solid #5dade2;display:inline-block;"></div></div><span>Harassment</span>
-          </div>
-          <div class="legend-row" data-layer="trafficking" onclick="toggleLayer('trafficking',this)">
-            <div class="legend-dot"><div style="width:13px;height:13px;background:#16a085;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);display:inline-block;"></div></div><span>Trafficking</span>
-          </div>
-          <div class="legend-row" data-layer="child_abuse" onclick="toggleLayer('child_abuse',this)">
-            <div class="legend-dot"><div style="width:12px;height:12px;background:#922b21;clip-path:polygon(33% 0%,67% 0%,67% 33%,100% 33%,100% 67%,67% 67%,67% 100%,33% 100%,33% 67%,0% 67%,0% 33%,33% 33%);display:inline-block;"></div></div><span>Child Abuse</span>
-          </div>
-          <div class="legend-row" data-layer="coercive_control" onclick="toggleLayer('coercive_control',this)">
-            <div class="legend-dot"><div style="width:9px;height:9px;background:#717d7e;border-radius:1px;display:inline-block;"></div></div><span>Coercive Ctrl</span>
-          </div>
-          <div class="legend-row" data-layer="trans_violence" onclick="toggleLayer('trans_violence',this)">
-            <div class="legend-dot"><div style="width:12px;height:12px;background:#c471ed;clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);display:inline-block;"></div></div><span>Trans Violence</span>
+            <div class="law-text"><strong>Women's Bureau Elimination.</strong> Trump proposed closing the 105-year-old DOL Women's Bureau. DOGE canceled Women in Apprenticeship grants, calling them "wasteful DEI."</div>
           </div>
         </div>
-      </div>
 
-      <!-- Tabs -->
-      <div id="filter-tabs">
-        <div class="tab active" onclick="switchTab('all',this)">All</div>
-        <div class="tab" onclick="switchTab('homicide',this)">Homicide</div>
-        <div class="tab" onclick="switchTab('sexual',this)">Sexual</div>
-        <div class="tab" onclick="switchTab('dv',this)">DV</div>
-        <div class="tab" onclick="switchTab('trans',this)">Trans</div>
-        <div class="tab" onclick="switchTab('officials',this)">Officials</div>
-        <div class="tab" onclick="switchTab('press',this)">Press</div>
-        <div class="tab" onclick="switchTab('research',this)">Research</div>
-        <div class="tab" onclick="switchTab('international',this)">Global</div>
-      </div>
-
-      <!-- Feed -->
-      <div id="feed">
-        <div style="padding:28px 14px;color:var(--muted);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-align:center;">
-          LOADING…
-        </div>
-      </div>
-
-      <!-- Disclosure -->
-      <div id="disclosure">
-        Sources: police reports · court records · DOJ/FBI releases ·
-        congressional records · civil suits · investigative journalism ·
-        Title IX findings · public news archives.<br>
-        No victim names stored. Sources always cited.<br>
-        Founded by Krone, Architect · 2026<br><br>
-        <a href="https://buymeacoffee.com/sentinel.commons" target="_blank" rel="noopener">
-          ☕ Keep Medusa free
-        </a><br>
-        <span style="font-size:9px;color:var(--muted)">Donations above operating costs go to The Commons redistribution fund.</span>
-      </div>
+      </div></div>
 
     </div>
 
