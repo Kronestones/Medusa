@@ -6,9 +6,9 @@ from medusa.fetch import safe_rss
 from medusa.record import district_to_city, STATE_LARGEST_CITY
 
 DOJ_FEEDS = [  # USAO removed — was hanging scans
-    "https://www.justice.gov/news/press-releases/rss",
-    "https://www.justice.gov/ovw/news/rss",
-    "https://www.justice.gov/crt/news/rss",
+    "https://www.justice.gov/rss/news.xml",
+    "https://www.justice.gov/ovw/rss/news.xml",
+    "https://www.justice.gov/crt/rss/news.xml",
     "https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml",
 ]
 

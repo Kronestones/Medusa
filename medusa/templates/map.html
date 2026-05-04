@@ -106,13 +106,7 @@
       gap: 1px;
     }
 
-    .stat-num {
-      font-family: 'Space Mono', monospace;
-      font-size: 17px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
-    }
+
 
     .stat-label-gone {
       font-family: 'Space Mono', monospace;
@@ -965,7 +959,13 @@ function makeIcon(color, vtype) {
 function renderMarkers() {
   for (const g of Object.values(layers)) g.clearLayers();
 
-  for (const c of allCases) {
+  // Batch render for performance — process in chunks to avoid blocking UI
+  const visible = allCases.filter(c => c.lat && c.lng);
+  let i = 0;
+  function batch() {
+    const end = Math.min(i + 200, visible.length);
+    for (; i < end; i++) {
+      const c = visible[i];
     if (!c.lat || !c.lng) continue;
     const vt    = c.violence_type || 'unknown';
     const color = TYPE_COLOR[vt] || TYPE_COLOR.unknown;
@@ -1001,7 +1001,10 @@ function renderMarkers() {
       </div>
     `, { maxWidth: 310, autoClose: false, closeOnClick: false });
     layer.addLayer(m);
+    }
+    if (i < visible.length) requestAnimationFrame(batch);
   }
+  requestAnimationFrame(batch);
 }
 
 // ── Feed ──────────────────────────────────────────────────────────────────────
@@ -1085,8 +1088,7 @@ async function loadAll() {
     updateStats(cJ.total, sJ);
   } catch(e) {
     console.error('loadAll error:', e);
-    // Retry once after 2s in case of cold start
-    setTimeout(loadAll, 2000);
+    setTimeout(loadAll, 3000);
     document.getElementById('feed').innerHTML =
       '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING…</div>';
   } finally {
