@@ -656,7 +656,7 @@
     </div>
 
     <div id="header-right">
-      <div class="stat-num" id="s-total">—</div>
+      <div class="stat-num" id="s-total">4429</div>
       <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
   </div>
@@ -959,13 +959,7 @@ function makeIcon(color, vtype) {
 function renderMarkers() {
   for (const g of Object.values(layers)) g.clearLayers();
 
-  // Batch render for performance — process in chunks to avoid blocking UI
-  const visible = allCases.filter(c => c.lat && c.lng);
-  let i = 0;
-  function batch() {
-    const end = Math.min(i + 200, visible.length);
-    for (; i < end; i++) {
-      const c = visible[i];
+  for (const c of allCases) {
     if (!c.lat || !c.lng) continue;
     const vt    = c.violence_type || 'unknown';
     const color = TYPE_COLOR[vt] || TYPE_COLOR.unknown;
@@ -1001,10 +995,7 @@ function renderMarkers() {
       </div>
     `, { maxWidth: 310, autoClose: false, closeOnClick: false });
     layer.addLayer(m);
-    }
-    if (i < visible.length) requestAnimationFrame(batch);
   }
-  requestAnimationFrame(batch);
 }
 
 // ── Feed ──────────────────────────────────────────────────────────────────────
