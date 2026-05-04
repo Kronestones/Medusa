@@ -137,7 +137,7 @@
 
     /* ── Sidebar ── */
     #sidebar {
-      width: 310px;
+      width: min(100vw, 420px);
       min-width: 310px;
       background: var(--surface);
       border-left: 1px solid var(--border);
@@ -188,9 +188,9 @@
     }
 
     .legend-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 8px;
     }
 
     .legend-row {
@@ -222,11 +222,9 @@
     /* ── Tabs ── */
     #filter-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 0;
       border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-      overflow-y: hidden;
-      scrollbar-width: none;
       flex-shrink: 0;
     }
     #filter-tabs::-webkit-scrollbar { display: none; }
