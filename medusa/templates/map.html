@@ -1186,16 +1186,6 @@ async function loadAll() {
           renderFeed();
         }).catch(() => {});
     }
-    // Load remaining cases in background
-    if (cJ.total > 500) {
-      fetch('/api/cases?limit=' + cJ.total)
-        .then(r => r.json())
-        .then(d => {
-          allCases = d.cases || [];
-          renderMarkers();
-          renderFeed();
-        }).catch(() => {});
-    }
   } catch(e) {
     console.error('loadAll error:', e);
     // Retry once after 2s in case of cold start
