@@ -1180,7 +1180,7 @@ async function loadAll() {
   } catch(e) {
     console.error('loadAll error:', e);
     // Retry once after 3s in case of cold start
-    setTimeout(loadAll, 3000);
+    setTimeout(loadAll, 8000);
     document.getElementById('feed').innerHTML =
       '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING… <br><small style='color:var(--muted)'>' + e.message + '</small></div>';
   } finally {
