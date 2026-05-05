@@ -827,6 +827,7 @@
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
+        <div class="tab"         onclick="switchTab('mmiw',this)">🪶 MMIW</div>
         <div class="tab"         onclick="switchTab('trans',this)">Trans</div>
         <div class="tab"         onclick="switchTab('press',this)">Press</div>
         <div class="tab"         onclick="switchTab('research',this)">Research</div>
@@ -1105,6 +1106,9 @@ function getFilteredCases() {
   if (activeTab === 'homicide')  items = items.filter(c => c.violence_type === 'homicide' || c.violence_type === 'attempted_murder');
   else if (activeTab === 'sexual') items = items.filter(c => SEXUAL_TYPES.has(c.violence_type));
   else if (activeTab === 'dv')   items = items.filter(c => DV_TYPES.has(c.violence_type));
+  else if (activeTab === 'mmiw') items = items.filter(c =>
+    c.source_name && /mmiw|indigenous|sovereign bodies|indian health|savanna|highway of tears|not invisible/i.test(c.source_name) ||
+    c.summary && /indigenous|native american|mmiw|tribal|reservation/i.test(c.summary));
   else if (activeTab === 'trans') items = items.filter(c => c.violence_type === 'trans_violence');
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
