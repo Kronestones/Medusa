@@ -227,11 +227,15 @@
     /* ── Tabs ── */
     #filter-tabs {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 0;
       border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
       flex-shrink: 0;
     }
+    #filter-tabs::-webkit-scrollbar { display: none; }
     #filter-tabs::-webkit-scrollbar { display: none; }
 
     .tab {
