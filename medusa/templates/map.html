@@ -1170,7 +1170,7 @@ function renderFeed() {
 
 async function loadAll() {
   try {
-    const [cR, sR] = await Promise.all([fetch('/api/cases?limit=2000'), fetch('/api/stats')]);
+    const [cR, sR] = await Promise.all([fetch('/api/cases?limit=500'), fetch('/api/stats')]);
     const cJ = await cR.json();
     const sJ = await sR.json();
     allCases = cJ.cases || [];
@@ -1180,9 +1180,9 @@ async function loadAll() {
   } catch(e) {
     console.error('loadAll error:', e);
     // Retry once after 2s in case of cold start
-    setTimeout(loadAll, 2000);
     document.getElementById('feed').innerHTML =
-      '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING…</div>';
+      '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING… retrying…</div>';
+    setTimeout(loadAll, 5000);
   } finally {
     document.getElementById('loading').classList.add('hidden');
   }
@@ -1201,7 +1201,7 @@ async function triggerScan() {
     const r = await fetch('/api/scan', { method:'POST' });
     const d = await r.json();
     if (d.ok) {
-      const [cR, sR] = await Promise.all([fetch('/api/cases?limit=2000'), fetch('/api/stats')]);
+      const [cR, sR] = await Promise.all([fetch('/api/cases?limit=500'), fetch('/api/stats')]);
       const cJ = await cR.json();
       const sJ = await sR.json();
       allCases = cJ.cases || [];
