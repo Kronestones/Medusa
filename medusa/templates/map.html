@@ -1177,6 +1177,15 @@ async function loadAll() {
     renderMarkers();
     renderFeed();
     updateStats(cJ.total, sJ);
+    if (cJ.total > 500) {
+      fetch('/api/cases?limit=' + cJ.total)
+        .then(r => r.json())
+        .then(d => {
+          allCases = d.cases || [];
+          renderMarkers();
+          renderFeed();
+        }).catch(() => {});
+    }
     // Load remaining cases in background
     if (cJ.total > 500) {
       fetch('/api/cases?limit=' + cJ.total)
