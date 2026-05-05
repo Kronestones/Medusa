@@ -1170,7 +1170,7 @@ function renderFeed() {
 
 async function loadAll() {
   try {
-    const [cR, sR] = await Promise.all([fetch('/api/cases'), fetch('/api/stats')]);
+    const [cR, sR] = await Promise.all([fetch('/api/cases?limit=2000'), fetch('/api/stats')]);
     const cJ = await cR.json();
     const sJ = await sR.json();
     allCases = cJ.cases || [];
@@ -1201,7 +1201,7 @@ async function triggerScan() {
     const r = await fetch('/api/scan', { method:'POST' });
     const d = await r.json();
     if (d.ok) {
-      const [cR, sR] = await Promise.all([fetch('/api/cases'), fetch('/api/stats')]);
+      const [cR, sR] = await Promise.all([fetch('/api/cases?limit=2000'), fetch('/api/stats')]);
       const cJ = await cR.json();
       const sJ = await sR.json();
       allCases = cJ.cases || [];
