@@ -1108,6 +1108,12 @@ function getFilteredCases() {
     c.source_name && /mmiw|indigenous|sovereign bodies|indian health|savanna|highway of tears|not invisible/i.test(c.source_name) ||
     c.summary && /indigenous|native american|mmiw|tribal|reservation/i.test(c.summary));
   else if (activeTab === 'trans') items = items.filter(c => c.violence_type === 'trans_violence');
+  else if (activeTab === 'press') items = items.filter(c =>
+    c.source_name && /nyt|times|guardian|post|reuters|ap |cnn|propublica|reveal|tribune|advocate|19th|rewire|huffpost|buzzfeed|insider|vice/i.test(c.source_name));
+  else if (activeTab === 'research') items = items.filter(c =>
+    c.source_name && /cdc|who|nih|jama|lancet|nejm|journal|study|report|gao|bureau|institute|university|college|research|survey|acog|rand|pew/i.test(c.source_name));
+  else if (activeTab === 'international') items = items.filter(c =>
+    c.state && !['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'].includes(c.state));
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
   // Search filter
@@ -1183,7 +1189,7 @@ async function loadAll() {
         .then(d => {
           allCases = d.cases || [];
           renderMarkers();
-          renderFeed();
+          if (activeTab !== 'all') renderFeed();
         }).catch(() => {});
     }
   } catch(e) {
@@ -1252,8 +1258,8 @@ function switchTab(tab, el) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  if (tab === 'press')         { loadArticleFeed('/api/press', 'Press & News'); }
-  else if (tab === 'research') { loadArticleFeed('/api/research', 'Research & Studies'); }
+  if (tab === 'press')         { activeTab = 'press'; renderFeed(); }
+  else if (tab === 'research') { activeTab = 'research'; renderFeed(); }
   else if (tab === 'international') { loadArticleFeed('/api/international', 'Global'); }
   else                         { renderFeed(); }
 }
