@@ -1316,11 +1316,12 @@ function focusCase(lat, lng) {
 
 function updateStats(total, s) {
   const bt = s.by_type || {};
-  document.getElementById('s-total').textContent    = total || allCases.length;
-  document.getElementById('s-homicide').textContent = (bt.homicide||0) + (bt.attempted_murder||0);
-  document.getElementById('s-sa').textContent       = (bt.rape||0) + (bt.sexual_assault||0);
-  document.getElementById('s-dv').textContent       = (bt.domestic_violence||0) + (bt.coercive_control||0) + (bt.stalking||0);
-  document.getElementById('s-pf').textContent       = s.public_figures || 0;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('s-total',   total || allCases.length);
+  set('s-homicide',(bt.homicide||0) + (bt.attempted_murder||0));
+  set('s-sa',      (bt.rape||0) + (bt.sexual_assault||0));
+  set('s-dv',      (bt.domestic_violence||0) + (bt.coercive_control||0) + (bt.stalking||0));
+  set('s-pf',      s.public_figures || 0);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
