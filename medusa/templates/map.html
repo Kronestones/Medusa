@@ -1109,9 +1109,9 @@ function getFilteredCases() {
     c.summary && /indigenous|native american|mmiw|tribal|reservation/i.test(c.summary));
   else if (activeTab === 'trans') items = items.filter(c => c.violence_type === 'trans_violence');
   else if (activeTab === 'press') items = items.filter(c =>
-    c.source_name && /nyt|times|guardian|post|reuters|ap |cnn|propublica|reveal|tribune|advocate|19th|rewire|huffpost|buzzfeed|insider|vice/i.test(c.source_name));
+    c.source_name && /New York Times|NYT —|Reuters|CNN —|ProPublica|Associated Press|Washington Post|Guardian|The Advocate|19th News|Rewire|HuffPost|BuzzFeed|Vice|The Tribune|Reveal|The New Republic|Rolling Stone|Time Magazine/i.test(c.source_name));
   else if (activeTab === 'research') items = items.filter(c =>
-    c.source_name && /cdc|who|nih|jama|lancet|nejm|journal|study|report|gao|bureau|institute|university|college|research|survey|acog|rand|pew/i.test(c.source_name));
+    c.source_name && /^(CDC|WHO|NIH|JAMA|Lancet|NEJM|New England Journal|American Journal|Journal of|Obstetrics|Pediatrics|RAND|Pew Research|Bureau of Justice|FBI UCR|GAO|NISVS|Urban Indian Health|Sovereign Bodies|NAF —|ACOG|HHS —|DOL —|Census Bureau|BLS —)/i.test(c.source_name));
   else if (activeTab === 'international') items = items.filter(c =>
     c.state && !['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'].includes(c.state));
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
