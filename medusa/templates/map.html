@@ -1098,7 +1098,7 @@ function renderMarkers() {
 // ── Feed ──────────────────────────────────────────────────────────────────────
 
 function getFilteredCases() {
-  let items = allCases;
+  let items = allCases.filter(c => !/fentanyl|drug trafficking|narcotics|cartel/i.test(c.summary));
 
   // Tab filter
   if (activeTab === 'homicide')  items = items.filter(c => c.violence_type === 'homicide' || c.violence_type === 'attempted_murder');
