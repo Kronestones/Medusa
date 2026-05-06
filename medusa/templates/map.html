@@ -1181,7 +1181,7 @@ async function loadAll() {
     const sJ = await sR.json();
     allCases = cJ.cases || [];
     renderMarkers();
-    renderFeed();
+    try { renderFeed(); } catch(fe) { console.error('renderFeed error:', fe); }
     updateStats(cJ.total, sJ);
     if (cJ.total > 500) {
       fetch('/api/cases?limit=' + cJ.total)
