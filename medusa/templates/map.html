@@ -795,7 +795,7 @@
           </div>
           <div class="legend-row" data-layer="rape" onclick="toggleLayer('rape',this)"><div class="legend-dot"><div style="width:11px;height:11px;background:#8e44ad;transform:rotate(45deg);display:inline-block;"></div></div><span>Rape</span>
           </div>
-          <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)"><div class="legend-dot"><div style="width:11px;height:11px;background:#a569bd;transform:rotate(45deg);display:inline-block;"></div></div><span>Sex. Assault</span>
+          <div class="legend-row" data-layer="sexual_assault" onclick="toggleLayer('sexual_assault',this)"><div class="legend-dot"><div style="width:11px;height:11px;background:#d7bde2;transform:rotate(45deg);display:inline-block;"></div></div><span>Sex. Assault</span>
           </div>
           <div class="legend-row" data-layer="domestic_violence" onclick="toggleLayer('domestic_violence',this)"><div class="legend-dot"><div style="width:12px;height:12px;border-radius:50%;background:#d35400;display:inline-block;"></div></div><span>Dom. Violence</span>
           </div>
@@ -871,7 +871,7 @@ const TYPE_COLOR = {
   homicide:          '#c0392b',
   attempted_murder:  '#e55039',
   rape:              '#8e44ad',
-  sexual_assault:    '#a569bd',
+  sexual_assault:    '#d7bde2',
   domestic_violence: '#d35400',
   assault:           '#e67e22',
   stalking:          '#2471a3',
@@ -1096,7 +1096,7 @@ function renderMarkers() {
 // ── Feed ──────────────────────────────────────────────────────────────────────
 
 function getFilteredCases() {
-  let items = allCases.filter(c => !/fentanyl|drug trafficking|narcotics|cartel/i.test(c.summary));
+  let items = allCases.filter(c => !/fentanyl|drug trafficking|narcotics|cartel/i.test(c.summary) && !/wikipedia.*list of/i.test(c.source_name || '') && (c.summary || '').length > 80);
 
   // Tab filter
   if (activeTab === 'homicide')  items = items.filter(c => c.violence_type === 'homicide' || c.violence_type === 'attempted_murder');
