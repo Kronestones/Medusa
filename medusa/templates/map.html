@@ -1189,7 +1189,6 @@ async function loadAll() {
         .then(d => {
           allCases = d.cases || [];
           renderMarkers();
-          if (activeTab !== 'all') renderFeed();
         }).catch(() => {});
     }
   } catch(e) {
