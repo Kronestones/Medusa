@@ -1193,10 +1193,9 @@ async function loadAll() {
     }
   } catch(e) {
     console.error('loadAll error:', e);
-    // Retry once after 2s in case of cold start
     document.getElementById('feed').innerHTML =
-      '<div style="padding:20px;color:#40916c;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">CONNECTING… retrying…</div>';
-    setTimeout(loadAll, 5000);
+      '<div style="padding:20px;color:#c0392b;font-family:\'Space Mono\',monospace;font-size:9px;text-align:center;">ERROR: ' + e.message + '</div>';
+    setTimeout(loadAll, 8000);
   } finally {
     document.getElementById('loading').classList.add('hidden');
   }
