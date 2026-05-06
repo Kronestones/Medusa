@@ -1111,7 +1111,7 @@ function getFilteredCases() {
   else if (activeTab === 'press') items = items.filter(c =>
     c.source_name && /New York Times|NYT —|Reuters|CNN —|ProPublica|Associated Press|Washington Post|Guardian|The Advocate|19th News|Rewire|HuffPost|BuzzFeed|Vice|The Tribune|Reveal|The New Republic|Rolling Stone|Time Magazine/i.test(c.source_name));
   else if (activeTab === 'research') items = items.filter(c =>
-    c.source_name && /^(CDC|WHO|NIH|JAMA|Lancet|NEJM|New England Journal|American Journal|Journal of|Obstetrics|Pediatrics|RAND|Pew Research|Bureau of Justice|FBI UCR|GAO|NISVS|Urban Indian Health|Sovereign Bodies|NAF —|ACOG|HHS —|DOL —|Census Bureau|BLS —)/i.test(c.source_name));
+    c.source_name && /CDC|WHO|NIH|JAMA|Lancet|NEJM|New England Journal|American Journal|Journal of|Obstetrics & Gynecology|Pediatrics|RAND|Pew Research|Bureau of Justice|FBI UCR|GAO|NISVS|Urban Indian Health|Sovereign Bodies|NAF —|ACOG|HHS —|DOL —|Census Bureau|BLS —|Frontiers in|Environmental Science|Home Security Heroes|Cyber Civil Rights/i.test(c.source_name) && !/Court Records|Wikipedia|court|v\. |plaintiff|defendant/i.test(c.source_name));
   else if (activeTab === 'international') items = items.filter(c =>
     c.state && !['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'].includes(c.state));
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
