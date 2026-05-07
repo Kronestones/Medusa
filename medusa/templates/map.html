@@ -1068,7 +1068,7 @@ function renderMarkers() {
     // Stable jitter seeded from case_id — dots don't jump on re-render.
     // Scale shrinks as zoom increases so dots converge on real location.
     const jSeed  = seededRand(c.case_id || c.summary || "");
-    const jScale = Math.max(0.004, 0.12 / Math.pow(2, map.getZoom() - 4));
+    const jScale = 0.08;
     const jLat   = c.lat + (jSeed[0] - 0.5) * jScale;
     const jLng   = c.lng + (jSeed[1] - 0.5) * jScale * 1.4;
     const m = L.marker([jLat, jLng], { icon: makeIcon(color, vt) });
