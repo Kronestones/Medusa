@@ -262,6 +262,7 @@
     }
 
     #feed { min-width: 0; width: 100%; box-sizing: border-box; }
+    #feed { min-width: 0; width: 100%; box-sizing: border-box; }
     #feed::-webkit-scrollbar { width: 3px; }
     #feed::-webkit-scrollbar-track { background: transparent; }
     #feed::-webkit-scrollbar-thumb { background: var(--border); }
@@ -1244,7 +1245,7 @@ function renderMarkers() {
 // ── Feed ──────────────────────────────────────────────────────────────────────
 
 function getFilteredCases() {
-  let items = allCases.filter(c => !/fentanyl|drug trafficking|narcotics|cartel/i.test(c.summary) && !/wikipedia.*list of/i.test(c.source_name || '') && (c.summary || '').length > 80);
+  let items = allCases.filter(c => !/fentanyl|drug trafficking|narcotics|cartel|gun trafficking|firearm trafficking|weapons trafficking/i.test(c.summary) && !/wikipedia.*list of/i.test(c.source_name || '') && (c.summary || '').length > 80);
 
   // Tab filter
   if (activeTab === 'homicide')  items = items.filter(c => c.violence_type === 'homicide' || c.violence_type === 'attempted_murder');
