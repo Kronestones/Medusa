@@ -1260,7 +1260,8 @@ function getFilteredCases() {
   else if (activeTab === 'research') items = items.filter(c =>
     c.source_name && /CDC|WHO|NIH|JAMA|Lancet|NEJM|New England Journal|American Journal|Journal of|Obstetrics & Gynecology|Pediatrics|RAND|Pew Research|Bureau of Justice|FBI UCR|GAO|NISVS|Urban Indian Health|Sovereign Bodies|NAF —|ACOG|HHS —|DOL —|Census Bureau|BLS —|Frontiers in|Environmental Science|Home Security Heroes|Cyber Civil Rights/i.test(c.source_name) && !/Court Records|Wikipedia|court|v\. |plaintiff|defendant/i.test(c.source_name));
   else if (activeTab === 'international') items = items.filter(c =>
-    c.state && !['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'].includes(c.state));
+    /global|worldwide|international|WHO|comfort women|montreal massacre|highway of tears|sophie lancaster|united nations|uk|england|canada|mexico|worldwide|38%.*women worldwide|femicide.*global|worldwide.*murder/i.test(c.summary || '') ||
+    /WHO —|UN Women|Doctors Without Borders|Sophie Lancaster|Montreal Massacre|Canadian|British|international/i.test(c.source_name || ''));
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
   // Search filter
@@ -1405,7 +1406,7 @@ function switchTab(tab, el) {
   el.classList.add('active');
   if (tab === 'press')         { activeTab = 'press'; renderFeed(); }
   else if (tab === 'research') { activeTab = 'research'; renderFeed(); }
-  else if (tab === 'international') { loadArticleFeed('/api/international', 'Global'); }
+  else if (tab === 'international') { activeTab = 'international'; renderFeed(); }
   else                         { renderFeed(); }
 }
 
