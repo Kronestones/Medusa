@@ -292,6 +292,30 @@ def normalize_record(raw: dict) -> dict | None:
     source_url  = (raw.get("source_url")  or "").strip()
     source_name = (raw.get("source_name") or "").strip()
 
+    # ── Relevance check — reject non-violence-against-women records ──────────
+    RELEVANT = [
+        'woman','women','girl','female','mother','daughter','wife','sister',
+        'child','minor','infant','baby','toddler','juvenile',
+        'rape','raped','sexual assault','sexually assaulted','molest',
+        'domestic violence','intimate partner','abuse','abused',
+        'trafficking','trafficked','stalking','stalked','harassment',
+        'homicide','murder','killed','femicide','beaten','strangled',
+        'assault','attacked','victim','survivor','sex offend',
+        'child abuse','child pornography','exploitation',
+    ]
+    IRRELEVANT = [
+        'burglary','firearm dealing','firearms dealing','drug trafficking',
+        'narcotics','money laundering','tax fraud','bank fraud',
+        'embezzlement','counterfeiting','immigration violation',
+        'lanternfly','gubernatorial','chick-fil-a','gun trafficking',
+        'weapons trafficking','cartel','fentanyl',
+    ]
+    summary_lower = summary.lower()
+    if any(bad in summary_lower for bad in IRRELEVANT):
+        return None
+    if summary and not any(good in summary_lower for good in RELEVANT):
+        return None
+
     # ── Case ID ───────────────────────────────────────────────────────────────
     case_id = make_case_id(city, state, vtype, date_incident,
                            source_url=source_url, summary=summary)
