@@ -1012,11 +1012,15 @@
 
       <!-- Disclosure -->
       <div id="disclosure">
-        <a href="https://buymeacoffee.com/sentinel.commons" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 20px;background:#40916c;color:#fff;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-decoration:none;text-transform:uppercase;">☕ Keep Medusa Free</a>
-        <br><br>
-        <span style="font-size:9px;color:var(--muted);">Donations above operating costs go to The Commons redistribution fund.</span>
-        <br><br>
-        <span style="font-size:9px;color:var(--muted);">Founded by Krone, Architect · 2026</span>
+        Sources: police reports · court records · DOJ/FBI releases ·
+        congressional records · civil suits · investigative journalism ·
+        Title IX findings · public news archives.<br>
+        No victim names stored. Sources always cited.<br>
+        Founded by Krone, Architect · 2026<br><br>
+        <a href="https://buymeacoffee.com/sentinel.commons" target="_blank" rel="noopener">
+          ☕ Keep Medusa free
+        </a><br>
+        <span style="font-size:9px;color:var(--muted)"><a href="https://buymeacoffee.com/sentinel.commons" target="_blank" rel="noopener noreferrer" style="color:#40916c;">Keep Medusa free</a> · All sources are public record · Donations above operating costs go to The Commons.</span>
       </div>
 
     </div>
@@ -1280,8 +1284,8 @@ function getFilteredCases() {
   else if (activeTab === 'research') items = items.filter(c =>
     c.source_name && /CDC|WHO|NIH|JAMA|Lancet|NEJM|New England Journal|American Journal|Journal of|Obstetrics & Gynecology|Pediatrics|RAND|Pew Research|Bureau of Justice|FBI UCR|GAO|NISVS|Urban Indian Health|Sovereign Bodies|NAF —|ACOG|HHS —|DOL —|Census Bureau|BLS —|Frontiers in|Environmental Science|Home Security Heroes|Cyber Civil Rights/i.test(c.source_name) && !/Court Records|Wikipedia|court|v\. |plaintiff|defendant/i.test(c.source_name));
   else if (activeTab === 'international') items = items.filter(c =>
-    /WHO —|UN Women|Doctors Without Borders|Sophie Lancaster Foundation|Montreal Massacre|Canadian Encyclopedia|Amnesty International|Human Rights Watch|BBC —|Guardian —|Reuters —|international tribunal/i.test(c.source_name || '') ||
-    /montreal massacre|école polytechnique|highway of tears|comfort women|sophie lancaster|femicide.*mexico|juarez|ciudad juarez|missing.*canada|nigeria.*girls|boko haram.*women|uk femicide|australia.*femicide|india.*rape|delhi gang rape|savita halappanavar/i.test((c.summary || '').toLowerCase()));
+    /global|worldwide|international|WHO|comfort women|montreal massacre|highway of tears|sophie lancaster|united nations|uk|england|canada|mexico|worldwide|38%.*women worldwide|femicide.*global|worldwide.*murder/i.test(c.summary || '') ||
+    /WHO —|UN Women|Doctors Without Borders|Sophie Lancaster|Montreal Massacre|Canadian|British|international/i.test(c.source_name || ''));
   else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
   // Search filter
