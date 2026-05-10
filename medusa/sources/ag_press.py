@@ -7,16 +7,13 @@ from medusa.fetch import safe_rss
 from medusa.record import STATE_LARGEST_CITY
 
 AG_FEEDS = [
-    ("Florida AG",    "https://myfloridalegal.com/rss.xml",    "FL"),
-    ("Arizona AG",    "https://www.azag.gov/rss.xml",          "AZ"),
-    ("Georgia AG",    "https://law.georgia.gov/rss.xml",       "GA"),
-    ("California AG", "https://oag.ca.gov/rss.xml",            "CA"),
-    ("Washington AG", "https://www.atg.wa.gov/rss.xml",        "WA"),
-    ("Colorado AG",   "https://coag.gov/press-releases/feed/", "CO"),
-    ("Texas AG",      "https://www.texasattorneygeneral.gov/news/rss.xml", "TX"),
-    ("New York AG",   "https://ag.ny.gov/press-releases/rss.xml",         "NY"),
-    ("Michigan AG",   "https://www.michigan.gov/ag/newsroom/rss",         "MI"),
-    ("Ohio AG",       "https://www.ohioattorneygeneral.gov/News/rss.aspx","OH"),
+    ("Florida AG",        "https://myfloridalegal.com/rss.xml",    "FL"),
+    ("Arizona AG",        "https://www.azag.gov/rss.xml",          "AZ"),
+    ("Georgia AG",        "https://law.georgia.gov/rss.xml",       "GA"),
+    ("California AG",     "https://oag.ca.gov/rss.xml",            "CA"),
+    ("Colorado AG",       "https://coag.gov/press-releases/feed/", "CO"),
+    ("North Carolina AG", "https://ncdoj.gov/feed/",               "NC"),
+    ("Missouri AG",       "https://ago.mo.gov/feed/",              "MO"),
 ]
 
 INCLUDE_KEYWORDS = [

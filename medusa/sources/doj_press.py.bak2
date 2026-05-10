@@ -16,7 +16,8 @@ import re
 from medusa.fetch import safe_rss
 
 DOJ_FEEDS = [
-    "https://www.justice.gov/news/rss",              # confirmed live
+    "https://www.justice.gov/rss/news.xml",
+    "https://www.justice.gov/usao/rss/press-releases.xml",
 ]
 
 INCLUDE_KEYWORDS = [

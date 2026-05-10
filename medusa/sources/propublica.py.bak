@@ -21,8 +21,8 @@ from medusa.record import normalize_violence_type, normalize_status, STATE_LARGE
 
 # ── DOJ feeds that actually work ──────────────────────────────────────────────
 DOJ_FEEDS = [
-    "https://www.propublica.org/feeds/propublica/main",  # confirmed live
-    "https://feeds.propublica.org/propublica/main",      # confirmed live
+    "https://www.justice.gov/rss/press-releases.xml",
+    "https://www.justice.gov/ovw/rss/press-releases",    # OVW-specific
 ]
 
 # Fallback: DOJ JSON API (used by their own site)

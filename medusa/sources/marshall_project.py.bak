@@ -43,7 +43,11 @@ INCLUDE_KEYWORDS = [
 EXCLUDE_KEYWORDS = [
     "ukraine", "israel", "gaza", "russia", "china", "iran",
     "robbery", "drug trafficking", "cartel", "money laundering",
-    "bank fraud", "tax", "corruption",   # avoid non-violence stories
+    "bank fraud", "tax", "corruption",
+    "military aircraft", "air force base", "national security",
+    "espionage", "photographing", "classified information",
+    "spy", "cybercrime", "hacking", "computer fraud",
+    "terrorism", "bomb", "explosive",
 ]
 
 _STATE_ABBR = {
@@ -172,6 +176,13 @@ def _parse_rss_entry(entry, source_name: str) -> dict | None:
     if not any(kw in text for kw in INCLUDE_KEYWORDS):
         return None
     if any(kw in text for kw in EXCLUDE_KEYWORDS):
+        return None
+
+    VICTIM_ANCHORS = [
+        "woman", "women", "girl", "female", "wife", "girlfriend",
+        "daughter", "mother", "minor", "child", "victim", "survivor",
+    ]
+    if not any(w in text for w in VICTIM_ANCHORS):
         return None
 
     vtype  = _infer_type(text)
