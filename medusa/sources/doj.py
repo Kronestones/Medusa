@@ -27,6 +27,10 @@ EXCLUDE_KEYWORDS = [
     "fraud", "embezzlement", "tax", "money laundering", "bribery",
     "firearms dealer", "export control", "sanction", "antitrust",
     "environmental", "immigration fraud", "visa fraud",
+    "alien smuggling", "smuggling organization", "gun trafficking",
+    "weapons trafficking", "burglary", "robbery", "counterfeiting",
+    "warden respondent", "petitioner appellant", "habeas corpus",
+    "ukraine", "russia", "china", "iran", "afghanistan",
 ]
 
 _DOJ_CITY_PATTERN = re.compile(

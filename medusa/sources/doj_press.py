@@ -23,18 +23,26 @@ DOJ_FEEDS = [
 INCLUDE_KEYWORDS = [
     "domestic violence", "sexual assault", "rape", "stalking",
     "sex trafficking", "human trafficking", "femicide",
-    "intimate partner", "trafficking", "harassment",
+    "intimate partner", "trafficking in persons", "harassment",
     "attempted murder", "strangled", "child abuse", "molestation",
-    "sexual abuse", "sexual exploitation", "coercive",
-    "violence against women", "assault", "murder", "homicide",
-    "beaten", "battered", "restraining order",
+    "sexual abuse", "sexual exploitation", "coercive control",
+    "violence against women", "battered", "restraining order",
+    "killed his wife", "killed her", "murdered his wife",
+    "murdered her", "assaulted his wife", "assaulted her",
+    "victim was a woman", "victim was a girl", "victim was female",
+    "child pornography", "child sexual", "minor victim",
+    "sex offender", "statutory rape", "indecent assault",
 ]
 
 EXCLUDE_KEYWORDS = [
     "drug trafficking", "drug conspiracy", "money laundering",
     "wire fraud", "tax fraud", "copyright", "antitrust",
-    "securities fraud", "immigration fraud", "cyber",
+    "securities fraud", "immigration fraud", "alien smuggling",
+    "smuggling organization", "gun trafficking", "firearms trafficking",
+    "weapons trafficking", "cartel", "fentanyl", "narcotics",
     "ukraine", "russia", "china", "iran", "afghanistan",
+    "burglary", "robbery", "counterfeiting", "embezzlement",
+    "warden respondent", "petitioner appellant", "habeas corpus",
 ]
 
 _STATE_ABBR = {
