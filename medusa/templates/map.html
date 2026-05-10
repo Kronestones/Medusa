@@ -1336,7 +1336,7 @@ function renderFeed() {
         <div class="feed-date">${fmtDate(c.date_incident)}</div>
       </div>
       <div class="feed-id">${c.case_id}</div>
-      <div class="feed-summary">${c.summary || ''}</div>
+      <div class="feed-summary">${(c.summary || '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
       <div class="feed-loc">📍 ${c.city}, ${c.state}</div>
       <div class="feed-row">
         <span class="status-badge ${sc}">${c.status || 'unknown'}</span>
