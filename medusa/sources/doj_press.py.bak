@@ -43,10 +43,6 @@ EXCLUDE_KEYWORDS = [
     "ukraine", "russia", "china", "iran", "afghanistan",
     "burglary", "robbery", "counterfeiting", "embezzlement",
     "warden respondent", "petitioner appellant", "habeas corpus",
-    "military aircraft", "air force base", "national security",
-    "espionage", "photographing", "classified information",
-    "spy", "cybercrime", "hacking", "computer fraud",
-    "bank robbery", "armed robbery", "terrorism", "bomb", "explosive",
 ]
 
 _STATE_ABBR = {
@@ -130,13 +126,6 @@ def _parse_entry(entry) -> dict | None:
     if not any(kw in text for kw in INCLUDE_KEYWORDS):
         return None
     if any(kw in text for kw in EXCLUDE_KEYWORDS):
-        return None
-
-    VICTIM_ANCHORS = [
-        "woman", "women", "girl", "female", "wife", "girlfriend",
-        "daughter", "mother", "minor", "child", "victim", "survivor",
-    ]
-    if not any(w in text for w in VICTIM_ANCHORS):
         return None
 
     full_text   = f"{title} {summary}"

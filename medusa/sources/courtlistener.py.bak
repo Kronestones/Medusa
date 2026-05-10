@@ -62,13 +62,6 @@ _REJECT_CASE_PATTERNS = [
     re.compile(r"\bdetainee\b",                      re.I),
     re.compile(r"\bprisoner\b",                      re.I),
     re.compile(r"\binmate\b",                        re.I),
-    re.compile(r"\bespionage\b",                     re.I),
-    re.compile(r"\bnational security\b",             re.I),
-    re.compile(r"\bcybercrime\b",                    re.I),
-    re.compile(r"\bwiretap\b",                       re.I),
-    re.compile(r"\bbank fraud\b",                    re.I),
-    re.compile(r"\bterrorism\b",                     re.I),
-    re.compile(r"\bexplosive\b",                     re.I),
 ]
 
 # The correct pattern for federal criminal cases: "United States v. [Defendant]"

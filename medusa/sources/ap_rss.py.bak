@@ -110,13 +110,6 @@ def _parse_entry(entry) -> dict | None:
     if any(kw in text for kw in EXCLUDE_KEYWORDS):
         return None
 
-    VICTIM_ANCHORS = [
-        "woman", "women", "girl", "female", "wife", "girlfriend",
-        "daughter", "mother", "minor", "child", "victim", "survivor",
-    ]
-    if not any(w in text for w in VICTIM_ANCHORS):
-        return None
-
     vtype      = _infer_type(text)
     full_text  = f"{title} {summary}"
     city, state = _extract_location(full_text)
