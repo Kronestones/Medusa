@@ -5,9 +5,11 @@ import re
 from medusa.fetch import safe_rss
 from medusa.record import district_to_city, STATE_LARGEST_CITY
 
-DOJ_FEEDS = [
-    "https://www.justice.gov/news/rss",              # DOJ main — confirmed live
-    "https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml",  # FBI — confirmed live
+DOJ_FEEDS = [  # USAO removed — was hanging scans
+    "https://www.justice.gov/rss/news.xml",
+    "https://www.justice.gov/ovw/rss/news.xml",
+    "https://www.justice.gov/crt/rss/news.xml",
+    "https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml",
 ]
 
 INCLUDE_KEYWORDS = [
@@ -91,14 +93,6 @@ def _parse_entry(entry) -> dict | None:
         return None
     if _is_excluded(text):
         return None
-
-    VICTIM_ANCHORS = [
-        "woman", "women", "girl", "female", "wife", "girlfriend",
-        "daughter", "mother", "minor", "child", "victim", "survivor",
-    ]
-    if not any(w in text for w in VICTIM_ANCHORS):
-        return None
-
     city, state = _extract_doj_location(title, summary)
     if not state:
         return None
