@@ -54,13 +54,6 @@ def fetch() -> list[dict]:
             if not any(inc in text for inc in INCLUDE_KEYWORDS):
                 continue
 
-            VICTIM_ANCHORS = [
-                "woman", "women", "girl", "female", "wife", "girlfriend",
-                "daughter", "mother", "minor", "child", "victim", "survivor",
-            ]
-            if not any(w in text for w in VICTIM_ANCHORS):
-                continue
-
             vtype = _infer_type(text)
             status = "convicted" if any(x in text for x in [
                 "convicted", "sentenced", "pleaded guilty", "guilty plea"
