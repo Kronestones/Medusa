@@ -693,26 +693,6 @@
     }
     #sidebar-toggle:hover { background: var(--surface2); }
 
-    #counter-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      line-height: 1.1;
-    }
-    #counter-label {
-      font-size: 9px;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-top: 1px;
-    }
-    #counter-cdc {
-      font-size: 8px;
-      color: #c0392b;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-top: 2px;
-    }
     #header-right {
       display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
@@ -780,11 +760,7 @@
     </div>
 
     <div id="header-right">
-      <div id="counter-block">
-        <div class="stat-num" id="s-total">—</div>
-        <div id="counter-label">documented cases and counting</div>
-        <div id="counter-cdc">~24M more will never be reported — CDC</div>
-      </div>
+      <div class="stat-num" id="s-total">—</div>
       <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
   </div>
