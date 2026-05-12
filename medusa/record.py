@@ -22,7 +22,7 @@ from datetime import datetime
 VALID_VIOLENCE_TYPES = {
     "homicide", "assault", "sexual_assault", "stalking", "trafficking",
     "domestic_violence", "rape", "harassment", "attempted_murder",
-    "child_abuse", "coercive_control",
+    "child_abuse", "coercive_control", "trans_violence",
 }
 
 VALID_STATUSES = {
