@@ -1004,13 +1004,7 @@
         <div class="tab active"  onclick="switchTab('all',this)">All</div>
         <div class="tab"         onclick="switchTab('homicide',this)">Homicide</div>
         <div class="tab"         onclick="switchTab('sexual',this)">Sexual</div>
-        <div class="tab"         onclick="switchTab('rape',this)">Rape</div>
-        <div class="tab"         onclick="switchTab('trafficking',this)">Trafficking</div>
-        <div class="tab"         onclick="switchTab('child',this)">Child Abuse</div>
         <div class="tab"         onclick="switchTab('dv',this)">DV</div>
-        <div class="tab"         onclick="switchTab('stalking',this)">Stalking</div>
-        <div class="tab"         onclick="switchTab('harassment',this)">Harassment</div>
-        <div class="tab"         onclick="switchTab('coercive',this)">Coercive Ctrl</div>
         <div class="tab"         onclick="switchTab('officials',this)">Officials</div>
         <div class="tab"         onclick="switchTab('mmiw',this)">🪶 MMIW</div>
         <div class="tab"         onclick="switchTab('trans',this)">Trans</div>
@@ -1298,13 +1292,7 @@ function getFilteredCases() {
   else if (activeTab === 'international') items = items.filter(c =>
     /WHO —|UN Women|Doctors Without Borders|Sophie Lancaster Foundation|Montreal Massacre|Canadian Encyclopedia|Amnesty International|Human Rights Watch|BBC —|Guardian —|Reuters —|international tribunal/i.test(c.source_name || '') ||
     /montreal massacre|école polytechnique|highway of tears|comfort women|sophie lancaster|femicide.*mexico|juarez|ciudad juarez|missing.*canada|nigeria.*girls|boko haram.*women|uk femicide|australia.*femicide|india.*rape|delhi gang rape|savita halappanavar/i.test((c.summary || '').toLowerCase()));
-  else if (activeTab === 'rape')       items = items.filter(c => c.violence_type === 'rape');
-  else if (activeTab === 'trafficking') items = items.filter(c => c.violence_type === 'trafficking');
-  else if (activeTab === 'child')      items = items.filter(c => c.violence_type === 'child_abuse');
-  else if (activeTab === 'stalking')   items = items.filter(c => c.violence_type === 'stalking');
-  else if (activeTab === 'harassment') items = items.filter(c => c.violence_type === 'harassment');
-  else if (activeTab === 'coercive')   items = items.filter(c => c.violence_type === 'coercive_control');
-  else if (activeTab === 'officials')  items = items.filter(c => c.is_public_figure);
+  else if (activeTab === 'officials') items = items.filter(c => c.is_public_figure);
 
   // Search filter
   if (searchText) {
