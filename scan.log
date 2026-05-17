@@ -963,3 +963,250 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
     raise RuntimeError("DATABASE_URL not set")
 RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting scan...
+[fetch] FAIL https://www.justice.gov/news/rss: HTTPSConnectionPool(host='www.justice.gov', port=443): Max retries exceeded with url: /news/rss (Caused by NameResolutionError("HTTPSConnection(host='www.justice.gov', port=443): Failed to resolve 'www.justice.gov' ([Errno 7] No address associated with hostname)"))
+[DOJ Press] 0 records fetched.
+[Medusa] DOJ Press (94 districts): 0 raw records
+[fetch] FAIL https://www.justice.gov/news/rss: HTTPSConnectionPool(host='www.justice.gov', port=443): Max retries exceeded with url: /news/rss (Caused by NameResolutionError("HTTPSConnection(host='www.justice.gov', port=443): Failed to resolve 'www.justice.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml: HTTPSConnectionPool(host='www.fbi.gov', port=443): Max retries exceeded with url: /feeds/fbi-in-the-news/rss.xml (Caused by NameResolutionError("HTTPSConnection(host='www.fbi.gov', port=443): Failed to resolve 'www.fbi.gov' ([Errno 7] No address associated with hostname)"))
+[DOJ] 0 records fetched.
+[Medusa] DOJ / OVW / FBI: 0 raw records
+[Wiki Homicides] CA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+California&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] IL error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Illinois&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MI error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Michigan&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Massachusetts&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] WI error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Wisconsin&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] OR error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Oregon&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NV error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Nevada&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] TX error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Texas&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] FL error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Florida&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NY error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+New+York&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] OH error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Ohio&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] GA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Georgia&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] PA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Pennsylvania&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NC error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+North+Carolina&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] AZ error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Arizona&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] WA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Washington&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] TN error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Tennessee&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] IN error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Indiana&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MO error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Missouri&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MD error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Maryland&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] CO error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Colorado&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MN error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Minnesota&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] SC error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+South+Carolina&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] AL error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Alabama&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] LA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Louisiana&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] KY error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Kentucky&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] OK error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Oklahoma&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] CT error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Connecticut&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] UT error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Utah&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] IA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Iowa&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] AR error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Arkansas&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MS error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Mississippi&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] KS error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Kansas&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NM error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+New+Mexico&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NE error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Nebraska&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] WV error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+West+Virginia&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] ID error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Idaho&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] HI error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Hawaii&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NH error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+New+Hampshire&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] ME error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Maine&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] MT error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Montana&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] RI error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Rhode+Island&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] DE error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Delaware&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] SD error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+South+Dakota&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] ND error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+North+Dakota&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] AK error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Alaska&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] VT error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Vermont&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] WY error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Wyoming&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] VA error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+Virginia&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] NJ error: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /w/api.php?action=parse&page=List+of+homicides+in+New+Jersey&prop=wikitext&format=json (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to resolve 'en.wikipedia.org' ([Errno 7] No address associated with hostname)"))
+[Wiki Homicides] 0 total records fetched.
+[Medusa] Wiki Homicides: 0 raw records
+[fetch] FAIL https://rss.nytimes.com/services/xml/rss/nyt/US.xml: HTTPSConnectionPool(host='rss.nytimes.com', port=443): Max retries exceeded with url: /services/xml/rss/nyt/US.xml (Caused by NameResolutionError("HTTPSConnection(host='rss.nytimes.com', port=443): Failed to resolve 'rss.nytimes.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://rss.nytimes.com/services/xml/rss/nyt/Crime.xml: HTTPSConnectionPool(host='rss.nytimes.com', port=443): Max retries exceeded with url: /services/xml/rss/nyt/Crime.xml (Caused by NameResolutionError("HTTPSConnection(host='rss.nytimes.com', port=443): Failed to resolve 'rss.nytimes.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.npr.org/1001/rss.xml: HTTPSConnectionPool(host='feeds.npr.org', port=443): Max retries exceeded with url: /1001/rss.xml (Caused by NameResolutionError("HTTPSConnection(host='feeds.npr.org', port=443): Failed to resolve 'feeds.npr.org' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.npr.org/1057/rss.xml: HTTPSConnectionPool(host='feeds.npr.org', port=443): Max retries exceeded with url: /1057/rss.xml (Caused by NameResolutionError("HTTPSConnection(host='feeds.npr.org', port=443): Failed to resolve 'feeds.npr.org' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.theguardian.com/us-news/rss: HTTPSConnectionPool(host='www.theguardian.com', port=443): Max retries exceeded with url: /us-news/rss (Caused by NameResolutionError("HTTPSConnection(host='www.theguardian.com', port=443): Failed to resolve 'www.theguardian.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.theguardian.com/society/domestic-violence/rss: HTTPSConnectionPool(host='www.theguardian.com', port=443): Max retries exceeded with url: /society/domestic-violence/rss (Caused by NameResolutionError("HTTPSConnection(host='www.theguardian.com', port=443): Failed to resolve 'www.theguardian.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.propublica.org/feeds/propublica/main: HTTPSConnectionPool(host='www.propublica.org', port=443): Max retries exceeded with url: /feeds/propublica/main (Caused by NameResolutionError("HTTPSConnection(host='www.propublica.org', port=443): Failed to resolve 'www.propublica.org' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.themarshallproject.org/marshall-project-stories: HTTPSConnectionPool(host='feeds.themarshallproject.org', port=443): Max retries exceeded with url: /marshall-project-stories (Caused by NameResolutionError("HTTPSConnection(host='feeds.themarshallproject.org', port=443): Failed to resolve 'feeds.themarshallproject.org' ([Errno 7] No address associated with hostname)"))
+[Wire RSS] 0 records fetched.
+[Medusa] AP News RSS: 0 raw records
+[fetch] FAIL https://myfloridalegal.com/rss.xml: HTTPSConnectionPool(host='myfloridalegal.com', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError("HTTPSConnection(host='myfloridalegal.com', port=443): Failed to resolve 'myfloridalegal.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.azag.gov/rss.xml: HTTPSConnectionPool(host='www.azag.gov', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError("HTTPSConnection(host='www.azag.gov', port=443): Failed to resolve 'www.azag.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://law.georgia.gov/rss.xml: HTTPSConnectionPool(host='law.georgia.gov', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError("HTTPSConnection(host='law.georgia.gov', port=443): Failed to resolve 'law.georgia.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://oag.ca.gov/rss.xml: HTTPSConnectionPool(host='oag.ca.gov', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError("HTTPSConnection(host='oag.ca.gov', port=443): Failed to resolve 'oag.ca.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://coag.gov/press-releases/feed/: HTTPSConnectionPool(host='coag.gov', port=443): Max retries exceeded with url: /press-releases/feed/ (Caused by NameResolutionError("HTTPSConnection(host='coag.gov', port=443): Failed to resolve 'coag.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://ncdoj.gov/feed/: HTTPSConnectionPool(host='ncdoj.gov', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError("HTTPSConnection(host='ncdoj.gov', port=443): Failed to resolve 'ncdoj.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://ago.mo.gov/feed/: HTTPSConnectionPool(host='ago.mo.gov', port=443): Max retries exceeded with url: /feed/ (Caused by NameResolutionError("HTTPSConnection(host='ago.mo.gov', port=443): Failed to resolve 'ago.mo.gov' ([Errno 7] No address associated with hostname)"))
+[AG Press] 0 total records fetched.
+[Medusa] AG Press: 0 raw records
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=domestic+violence+assault+intimate+partner&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=sexual+assault+rape+conviction+sentence&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=stalking+harassment+restraining+order+violation&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=femicide+murder+intimate+partner+women&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=sex+trafficking+women+forced+prostitution&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=attempted+murder+girlfriend+wife+assault&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=sexual+abuse+minor+child+molestation&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.courtlistener.com/api/rest/v4/dockets/: HTTPSConnectionPool(host='www.courtlistener.com', port=443): Max retries exceeded with url: /api/rest/v4/dockets/?q=rape+conviction+sentence+women&court_type=fd&order_by=date_filed&page_size=20 (Caused by NameResolutionError("HTTPSConnection(host='www.courtlistener.com', port=443): Failed to resolve 'www.courtlistener.com' ([Errno 7] No address associated with hostname)"))
+[CourtListener] 4 known documented-perpetrator cases loaded.
+[CourtListener] 4 records fetched.
+[Medusa] CourtListener: 4 raw records
+[fetch] FAIL https://www.themarshallproject.org/feeds/news.rss: HTTPSConnectionPool(host='www.themarshallproject.org', port=443): Max retries exceeded with url: /feeds/news.rss (Caused by NameResolutionError("HTTPSConnection(host='www.themarshallproject.org', port=443): Failed to resolve 'www.themarshallproject.org' ([Errno 7] No address associated with hostname)"))
+[Marshall Project] 0 records.
+[fetch] FAIL https://www.justice.gov/api/node/press_release: HTTPSConnectionPool(host='www.justice.gov', port=443): Max retries exceeded with url: /api/node/press_release?sort=-field_pr_date&page%5Blimit%5D=50&filter%5Bfield_pr_component.name%5D=Criminal+Division (Caused by NameResolutionError("HTTPSConnection(host='www.justice.gov', port=443): Failed to resolve 'www.justice.gov' ([Errno 7] No address associated with hostname)"))
+[DOJ CEOS] 0 records.
+[Medusa] Marshall Project: 0 raw records
+[fetch] FAIL https://www.propublica.org/feeds/propublica/main: HTTPSConnectionPool(host='www.propublica.org', port=443): Max retries exceeded with url: /feeds/propublica/main (Caused by NameResolutionError("HTTPSConnection(host='www.propublica.org', port=443): Failed to resolve 'www.propublica.org' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://feeds.propublica.org/propublica/main: HTTPSConnectionPool(host='feeds.propublica.org', port=443): Max retries exceeded with url: /propublica/main (Caused by NameResolutionError("HTTPSConnection(host='feeds.propublica.org', port=443): Failed to resolve 'feeds.propublica.org' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://www.justice.gov/api/node/press_release: HTTPSConnectionPool(host='www.justice.gov', port=443): Max retries exceeded with url: /api/node/press_release?sort=-field_pr_date&page%5Blimit%5D=50&filter%5Bfield_pr_component.name%5D=Office+on+Violence+Against+Women (Caused by NameResolutionError("HTTPSConnection(host='www.justice.gov', port=443): Failed to resolve 'www.justice.gov' ([Errno 7] No address associated with hostname)"))
+[ProPublica/DOJ] 0 records fetched.
+[Medusa] ProPublica / DOJ OVW: 0 raw records
+[fetch] FAIL https://ucr.fbi.gov/api/table/10/2022: HTTPSConnectionPool(host='ucr.fbi.gov', port=443): Max retries exceeded with url: /api/table/10/2022?api_key=iiHnOKfno2Mgkt5AynpvPpUQTEyxE77jo1RU8PIv&offense=rape (Caused by NameResolutionError("HTTPSConnection(host='ucr.fbi.gov', port=443): Failed to resolve 'ucr.fbi.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/states/offense/MA/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/states/offense/OK/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/states/offense/OH/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/states/offense/ME/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/states/offense/MD/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-of: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/sex-offenses/sex-offenses/count/national/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://ucr.fbi.gov/api/table/10/2022: HTTPSConnectionPool(host='ucr.fbi.gov', port=443): Max retries exceeded with url: /api/table/10/2022?api_key=iiHnOKfno2Mgkt5AynpvPpUQTEyxE77jo1RU8PIv&offense=aggravated-assault (Caused by NameResolutionError("HTTPSConnection(host='ucr.fbi.gov', port=443): Failed to resolve 'ucr.fbi.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/states/offense/MA/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/states/offense/OK/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/states/offense/OH/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/states/offense/ME/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/states/offense/MD/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/aggravated-assault/: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/aggravated-assault/aggravated-assault/count/national/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://ucr.fbi.gov/api/table/10/2022: HTTPSConnectionPool(host='ucr.fbi.gov', port=443): Max retries exceeded with url: /api/table/10/2022?api_key=iiHnOKfno2Mgkt5AynpvPpUQTEyxE77jo1RU8PIv&offense=homicide (Caused by NameResolutionError("HTTPSConnection(host='ucr.fbi.gov', port=443): Failed to resolve 'ucr.fbi.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/states/offense/MA/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/states/offense/OK/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/states/offense/OH/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/states/offense/ME/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/states/offense/MD/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/homicide/homicide/c: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/homicide/homicide/count/national/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://ucr.fbi.gov/api/table/10/2022: HTTPSConnectionPool(host='ucr.fbi.gov', port=443): Max retries exceeded with url: /api/table/10/2022?api_key=iiHnOKfno2Mgkt5AynpvPpUQTEyxE77jo1RU8PIv&offense=human-trafficking (Caused by NameResolutionError("HTTPSConnection(host='ucr.fbi.gov', port=443): Failed to resolve 'ucr.fbi.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/states/offense/MA/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/states/offense/OK/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/states/offense/OH/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/states/offense/ME/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/states/offense/MD/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[fetch] FAIL https://cde.ucr.cjis.gov/LATEST/webapp/public/api/data/nibrs/human-trafficking/h: HTTPSConnectionPool(host='cde.ucr.cjis.gov', port=443): Max retries exceeded with url: /LATEST/webapp/public/api/data/nibrs/human-trafficking/human-trafficking/count/national/2022/2022 (Caused by NameResolutionError("HTTPSConnection(host='cde.ucr.cjis.gov', port=443): Failed to resolve 'cde.ucr.cjis.gov' ([Errno 7] No address associated with hostname)"))
+[FBI CDE] 0 aggregate state records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Medusa] Total raw records: 4
+[Medusa] After normalization: 3 valid records
+[Medusa] After dedup: 3 unique records
+[Medusa] Geocoded 3 unique locations for 3 records.
+[Medusa] Scan complete. 3 cases ready.
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting scan...
+[DOJ Press] 1 records fetched.
+[Medusa] DOJ Press (94 districts): 1 raw records
+[DOJ] 14 records fetched.
+[Medusa] DOJ / OVW / FBI: 14 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] TX: 0 relevant cases
+[Wiki Homicides] FL: 0 relevant cases
+[Wiki Homicides] NY: 0 relevant cases
+[Wiki Homicides] OH: 0 relevant cases
+[Wiki Homicides] GA: 0 relevant cases
+[Wiki Homicides] PA: 0 relevant cases
+[Wiki Homicides] NC: 0 relevant cases
+[Wiki Homicides] AZ: 0 relevant cases
+[Wiki Homicides] WA: 0 relevant cases
+[Wiki Homicides] TN: 0 relevant cases
+[Wiki Homicides] IN: 0 relevant cases
+[Wiki Homicides] MO: 0 relevant cases
+[Wiki Homicides] MD: 0 relevant cases
+[Wiki Homicides] CO: 0 relevant cases
+[Wiki Homicides] MN: 0 relevant cases
+[Wiki Homicides] SC: 0 relevant cases
+[Wiki Homicides] AL: 0 relevant cases
+[Wiki Homicides] LA: 0 relevant cases
+[Wiki Homicides] KY: 0 relevant cases
+[Wiki Homicides] OK: 0 relevant cases
+[Wiki Homicides] CT: 0 relevant cases
+[Wiki Homicides] UT: 0 relevant cases
+[Wiki Homicides] IA: 0 relevant cases
+[Wiki Homicides] AR: 0 relevant cases
+[Wiki Homicides] MS: 0 relevant cases
+[Wiki Homicides] KS: 0 relevant cases
+[Wiki Homicides] NM: 0 relevant cases
+[Wiki Homicides] NE: 0 relevant cases
+[Wiki Homicides] WV: 0 relevant cases
+[Wiki Homicides] ID: 0 relevant cases
+[Wiki Homicides] HI: 0 relevant cases
+[Wiki Homicides] NH: 0 relevant cases
+[Wiki Homicides] ME: 0 relevant cases
+[Wiki Homicides] MT: 0 relevant cases
+[Wiki Homicides] RI: 0 relevant cases
+[Wiki Homicides] DE: 0 relevant cases
+[Wiki Homicides] SD: 0 relevant cases
+[Wiki Homicides] ND: 0 relevant cases
+[Wiki Homicides] AK: 0 relevant cases
+[Wiki Homicides] VT: 0 relevant cases
+[Wiki Homicides] WY: 0 relevant cases
+[Wiki Homicides] VA: 0 relevant cases
+[Wiki Homicides] NJ: 0 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[fetch] FAIL https://feeds.themarshallproject.org/marshall-project-stories: HTTPSConnectionPool(host='feeds.themarshallproject.org', port=443): Max retries exceeded with url: /marshall-project-stories (Caused by NameResolutionError("HTTPSConnection(host='feeds.themarshallproject.org', port=443): Failed to resolve 'feeds.themarshallproject.org' ([Errno 7] No address associated with hostname)"))
+[Wire RSS] 1 records fetched.
+[Medusa] AP News RSS: 1 raw records
+[AG Press] Florida AG: 4 records
+[AG Press] Arizona AG: 1 records
+[AG Press] Georgia AG: 1 records
+[AG Press] 6 total records fetched.
+[Medusa] AG Press: 6 raw records
+[CourtListener] 4 known documented-perpetrator cases loaded.
+[CourtListener] 4 records fetched.
+[Medusa] CourtListener: 4 raw records
+[Marshall Project] 0 records.
+[DOJ CEOS] 0 records.
+[Medusa] Marshall Project: 0 raw records
+[ProPublica/DOJ] 1 records fetched.
+[Medusa] ProPublica / DOJ OVW: 1 raw records
+[FBI CDE] 0 aggregate state records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Medusa] Total raw records: 94
+[Medusa] After normalization: 44 valid records
+[Medusa] After dedup: 44 unique records
+[Medusa] Geocoded 44 unique locations for 44 records.
+[Medusa] Scan complete. 44 cases ready.
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 107, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 93, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
