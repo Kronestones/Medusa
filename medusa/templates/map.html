@@ -718,6 +718,20 @@
       letter-spacing: 0.05em;
       margin-top: 1px;
     }
+    #cdc-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: #c0392b;
+      line-height: 1;
+    }
+    #cdc-label {
+      font-size: 8px;
+      color: #c0392b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
     #counter-cdc {
       font-size: 8px;
       color: #c0392b;
@@ -793,7 +807,7 @@
 
     <div id="header-right">
       <div id="counter-block">
-        <div id="counter-cdc">~24M more will never be reported — CDC</div>
+        <div id="counter-cdc"><div id="cdc-num">~24M+</div><div id="cdc-label">will never be reported — CDC</div></div>
       </div>
       <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     </div>
