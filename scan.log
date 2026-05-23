@@ -1690,3 +1690,99 @@ Traceback (most recent call last):
   File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 81, in get_engine
     raise RuntimeError("DATABASE_URL not set")
 RuntimeError: DATABASE_URL not set
+  [Medusa] DB warning: DATABASE_URL not set
+  [Medusa] Scanning all public records…
+
+[Medusa] Starting scan...
+[DOJ Press] 3 records fetched.
+[Medusa] DOJ Press (94 districts): 3 raw records
+[DOJ] 14 records fetched.
+[Medusa] DOJ / OVW / FBI: 14 raw records
+[Wiki Homicides] CA: 23 relevant cases
+[Wiki Homicides] IL: 15 relevant cases
+[Wiki Homicides] MI: 10 relevant cases
+[Wiki Homicides] MA: 0 relevant cases
+[Wiki Homicides] WI: 9 relevant cases
+[Wiki Homicides] OR: 4 relevant cases
+[Wiki Homicides] NV: 6 relevant cases
+[Wiki Homicides] TX: 0 relevant cases
+[Wiki Homicides] FL: 0 relevant cases
+[Wiki Homicides] NY: 0 relevant cases
+[Wiki Homicides] OH: 0 relevant cases
+[Wiki Homicides] GA: 0 relevant cases
+[Wiki Homicides] PA: 0 relevant cases
+[Wiki Homicides] NC: 0 relevant cases
+[Wiki Homicides] AZ: 0 relevant cases
+[Wiki Homicides] WA: 0 relevant cases
+[Wiki Homicides] TN: 0 relevant cases
+[Wiki Homicides] IN: 0 relevant cases
+[Wiki Homicides] MO: 0 relevant cases
+[Wiki Homicides] MD: 0 relevant cases
+[Wiki Homicides] CO: 0 relevant cases
+[Wiki Homicides] MN: 0 relevant cases
+[Wiki Homicides] SC: 0 relevant cases
+[Wiki Homicides] AL: 0 relevant cases
+[Wiki Homicides] LA: 0 relevant cases
+[Wiki Homicides] KY: 0 relevant cases
+[Wiki Homicides] OK: 0 relevant cases
+[Wiki Homicides] CT: 0 relevant cases
+[Wiki Homicides] UT: 0 relevant cases
+[Wiki Homicides] IA: 0 relevant cases
+[Wiki Homicides] AR: 0 relevant cases
+[Wiki Homicides] MS: 0 relevant cases
+[Wiki Homicides] KS: 0 relevant cases
+[Wiki Homicides] NM: 0 relevant cases
+[Wiki Homicides] NE: 0 relevant cases
+[Wiki Homicides] WV: 0 relevant cases
+[Wiki Homicides] ID: 0 relevant cases
+[Wiki Homicides] HI: 0 relevant cases
+[Wiki Homicides] NH: 0 relevant cases
+[Wiki Homicides] ME: 0 relevant cases
+[Wiki Homicides] MT: 0 relevant cases
+[Wiki Homicides] RI: 0 relevant cases
+[Wiki Homicides] DE: 0 relevant cases
+[Wiki Homicides] SD: 0 relevant cases
+[Wiki Homicides] ND: 0 relevant cases
+[Wiki Homicides] AK: 0 relevant cases
+[Wiki Homicides] VT: 0 relevant cases
+[Wiki Homicides] WY: 0 relevant cases
+[Wiki Homicides] VA: 0 relevant cases
+[Wiki Homicides] NJ: 0 relevant cases
+[Wiki Homicides] 67 total records fetched.
+[Medusa] Wiki Homicides: 67 raw records
+[fetch] FAIL https://feeds.themarshallproject.org/marshall-project-stories: HTTPSConnectionPool(host='feeds.themarshallproject.org', port=443): Max retries exceeded with url: /marshall-project-stories (Caused by NameResolutionError("HTTPSConnection(host='feeds.themarshallproject.org', port=443): Failed to resolve 'feeds.themarshallproject.org' ([Errno 7] No address associated with hostname)"))
+[Wire RSS] 1 records fetched.
+[Medusa] AP News RSS: 1 raw records
+[AG Press] Florida AG: 4 records
+[AG Press] Georgia AG: 1 records
+[AG Press] Missouri AG: 1 records
+[AG Press] 6 total records fetched.
+[Medusa] AG Press: 6 raw records
+[CourtListener] 4 known documented-perpetrator cases loaded.
+[CourtListener] 4 records fetched.
+[Medusa] CourtListener: 4 raw records
+[Marshall Project] 0 records.
+[DOJ CEOS] 0 records.
+[Medusa] Marshall Project: 0 raw records
+[ProPublica/DOJ] 1 records fetched.
+[Medusa] ProPublica / DOJ OVW: 1 raw records
+[FBI CDE] 0 aggregate state records fetched.
+[Medusa] FBI CDE: 0 raw records
+[Medusa] Total raw records: 96
+[Medusa] After normalization: 45 valid records
+[Medusa] After dedup: 45 unique records
+[Medusa] Geocoded 45 unique locations for 45 records.
+[Medusa] Scan complete. 45 cases ready.
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/medusa/main.py", line 43, in <module>
+    if save_case(c):
+       ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 102, in save_case
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 88, in get_session
+    engine = get_engine()
+             ^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/medusa/medusa/database.py", line 77, in get_engine
+    raise RuntimeError("DATABASE_URL not set")
+RuntimeError: DATABASE_URL not set
