@@ -71,22 +71,17 @@ class Case(Base):
 
 # ── Engine ────────────────────────────────────────────────────────────────────
 
-_engine = None
-
 def get_engine():
-    global _engine
-    if _engine is None:
-        url = os.environ.get("DATABASE_URL", "")
-        if not url:
-            raise RuntimeError("DATABASE_URL not set")
-        _engine = create_engine(
-            url,
-            pool_pre_ping=True,
-            pool_recycle=300,
-            pool_size=5,
-            max_overflow=10,
-        )
-    return _engine
+    url = os.environ.get("DATABASE_URL", "")
+    if not url:
+        raise RuntimeError("DATABASE_URL not set")
+    return create_engine(
+        url,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        pool_size=5,
+        max_overflow=10,
+    )
 
 
 def get_session():
@@ -179,7 +174,22 @@ def get_cases(limit=2000, violence_type=None, state=None,
         session.close()
 
 
-def get_case_count() -> int:
+def get_erasure_cases() -> list:
+    """Return all cases flagged tab='erasure' in the extra JSONB field."""
+    session = get_session()
+    try:
+        rows = session.query(Case).filter(
+            Case.extra["tab"].astext == "erasure"
+        ).order_by(Case.date_incident.asc()).all()
+        return [_to_dict(r) for r in rows]
+    except Exception as e:
+        print(f"[DB] get_erasure_cases error: {e}")
+        return []
+    finally:
+        session.close()
+
+
+
     session = get_session()
     try:
         return session.query(Case).count()
@@ -237,69 +247,5 @@ def _to_dict(row: Case) -> dict:
         "source_name":         row.source_name,
         "additional_sources":  row.additional_sources,
         "verified":            row.verified,
+        "extra":               row.extra,
     }
-
-
-def save_cases_batch(case_list: list) -> int:
-    """Save multiple cases in a single DB session. Returns count saved."""
-    if not case_list:
-        return 0
-    session = get_session()
-    saved = 0
-    try:
-        for case_dict in case_list:
-            existing = session.query(Case).filter_by(
-                case_id=case_dict.get("case_id")
-            ).first()
-            if existing:
-                continue
-
-            date_incident = case_dict.get("date_incident")
-            if isinstance(date_incident, str):
-                try:
-                    date_incident = datetime.fromisoformat(date_incident)
-                except Exception:
-                    date_incident = None
-
-            core_keys = {
-                "case_id", "date_incident", "date_reported", "violence_type",
-                "city", "state", "lat", "lng", "summary", "source_url",
-                "source_name", "status", "verified", "is_public_figure",
-                "additional_sources",
-            }
-            extra = {k: v for k, v in case_dict.items() if k not in core_keys}
-
-            row = Case(
-                case_id            = case_dict["case_id"],
-                violence_type      = case_dict.get("violence_type", "unknown"),
-                summary            = case_dict.get("summary", ""),
-                status             = case_dict.get("status", "reported"),
-                is_public_figure   = case_dict.get("is_public_figure", False),
-                date_incident      = date_incident,
-                date_reported      = datetime.now(timezone.utc),
-                city               = case_dict.get("city", "Unknown"),
-                state              = case_dict.get("state", "Unknown"),
-                lat                = case_dict.get("lat"),
-                lng                = case_dict.get("lng"),
-                source_url         = case_dict.get("source_url", ""),
-                source_name        = case_dict.get("source_name", ""),
-                additional_sources = case_dict.get("additional_sources"),
-                verified           = case_dict.get("verified", False),
-                extra              = extra if extra else None,
-            )
-            session.add(row)
-            saved += 1
-
-            # Commit every 50 records to avoid memory buildup
-            if saved % 50 == 0:
-                session.commit()
-                print(f"  [DB] {saved} saved so far...")
-
-        session.commit()
-        return saved
-    except Exception as e:
-        session.rollback()
-        print(f"[DB] batch save error: {e}")
-        return saved
-    finally:
-        session.close()

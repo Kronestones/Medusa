@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDUSA — Erasure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0a08;
+      --bg2:       #111110;
+      --bg3:       #1a1a17;
+      --border:    #2a2a25;
+      --muted:     #555550;
+      --text:      #d4d0c8;
+      --text-dim:  #888880;
+      --accent:    #c0392b;
+      --accent2:   #8b6914;
+      --gold:      #c9a84c;
+      --white:     #f0ece0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'EB Garamond', Georgia, serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    #header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #header-left { display: flex; flex-direction: column; gap: 2px; }
+
+    #logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--white);
+    }
+
+    #tagline {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: #6b8c6b;
+      letter-spacing: 0.02em;
+    }
+
+    #nav-tabs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-tab {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover { border-color: var(--text-dim); color: var(--text); }
+    .nav-tab.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(192, 57, 43, 0.08);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      padding: 72px 28px 56px;
+      max-width: 860px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    #hero h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.0;
+      color: var(--white);
+      margin-bottom: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    #hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    #hero-body {
+      font-size: 18px;
+      line-height: 1.75;
+      color: var(--text);
+      max-width: 680px;
+    }
+
+    #hero-body p + p { margin-top: 16px; }
+
+    #hero-stat {
+      margin-top: 40px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 4px;
+      border-left: 3px solid var(--accent);
+      padding-left: 20px;
+    }
+
+    #hero-stat-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    #hero-stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── CONTROLS ── */
+    #controls {
+      padding: 20px 28px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    #filter-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .filter-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.08);
+    }
+
+    #record-count {
+      margin-left: auto;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* ── TIMELINE ── */
+    #timeline {
+      padding: 0 28px 80px;
+      max-width: 1100px;
+    }
+
+    /* Section headers */
+    .era-header {
+      margin-top: 56px;
+      margin-bottom: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .era-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--gold);
+    }
+
+    .era-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Cards */
+    .record-card {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 0;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 0 32px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .record-card:hover { background: rgba(255,255,255,0.015); }
+    .record-card.expanded { background: rgba(255,255,255,0.02); }
+
+    .record-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      padding-top: 4px;
+      line-height: 1.6;
+    }
+
+    .record-date .year {
+      font-size: 18px;
+      color: var(--text-dim);
+      display: block;
+      font-weight: 700;
+    }
+
+    .record-main { display: flex; flex-direction: column; gap: 8px; }
+
+    .record-type {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .record-type.stolen    { background: rgba(139, 105, 20, 0.2); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+    .record-type.killed    { background: rgba(192, 57, 43, 0.15); color: var(--accent); border: 1px solid rgba(192,57,43,0.3); }
+    .record-type.erased    { background: rgba(85, 85, 80, 0.2); color: var(--text-dim); border: 1px solid var(--border); }
+    .record-type.law       { background: rgba(60, 80, 120, 0.2); color: #7090c0; border: 1px solid rgba(70,100,160,0.3); }
+    .record-type.campaign  { background: rgba(120, 40, 100, 0.2); color: #c070b0; border: 1px solid rgba(150,50,120,0.3); }
+
+    .record-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .record-subtitle {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .record-preview {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-dim);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .record-card.expanded .record-preview {
+      display: block;
+      -webkit-line-clamp: unset;
+      color: var(--text);
+    }
+
+    .record-full {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .record-card.expanded .record-full { display: block; }
+
+    .record-full-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .record-source {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .source-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .source-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      transition: border-color 0.15s;
+    }
+
+    .source-link:hover { border-color: var(--gold); }
+
+    .expand-hint {
+      font-family: 'Space Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .record-card.expanded .expand-hint { display: none; }
+
+    /* ── LOADING / EMPTY ── */
+    #loading {
+      padding: 80px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    #empty {
+      display: none;
+      padding: 80px 28px;
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    /* ── FOOTER ── */
+    #footer {
+      border-top: 1px solid var(--border);
+      padding: 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .record-card {
+        grid-template-columns: 1fr;
+        gap: 12px 0;
+      }
+      #hero { padding: 40px 16px 36px; }
+      #controls, #timeline, #footer { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-left">
+      <div id="logo">M E D U S A</div>
+      <div id="tagline">Tracking male violence against women and children across America.</div>
+    </div>
+    <nav id="nav-tabs">
+      <a href="/" class="nav-tab">Map</a>
+      <a href="/erasure" class="nav-tab active">Erasure</a>
+    </nav>
+  </div>
+
+  <!-- HERO -->
+  <div id="hero">
+    <div id="hero-eyebrow">The Archive of Erasure</div>
+    <h1>They were never<br><em>protectors.</em></h1>
+    <div id="hero-body">
+      <p>Men and their laws, religions, and institutions have never been providers and protectors of women. They have used power to limit women's access to resources, knowledge, income, and autonomy — making women dependent on men by design, not by nature.</p>
+      <p>This is the documented record of that campaign: from the coordinated elimination of women healers in the 14th century, through the legal erasure of married women's personhood, through the systematic theft of women's scientific discoveries — to today.</p>
+      <p>The dependency was manufactured. The erasure was deliberate. The record is here.</p>
+    </div>
+    <div id="hero-stat">
+      <div id="hero-stat-num" id="stat-total">—</div>
+      <div id="hero-stat-label">Documented acts of erasure</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls">
+    <span id="filter-label">Filter:</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="stolen">Stolen Credit</button>
+    <button class="filter-btn" data-filter="killed">Killed for Knowledge</button>
+    <button class="filter-btn" data-filter="law">Legal Erasure</button>
+    <button class="filter-btn" data-filter="campaign">Coordinated Campaign</button>
+    <button class="filter-btn" data-filter="erased">Written Out</button>
+    <span id="record-count"></span>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="timeline">
+    <div id="loading">Loading records…</div>
+    <div id="empty">No records found for this filter.</div>
+    <div id="records"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="footer">
+    <span>MEDUSA — Every act documented. Every source cited.</span>
+    <span id="footer-count"></span>
+  </div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+let allRecords = [];
+let activeFilter = 'all';
+
+// Map case_id keywords → display type tags
+function inferType(c) {
+  const id = c.case_id || '';
+  const vt = c.violence_type || '';
+  if (id.includes('witch') || id.includes('malleus') || id.includes('jacoba') ||
+      id.includes('campaign')) return 'campaign';
+  if (id.includes('coverture') || id.includes('university') || id.includes('banned') ||
+      vt === 'coercive_control' && id.includes('law')) return 'law';
+  if (id.includes('franklin') || id.includes('stevens') || id.includes('ball') ||
+      id.includes('payne') || id.includes('foote') || id.includes('bell') ||
+      id.includes('meitner') || id.includes('lamarr') || id.includes('johnson') ||
+      id.includes('knight')) return 'stolen';
+  if (id.includes('hypatia')) return 'killed';
+  if (id.includes('matilda') || id.includes('hidden') || id.includes('erasure'))
+      return 'erased';
+  if (vt === 'coercive_control') return 'law';
+  if (vt === 'homicide') return 'killed';
+  return 'erased';
+}
+
+function typeLabel(type) {
+  const labels = {
+    stolen:   'Stolen Credit',
+    killed:   'Killed',
+    law:      'Legal Erasure',
+    campaign: 'Coordinated Campaign',
+    erased:   'Written Out',
+  };
+  return labels[type] || 'Documented';
+}
+
+function getYear(c) {
+  if (!c.date_incident) return 9999;
+  return new Date(c.date_incident).getFullYear();
+}
+
+function getEra(year) {
+  if (year < 1000)  return { key: 'ancient',    title: 'Ancient World',        sub: 'Before 1000 CE' };
+  if (year < 1500)  return { key: 'medieval',   title: 'Medieval Period',      sub: '1000 – 1499' };
+  if (year < 1700)  return { key: 'early',      title: 'Early Modern',         sub: '1500 – 1699' };
+  if (year < 1850)  return { key: 'enlighten',  title: 'Age of Reason',        sub: '1700 – 1849' };
+  if (year < 1950)  return { key: 'modern',     title: 'Industrial & Modern',  sub: '1850 – 1949' };
+  if (year < 2000)  return { key: 'late20',     title: 'Late 20th Century',    sub: '1950 – 1999' };
+  return              { key: 'now',         title: 'Present Day',           sub: '2000 – now' };
+}
+
+function formatYear(year) {
+  if (year < 0) return Math.abs(year) + ' BCE';
+  if (year < 1000) return year + ' CE';
+  return year;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function render(records) {
+  const container = document.getElementById('records');
+  const empty     = document.getElementById('empty');
+  const countEl   = document.getElementById('record-count');
+
+  container.innerHTML = '';
+
+  const visible = activeFilter === 'all'
+    ? records
+    : records.filter(r => inferType(r) === activeFilter);
+
+  countEl.textContent = visible.length + ' record' + (visible.length !== 1 ? 's' : '');
+
+  if (visible.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Sort ascending by date
+  visible.sort((a, b) => getYear(a) - getYear(b));
+
+  // Group by era
+  let currentEra = null;
+
+  visible.forEach((c, i) => {
+    const year = getYear(c);
+    const era  = getEra(year);
+    const type = inferType(c);
+
+    if (era.key !== currentEra) {
+      currentEra = era.key;
+      const eraEl = document.createElement('div');
+      eraEl.className = 'era-header';
+      eraEl.innerHTML = `
+        <span class="era-title">${era.title}</span>
+        <span class="era-subtitle">${era.sub}</span>
+      `;
+      container.appendChild(eraEl);
+    }
+
+    // Build title from case_id
+    const title = buildTitle(c);
+    const subtitle = buildSubtitle(c);
+
+    const card = document.createElement('div');
+    card.className = 'record-card';
+    card.dataset.idx = i;
+
+    const preview = (c.summary || '').slice(0, 280) + '…';
+    const fullText = c.summary || '';
+
+    card.innerHTML = `
+      <div class="record-date">
+        <span class="year">${formatYear(year)}</span>
+        ${c.city && c.city !== 'Washington' ? c.city : ''}
+      </div>
+      <div class="record-main">
+        <span class="record-type ${type}">${typeLabel(type)}</span>
+        <div class="record-title">${title}</div>
+        ${subtitle ? `<div class="record-subtitle">${subtitle}</div>` : ''}
+        <div class="record-preview">${preview}</div>
+        <div class="record-full">
+          <div class="record-full-text">${fullText}</div>
+          ${c.source_url ? `
+          <div class="record-source">
+            <span class="source-label">Source:</span>
+            <a class="source-link" href="${c.source_url}" target="_blank" rel="noopener">
+              ${c.source_name || c.source_url}
+            </a>
+          </div>` : ''}
+        </div>
+        <div class="expand-hint">↓ Read full record</div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      card.classList.toggle('expanded');
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function buildTitle(c) {
+  const id = c.case_id || '';
+  const titles = {
+    'erasure_witch_trials_medical_campaign_overview': 'The Witch Trials as Medical Campaign',
+    'erasure_jacoba_felicie_paris_1322':              'Jacoba Felicie — Prosecuted for Healing',
+    'erasure_malleus_maleficarum_1487':               'The Malleus Maleficarum',
+    'erasure_matilda_effect_pattern':                 'The Matilda Effect',
+    'erasure_rosalind_franklin_dna_photo51':          'Rosalind Franklin — Photo 51',
+    'erasure_nettie_stevens_sex_chromosomes':         'Nettie Stevens — Sex Chromosomes',
+    'erasure_alice_ball_leprosy_cure':                'Alice Ball — The Leprosy Cure',
+    'erasure_cecilia_payne_stellar_composition':      'Cecilia Payne-Gaposchkin — Stars',
+    'erasure_eunice_newton_foote_greenhouse_effect':  'Eunice Newton Foote — Climate Science',
+    'erasure_jocelyn_bell_burnell_pulsars':           'Jocelyn Bell Burnell — Pulsars',
+    'erasure_lise_meitner_nuclear_fission':           'Lise Meitner — Nuclear Fission',
+    'erasure_hedy_lamarr_spread_spectrum':            'Hedy Lamarr — WiFi & Bluetooth',
+    'erasure_katherine_johnson_nasa_hidden_figures':  'Katherine Johnson & the Hidden Figures',
+    'erasure_margaret_knight_patent_stolen':          'Margaret Knight — The Stolen Patent',
+    'erasure_hypatia_alexandria_415ad':               'Hypatia of Alexandria',
+    'erasure_coverture_laws_married_women':           'Coverture — The Legal Erasure of Wives',
+    'erasure_women_banned_universities_timeline':     'Women Banned from Universities',
+  };
+  return titles[id] || id.replace(/erasure_/g, '').replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function buildSubtitle(c) {
+  const id = c.case_id || '';
+  const subs = {
+    'erasure_witch_trials_medical_campaign_overview': '14th–17th century · Church, State & the male medical profession',
+    'erasure_jacoba_felicie_paris_1322':              'Paris, 1322 · Convicted of healing patients male doctors couldn\'t cure',
+    'erasure_malleus_maleficarum_1487':               '1487 · The official manual for torturing and murdering women healers',
+    'erasure_matilda_effect_pattern':                 'Named 1993 · The documented pattern of women\'s science being credited to men',
+    'erasure_rosalind_franklin_dna_photo51':          'London, 1952 · Her X-ray of DNA stolen. Nobel given to the men who took it.',
+    'erasure_nettie_stevens_sex_chromosomes':         'Pennsylvania, 1905 · Discovered XY chromosomes. Nobel given to male colleague.',
+    'erasure_alice_ball_leprosy_cure':                'Hawaii, 1915 · Cured leprosy. Her method published under a man\'s name after her death.',
+    'erasure_cecilia_payne_stellar_composition':      'Harvard, 1925 · Discovered stars are hydrogen. Told her finding was impossible.',
+    'erasure_eunice_newton_foote_greenhouse_effect':  'New York, 1856 · Discovered the greenhouse effect. Erased for 155 years.',
+    'erasure_jocelyn_bell_burnell_pulsars':           'Cambridge, 1967 · Discovered pulsars. Nobel given to her supervisor.',
+    'erasure_lise_meitner_nuclear_fission':           'Stockholm, 1938 · Co-discovered nuclear fission. Nobel given to male partner.',
+    'erasure_hedy_lamarr_spread_spectrum':            'Los Angeles, 1942 · Invented WiFi & Bluetooth. Known only as beautiful.',
+    'erasure_katherine_johnson_nasa_hidden_figures':  'Virginia, 1953–1969 · Calculated the Moon landing. Segregated bathroom.',
+    'erasure_margaret_knight_patent_stolen':          'Boston, 1869 · Her patent stolen. Court told she couldn\'t understand her own machine.',
+    'erasure_hypatia_alexandria_415ad':               'Alexandria, 415 CE · Torn apart by a Christian mob. Her killer made a saint.',
+    'erasure_coverture_laws_married_women':           '1765–1974 · Upon marriage, a woman ceased to exist as a legal person.',
+    'erasure_women_banned_universities_timeline':     '1322–1972 · Excluded from credentials, then cited as proof of inferiority.',
+  };
+  return subs[id] || '';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+async function init() {
+  try {
+    const res  = await fetch('/api/erasure');
+    const data = await res.json();
+
+    document.getElementById('loading').style.display = 'none';
+
+    allRecords = data.cases || [];
+
+    // Update hero stat
+    document.getElementById('hero-stat-num') &&
+      (document.querySelector('#hero-stat .stat-num,#hero-stat-num').textContent =
+        allRecords.length);
+    document.getElementById('footer-count').textContent =
+      allRecords.length + ' records loaded';
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        render(allRecords);
+      });
+    });
+
+    render(allRecords);
+
+  } catch (e) {
+    document.getElementById('loading').textContent = 'Error loading records.';
+    console.error(e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
