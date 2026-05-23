@@ -174,6 +174,17 @@ def get_cases(limit=2000, violence_type=None, state=None,
         session.close()
 
 
+def get_case_count() -> int:
+    session = get_session()
+    try:
+        return session.query(Case).count()
+    except Exception as e:
+        print(f"[DB] get_case_count error: {e}")
+        return 0
+    finally:
+        session.close()
+
+
 def get_erasure_cases() -> list:
     """Return all cases flagged tab='erasure' in the extra JSONB field."""
     session = get_session()
